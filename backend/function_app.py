@@ -61,3 +61,4 @@ def GetVisitorCount(req: func.HttpRequest) -> func.HttpResponse:
             status_code=500,
             headers=headers
         )
+        
