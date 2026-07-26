@@ -4,7 +4,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
 // For local testing in Codespaces, we will use the forwarded port URL.
 // When you deploy to Azure, you will change this to your real Azure Function URL.
-const functionApiUrl = 'https://bug-free-waddle-r4p6gvjp5qpvhxwqq-7071.app.github.dev/api/GetVisitorCount'; 
+const apiEndpoint = 'https://func-jeysibn-portfolio.azurewebsites.net/api/GetResumeCounter';
 
 const getVisitorCount = async () => {
     let countElement = document.getElementById('visitor-count');
