@@ -1,0 +1,16 @@
+/* Custom Styles for Portfolio */
+
+/* Enable smooth scrolling for anchor links */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Hide non-essential elements when printing to PDF */
+@media print {
+  body {
+    -webkit-print-color-adjust: exact;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
