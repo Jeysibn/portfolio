@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jerome Christian V. Ibon - Resume</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @media print {
+            body { background: white !important; color: black !important; }
+            header, footer, .no-print { display: none !important; }
+            .print-shadow { box-shadow: none !important; border: none !important; }
+            .print-text { color: #1e293b !important; }
+            .print-bg { background-color: #f8fafc !important; border-color: #cbd5e1 !important; }
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 font-sans antialiased min-h-screen flex flex-col justify-between">
+
+    <!-- Navigation Header -->
+    <header class="bg-slate-800/50 backdrop-blur-md sticky top-0 z-50 border-b border-slate-700">
+        <div class="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-xl font-bold tracking-tight text-cyan-400">Portfolio</a>
+            <nav class="space-x-6 flex items-center">
+                <a href="index.html" class="hover:text-cyan-400 transition">Home</a>
+                <a href="projects.html" class="hover:text-cyan-400 transition">Projects</a>
+                <a href="resume.html" class="text-cyan-400 font-medium">Resume</a>
+                <button onclick="window.print()" class="no-print bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition shadow">Print / PDF</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-6 py-12 flex-grow w-full">
+        <div class="bg-slate-800 border border-slate-700 rounded-xl p-8 print-shadow shadow-xl">
+            
+            <!-- Header / Contact Info -->
+            <div class="border-b border-slate-700 pb-6 mb-6">
+                <h1 class="text-3xl font-extrabold tracking-tight mb-1 print-text">Jerome Christian V. Ibon</h1>
+                <p class="text-cyan-400 font-medium mb-3">Cloud Support & DevOps | Kubernetes • GitOps • Infrastructure Automation</p>
+                <div class="flex flex-wrap gap-3 text-xs md:text-sm text-slate-400 print-text">
+                    <span>Malolos, Bulacan, Philippines</span>
+                    <span>•</span>
+                    <a href="mailto:jeysibn@gmail.com" class="text-cyan-400 hover:underline">jeysibn@gmail.com</a>
+                    <span>•</span>
+                    <span>+63 991 408 9619</span>
+                    <span>•</span>
+                    <a href="https://linkedin.com/in/jeromeibon" target="_blank" class="text-cyan-400 hover:underline">LinkedIn</a>
+                    <span>•</span>
+                    <a href="https://github.com/Jeysibn" target="_blank" class="text-cyan-400 hover:underline">GitHub</a>
+                </div>
+            </div>
+
+            <!-- Professional Summary -->
+            <section class="mb-8">
+                <h2 class="text-xl font-bold text-slate-200 mb-3 border-l-4 border-cyan-500 pl-3 print-text">Professional Summary</h2>
+                <p class="text-sm text-slate-300 leading-relaxed print-text">
+                    Computer Engineering graduate and OCI-certified engineer who builds and operates production-style Kubernetes infrastructure — from cluster provisioning through GitOps-based deployment and observability — using AI-assisted workflows to accelerate design, configuration, and troubleshooting. Combines this with 6 months of enterprise SaaS technical support in cloud-based security environments. Seeking an entry-level Cloud Support, DevOps, or Junior Site Reliability role to apply hands-on automation and infrastructure skills in a production environment.
+                </p>
+            </section>
+
+            <!-- Technical Skills -->
+            <section class="mb-8">
+                <h2 class="text-xl font-bold text-slate-200 mb-3 border-l-4 border-cyan-500 pl-3 print-text">Technical Skills</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div class="bg-slate-700/50 print-bg p-3.5 rounded-lg border border-slate-600">
+                        <span class="font-semibold block text-cyan-400 mb-1">Cloud & Virtualization</span>
+                        <span class="text-slate-300 text-xs print-text">Oracle Cloud Infrastructure (OCI Foundations Associate); AWS — EC2, VPC, security groups, subnets, routing; Azure, VMware vSphere</span>
+                    </div>
+                    <div class="bg-slate-700/50 print-bg p-3.5 rounded-lg border border-slate-600">
+                        <span class="font-semibold block text-cyan-400 mb-1">Containers & Orchestration</span>
+                        <span class="text-slate-300 text-xs print-text">Kubernetes (k3s), Docker, Helm</span>
+                    </div>
+                    <div class="bg-slate-700/50 print-bg p-3.5 rounded-lg border border-slate-600">
+                        <span class="font-semibold block text-cyan-400 mb-1">CI/CD & GitOps</span>
+                        <span class="text-slate-300 text-xs print-text">Argo CD, GitHub Actions, Git, YAML</span>
+                    </div>
+                    <div class="bg-slate-700/50 print-bg p-3.5 rounded-lg border border-slate-600">
+                        <span class="font-semibold block text-cyan-400 mb-1">Observability & Monitoring</span>
+                        <span class="text-slate-300 text-xs print-text">Prometheus, Grafana</span>
+                    </div>
+                    <div class="bg-slate-700/50 print-bg p-3.5 rounded-lg border border-slate-600">
+                        <span class="font-semibold block text-cyan-400 mb-1">Systems & Networking</span>
+                        <span class="text-slate-300 text-xs print-text">Linux (Ubuntu), Windows Server, Active Directory, TCP/IP, DNS, VPN, SSH, RDP</span>
+                    </div>
+                    <div class="bg-slate-700/50 print-bg p-3.5 rounded-lg border border-slate-600">
+                        <span class="font-semibold block text-cyan-400 mb-1">Scripting, Security & Tools</span>
+                        <span class="text-slate-300 text-xs print-text">Bash, Python, PowerShell, Endpoint Security, Trend Vision One, Jira, ITIL</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Professional Experience -->
+            <section class="mb-8">
+                <h2 class="text-xl font-bold text-slate-200 mb-4 border-l-4 border-cyan-500 pl-3 print-text">Professional Experience</h2>
+                <div class="space-y-6">
+                    <div>
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-baseline mb-1">
+                            <h3 class="font-semibold text-lg print-text">Technical Support Engineer, Endpoint Security SaaS</h3>
+                            <span class="text-xs text-slate-400">August 2025 – February 2026</span>
+                        </div>
+                        <p class="text-sm text-cyan-400 font-medium mb-2">TrendAI | Pasig City</p>
+                        <ul class="list-disc list-inside text-sm text-slate-300 space-y-1.5 print-text">
+                            <li>Troubleshot endpoint security agent deployment, policy configuration, and connectivity issues across hybrid Windows/Linux and cloud-based Trend Vision One Server and Workload Protection environments for global SMB clients.</li>
+                            <li>Resolved 80+ enterprise technical cases spanning network, system, and cloud infrastructure issues while maintaining SLA compliance and customer satisfaction.</li>
+                            <li>Provisioned AWS environments (EC2, VPC, security groups, subnets, routing) to replicate customer setups and reproduce reported issues.</li>
+                            <li>Completed 640-hour New Engineer Training covering enterprise networking, server administration, VMware vSphere virtualization, Azure fundamentals, and AWS cloud fundamentals.</li>
+                            <li>Composed detailed customer-facing resolution emails that served as the official case documentation, requiring precise, well-organized technical write-ups.</li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-baseline mb-1">
+                            <h3 class="font-semibold text-lg print-text">IT Helpdesk Intern</h3>
+                            <span class="text-xs text-slate-400">March 2025 – May 2025</span>
+                        </div>
+                        <p class="text-sm text-cyan-400 font-medium mb-1">Philippine Transmarine Carriers | Makati City</p>
+                        <p class="text-xs text-slate-400 italic mb-2">(Tasks performed under the supervision and mentorship of senior IT staff)</p>
+                        <ul class="list-disc list-inside text-sm text-slate-300 space-y-1.5 print-text">
+                            <li>Assisted in administering user access controls and Active Directory accounts, and supported troubleshooting of network connectivity and VPN issues for office users.</li>
+                            <li>Performed secure reformatting and redeployment of Windows workstations following enterprise data privacy and asset management protocols.</li>
+                            <li>Logged and tracked IT asset inventory in Excel, reporting updates to supervisor; assisted with hardware upgrades (RAM/SSD) extending equipment lifecycle.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Projects / Home Lab -->
+            <section class="mb-8">
+                <h2 class="text-xl font-bold text-slate-200 mb-4 border-l-4 border-cyan-500 pl-3 print-text">Projects / Home Lab</h2>
+                <div>
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-baseline mb-1">
+                        <h3 class="font-semibold text-lg print-text">Production-Style Kubernetes Home Lab</h3>
+                        <span class="text-xs text-cyan-400">Self-Directed Infrastructure Project</span>
+                    </div>
+                    <ul class="list-disc list-inside text-sm text-slate-300 space-y-1.5 print-text mt-2">
+                        <li>Architected and deployed a multi-node k3s Kubernetes cluster across Raspberry Pi 4 and repurposed x86 hardware (Proxmox), running containerized workloads with automated DNS management.</li>
+                        <li>Implemented observability with Prometheus and Grafana, and deployed Argo CD for GitOps-based continuous delivery, managing declarative manifests in Git with automated sync policies.</li>
+                        <li>Designed, provisioned, and maintains the entire environment end-to-end, using AI-assisted tooling to speed up configuration and troubleshooting while building deeper hands-on system understanding.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Education -->
+            <section class="mb-8">
+                <h2 class="text-xl font-bold text-slate-200 mb-4 border-l-4 border-cyan-500 pl-3 print-text">Education</h2>
+                <div>
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-baseline mb-1">
+                        <h3 class="font-semibold text-lg print-text">Bachelor of Science in Computer Engineering</h3>
+                        <span class="text-xs text-slate-400">August 2021 – August 2025</span>
+                    </div>
+                    <p class="text-sm text-cyan-400 font-medium mb-1">National University Baliwag | Baliwag, Bulacan</p>
+                    <p class="text-sm text-slate-300 print-text"><strong>Thesis:</strong> IoT Integrated Consultation System for Enhanced Student-Faculty Interaction</p>
+                </div>
+            </section>
+
+            <!-- Certifications -->
+            <section>
+                <h2 class="text-xl font-bold text-slate-200 mb-3 border-l-4 border-cyan-500 pl-3 print-text">Certifications</h2>
+                <ul class="list-disc list-inside text-sm text-slate-300 space-y-1 print-text">
+                    <li>Oracle Cloud Infrastructure (OCI) Foundations Associate</li>
+                    <li>Trend Vision One Server and Workload Protection Professional</li>
+                    <li>GitHub Foundations</li>
+                </ul>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-800/30 border-t border-slate-800 py-6 text-center text-sm text-slate-500">
+        <p>&copy; 2026 Jerome Christian V. Ibon. Built with Azure & Tailwind CSS.</p>
+    </footer>
+
+</body>
+</html>

@@ -1,41 +1,68 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Projects</title>
-    <!-- Tailwind CSS (Development CDN) -->
+    <title>Projects - My Portfolio</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="./css/style.css">
 </head>
-<body class="bg-gray-50 text-gray-900 font-sans p-8">
-    
-    <header class="max-w-4xl mx-auto mb-10">
-        <h1 class="text-4xl font-bold text-gray-800">My Projects</h1>
-        <a href="index.html" class="text-blue-600 hover:underline mt-2 inline-block">&larr; Back to Resume</a>
+<body class="bg-slate-900 text-slate-100 font-sans antialiased min-h-screen flex flex-col justify-between">
+
+    <!-- Navigation Header -->
+    <header class="bg-slate-800/50 backdrop-blur-md sticky top-0 z-50 border-b border-slate-700">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-xl font-bold tracking-tight text-cyan-400">Portfolio</a>
+            <nav class="space-x-6">
+                <a href="index.html" class="hover:text-cyan-400 transition">Home</a>
+                <a href="projects.html" class="text-cyan-400 font-medium">Projects</a>
+                <a href="resume.html" class="hover:text-cyan-400 transition">Resume</a>
+            </nav>
+        </div>
     </header>
 
-    <main class="max-w-4xl mx-auto grid gap-6 md:grid-cols-2">
-        <!-- Project Card 1 -->
-        <div class="bg-white p-6 rounded-lg shadow border border-gray-200">
-            <h2 class="text-2xl font-semibold mb-2">Cloud Resume Challenge</h2>
-            <p class="text-gray-700 mb-4">A full-stack, serverless portfolio utilizing Azure Functions, Cosmos DB, Terraform, and GitHub Actions CI/CD.</p>
-            <a href="https://github.com/yourusername/yourrepo" target="_blank" class="text-blue-600 hover:underline font-medium">View Repository</a>
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto px-6 py-12 flex-grow">
+        <div class="mb-12">
+            <h1 class="text-4xl font-extrabold tracking-tight mb-3">Featured Projects</h1>
+            <p class="text-slate-400 text-lg">A collection of systems, applications, and tools I've built.</p>
         </div>
-        
-        <!-- Project Card 2 (Placeholder) -->
-        <div class="bg-white p-6 rounded-lg shadow border border-gray-200">
-            <h2 class="text-2xl font-semibold mb-2">Next Big Project</h2>
-            <p class="text-gray-700 mb-4">Currently in development. Check back soon for updates!</p>
+
+        <!-- Projects Grid -->
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            
+            <!-- Project Card 1: Serverless Portfolio -->
+            <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 flex flex-col justify-between hover:border-cyan-500/50 transition shadow-lg">
+                <div>
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-xs font-semibold px-2.5 py-1 bg-cyan-950 text-cyan-400 rounded-full border border-cyan-800">Cloud / Serverless</span>
+                        <span class="text-xs text-slate-400">Azure / Cosmos DB</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Cloud-Backed Portfolio</h3>
+                    <p class="text-slate-400 text-sm mb-4">
+                        A fully automated serverless portfolio featuring an Azure Functions visitor counter backed by Cosmos DB and deployed via GitHub Actions.
+                    </p>
+                </div>
+                <div>
+                    <div class="flex flex-wrap gap-2 mb-6">
+                        <span class="text-xs bg-slate-700 text-slate-300 px-2 py-1 rounded">Python</span>
+                        <span class="text-xs bg-slate-700 text-slate-300 px-2 py-1 rounded">Tailwind</span>
+                        <span class="text-xs bg-slate-700 text-slate-300 px-2 py-1 rounded">Terraform</span>
+                    </div>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-sm font-medium text-cyan-400 hover:underline">View Source &rarr;</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add more project cards here as needed -->
+
         </div>
     </main>
 
-    <footer class="max-w-4xl mx-auto mt-16 text-center text-gray-500 text-sm">
-        <p>Total Page Views: <span id="counter" class="font-bold text-gray-700">Loading...</span></p>
+    <!-- Footer -->
+    <footer class="bg-slate-800/30 border-t border-slate-800 py-6 text-center text-sm text-slate-500">
+        <p>&copy; 2026 Portfolio. Built with Azure & Tailwind CSS.</p>
     </footer>
 
-    <!-- Visitor Counter Script -->
-    <script src="./js/counter.js"></script>
 </body>
 </html>
