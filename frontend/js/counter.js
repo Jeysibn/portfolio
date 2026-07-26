@@ -10,7 +10,7 @@ const getVisitorCount = async () => {
     let countElement = document.getElementById('visitor-count');
     
     try {
-        const response = await fetch(functionApiUrl);
+        const response = await fetch(apiEndpoint);
         const data = await response.json();
         
         // Update the HTML with the new count
