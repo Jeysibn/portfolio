@@ -43,18 +43,13 @@ def GetVisitorCount(req: func.HttpRequest) -> func.HttpResponse:
         document_id = "1"
 
         # 1. Get the client IP robustly
-        # Azure App Service natively provides x-client-ip (often cleaner). Fallback to x-forwarded-for.
         raw_ip = req.headers.get("x-client-ip") or req.headers.get("x-forwarded-for", "127.0.0.1")
-        
-        # Grab the first IP in the chain (in case of proxies) and remove whitespace
         client_ip = raw_ip.split(',')[0].strip()
         
-        # If Azure appended a port to an IPv4 address (e.g., 192.168.1.1:50123), strip it.
-        # (We check for exactly one colon to avoid breaking IPv6 addresses)
         if client_ip.count(":") == 1:
             client_ip = client_ip.split(":")[0]
 
-        # 2. Hash the IP for privacy
+        # 2. Hash the IP for privacy (GDPR compliance)
         ip_hash = hashlib.sha256(client_ip.encode('utf-8')).hexdigest()
 
         # 3. Check if this IP hash exists in the VisitorIPs container
@@ -68,7 +63,6 @@ def GetVisitorCount(req: func.HttpRequest) -> func.HttpResponse:
         try:
             item = counter_container.read_item(item=document_id, partition_key=document_id)
         except exceptions.CosmosResourceNotFoundError:
-            # Create the first document if it doesn't exist
             item = {"id": document_id, "count": 0}
             item = counter_container.create_item(body=item)
 
@@ -77,17 +71,14 @@ def GetVisitorCount(req: func.HttpRequest) -> func.HttpResponse:
             item['count'] += 1
             updated_item = counter_container.replace_item(item=document_id, body=item)
             
-            # Log the IP hash in the tracking container so they aren't counted again
+            # Log the IP hash in the tracking container
             ips_container.create_item(body={"id": ip_hash})
         else:
-            updated_item = item # Use existing item if already visited
+            updated_item = item 
 
-        # 6. Return the count (and temporarily the debug IP)
+        # 6. Return the secure count
         return func.HttpResponse(
-            body=json.dumps({
-                "count": updated_item['count'],
-                "debug_ip": client_ip  # REMOVE THIS before sharing your portfolio!
-            }),
+            body=json.dumps({"count": updated_item['count']}),
             mimetype="application/json",
             status_code=200,
             headers=headers
