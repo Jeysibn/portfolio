@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en" class="scroll-smooth no-scrollbar">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,8 +8,7 @@
     
     <!-- Custom CSS to hide scrollbars seamlessly across browsers -->
     <style>
-
-            /* Prevent layout shifting between pages when scrollbars appear/disappear */
+        /* Prevent layout shifting between pages when scrollbars appear/disappear */
         html {
             scrollbar-gutter: stable;
         }
@@ -24,9 +23,9 @@
         }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-100 font-sans antialiased min-h-screen flex flex-col justify-between">
+<body class="bg-slate-900 text-slate-100 font-sans antialiased min-h-screen flex flex-col justify-between no-scrollbar">
 
-<!-- Fixed Sticky Navigation Header -->
+    <!-- Fixed Sticky Navigation Header -->
     <header class="bg-slate-800/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-700 w-full">
         <div class="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
             <!-- Logo (Fixed position) -->
