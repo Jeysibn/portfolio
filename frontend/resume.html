@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en" class="scroll-smooth no-scrollbar">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,18 +13,39 @@
             .print-text { color: #1e293b !important; }
             .print-bg { background-color: #f8fafc !important; border-color: #cbd5e1 !important; }
         }
+
+
+        /* Prevent layout shifting between pages when scrollbars appear/disappear */
+        html {
+            scrollbar-gutter: stable;
+        }
+
+        /* Hide scrollbar for Chrome, Safari, and Opera */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        /* Hide scrollbar for IE, Edge, and Firefox */
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-100 font-sans antialiased min-h-screen flex flex-col justify-between">
+<body class="bg-slate-900 text-slate-100 font-sans antialiased min-h-screen flex flex-col justify-between no-scrollbar">
 
-    <!-- Navigation Header -->
-    <header class="bg-slate-800/50 backdrop-blur-md sticky top-0 z-50 border-b border-slate-700">
+    <!-- Fixed Sticky Navigation Header -->
+    <header class="bg-slate-800/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-700 w-full">
         <div class="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
-            <a href="index.html" class="text-xl font-bold tracking-tight text-cyan-400">Portfolio</a>
-            <nav class="space-x-6 flex items-center">
+            <!-- Logo (Fixed position) -->
+            <a href="index.html" class="text-xl font-bold tracking-tight text-cyan-400 hover:text-cyan-300 transition shrink-0">
+                Jeysibn
+            </a>
+            
+            <!-- Navigation Links -->
+            <nav class="space-x-6 flex items-center text-sm font-medium">
                 <a href="index.html" class="hover:text-cyan-400 transition">Home</a>
                 <a href="projects.html" class="hover:text-cyan-400 transition">Projects</a>
-                <a href="resume.html" class="text-cyan-400 font-medium">Resume</a>
+                <a href="resume.html" class="hover:text-cyan-400 transition">Resume</a>
                 <button onclick="window.print()" class="no-print bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition shadow">Print / PDF</button>
             </nav>
         </div>

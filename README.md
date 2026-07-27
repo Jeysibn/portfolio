@@ -3,11 +3,13 @@
 Welcome to the repository for my Cloud Resume portfolio. I am an aspiring Cloud and DevOps Engineer passionate about IT infrastructure. I hold an OCI Foundation Associate certificate and enjoy building projects to expand my skills. I am also an active AI utilizer, leveraging modern tools to accelerate learning and development.
 
 ## 🔗 Links
-- **Portfolio Website:** [Insert GitHub Pages URL once deployed]
+- **Portfolio Website:** [Jeysibn Profile](https://jeysibn.github.io/portfolio)
 - **LinkedIn:** [Jerome Christian Ibon](https://www.linkedin.com/in/jeromeibon)
 - **GitHub:** [@Jeysibn](https://github.com/Jeysibn)
 
 ## 🏗️ Architecture
+![System Architecture Diagram](frontend/assets/architectural-diagram-cloudbacked-portfolio.png)
+
 - **Frontend:** HTML/JS + Tailwind CSS, hosted on GitHub Pages.
 - **Backend:** Azure Functions (Python) serverless API.
 - **Database:** Azure Cosmos DB (Table API / Serverless).
