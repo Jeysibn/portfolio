@@ -81,3 +81,15 @@ resource "azurerm_linux_function_app" "function" {
     "CosmosDbConnectionString" = azurerm_cosmosdb_account.db.primary_sql_connection_string
   }
 }
+
+resource "azurerm_cosmosdb_sql_container" "visitor_ips" {
+  name                  = "VisitorIPs"
+  resource_group_name   = azurerm_resource_group.rg.name
+  account_name          = azurerm_cosmosdb_account.db.name
+  database_name         = azurerm_cosmosdb_sql_database.sqldb.name
+  partition_key_path   = "/id"
+  partition_key_version = 1
+  
+  # The DevOps flex: Automatically delete records after 24 hours (86400 seconds)
+  default_ttl           = 86400 
+}
