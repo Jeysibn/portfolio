@@ -7,9 +7,41 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @media print {
-            body { background: white !important; color: black !important; }
-            header, footer, .no-print { display: none !important; }
-            .print-shadow { box-shadow: none !important; border: none !important; }
+            /* Force page margins to 0 and size to standard Letter/A4 */
+            @page {
+                size: auto;
+                margin: 0;
+            }
+
+            /* Reset layout positioning for page flow */
+            html, body {
+                background: white !important;
+                color: black !important;
+                height: auto !important;
+                min-height: 0 !important;
+                display: block !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            /* Hide elements not needed on printed output */
+            header, footer, .no-print {
+                display: none !important;
+            }
+
+            /* Flatten main wrapper containers */
+            main {
+                padding: 0 !important;
+                margin: 0 !important;
+                max-width: 100% !important;
+            }
+
+            /* Optimize container spacing for print output */
+            .print-shadow {
+                box-shadow: none !important;
+                border: none !important;
+                padding: 1.5rem !important; /* Adjust print inner padding */
+            }
             .print-text { color: #1e293b !important; }
             .print-bg { background-color: #f8fafc !important; border-color: #cbd5e1 !important; }
         }
@@ -19,15 +51,9 @@
             scrollbar-gutter: stable;
         }
 
-        /* Hide scrollbar for Chrome, Safari, and Opera */
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        /* Hide scrollbar for IE, Edge, and Firefox */
-        .no-scrollbar {
-            -ms-overflow-style: none;  /* IE and Edge */
-            scrollbar-width: none;  /* Firefox */
-        }
+        /* Hide scrollbar styles... */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body class="bg-slate-900 text-slate-100 font-sans antialiased min-h-screen flex flex-col justify-between no-scrollbar">
