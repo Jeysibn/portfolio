@@ -5,6 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Projects - My Portfolio</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom CSS to hide scrollbars seamlessly across browsers -->
+    <style>
+        /* Hide scrollbar for Chrome, Safari, and Opera */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        /* Hide scrollbar for IE, Edge, and Firefox */
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+    </style>
 </head>
 <body class="bg-slate-900 text-slate-100 font-sans antialiased min-h-screen flex flex-col justify-between">
 
@@ -60,9 +73,9 @@
         </div>
     </main>
 
-    <!-- Project Detail Modal -->
-    <div id="project-serverless" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 md:p-6 overflow-y-auto">
-        <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6 md:p-8 shadow-2xl relative">
+    <!-- Project Detail Modal (Hidden Scrollbar) -->
+    <div id="project-serverless" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 md:p-6 overflow-y-auto no-scrollbar">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto no-scrollbar p-6 md:p-8 shadow-2xl relative">
             
             <!-- Close Button -->
             <button onclick="closeModal('project-serverless')" class="absolute top-4 right-4 text-slate-400 hover:text-white p-2 rounded-lg bg-slate-900/50 border border-slate-700 transition">
@@ -79,7 +92,7 @@
             <!-- Architectural Diagram PNG -->
             <div class="mb-8 bg-slate-900 border border-slate-700/80 rounded-xl p-3 shadow-inner">
                 <a href="assets/architectural-diagram-cloudbacked-portfolio.png" target="_blank" title="Click to open full size image">
-                    <img src="assets/architectural-diagram-cloudbacked-portfolio.png" 
+                    <img src="architectural-diagram-cloudbacked-portfolio.png" 
                          alt="Serverless Portfolio Architecture Diagram" 
                          class="w-full h-auto rounded-lg hover:opacity-95 transition">
                 </a>
