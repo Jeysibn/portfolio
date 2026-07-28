@@ -1,11 +1,26 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth no-scrollbar">
+<html lang="en" class="scroll-smooth no-scrollbar dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jerome Ibon - Projects</title>
+
+    <!-- Script to prevent flash of wrong theme on page load -->
+    <script>
+        if (localStorage.getItem('color-theme') === 'light' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: light)').matches)) {
+            document.documentElement.classList.remove('dark');
+        } else {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
+
     <script src="https://cdn.tailwindcss.com"></script>
-    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+
     <!-- Custom CSS to hide scrollbars seamlessly across browsers -->
     <style>
         /* Prevent layout shifting between pages when scrollbars appear/disappear */
@@ -23,21 +38,33 @@
         }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-100 font-sans antialiased min-h-screen flex flex-col justify-between no-scrollbar">
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 font-sans antialiased min-h-screen flex flex-col justify-between no-scrollbar transition-colors duration-300">
 
     <!-- Fixed Sticky Navigation Header -->
-    <header class="bg-slate-800/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-700 w-full">
+    <header class="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-200 dark:border-slate-700 w-full transition-colors duration-300">
         <div class="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
             <!-- Logo (Fixed position) -->
-            <a href="index.html" class="text-xl font-bold tracking-tight text-cyan-400 hover:text-cyan-300 transition shrink-0">
+            <a href="index.html" class="text-xl font-bold tracking-tight text-cyan-600 dark:text-cyan-400 hover:text-cyan-500 dark:hover:text-cyan-300 transition shrink-0">
                 Jeysibn
             </a>
             
-            <!-- Navigation Links -->
-            <nav class="space-x-6 flex items-center text-sm font-medium">
-                <a href="index.html" class="hover:text-cyan-400 transition">Home</a>
-                <a href="projects.html" class="hover:text-cyan-400 transition">Projects</a>
-                <a href="resume.html" class="hover:text-cyan-400 transition">Resume</a>
+            <!-- Navigation Links & Theme Toggle -->
+            <nav class="space-x-4 sm:space-x-6 flex items-center text-sm font-medium">
+                <a href="index.html" class="hover:text-cyan-600 dark:hover:text-cyan-400 transition">Home</a>
+                <a href="projects.html" class="text-cyan-600 dark:text-cyan-400 hover:text-cyan-500 dark:hover:text-cyan-300 transition">Projects</a>
+                <a href="resume.html" class="hover:text-cyan-600 dark:hover:text-cyan-400 transition">Resume</a>
+
+                <!-- Theme Toggle Button -->
+                <button id="theme-toggle" type="button" aria-label="Toggle theme" class="p-2 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700/60 focus:outline-none transition">
+                    <!-- Sun Icon (Visible in dark mode) -->
+                    <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 100 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path>
+                    </svg>
+                    <!-- Moon Icon (Visible in light mode) -->
+                    <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                    </svg>
+                </button>
             </nav>
         </div>
     </header>
@@ -45,8 +72,8 @@
     <!-- Main Content -->
     <main class="max-w-6xl mx-auto px-6 py-12 flex-grow">
         <div class="mb-12">
-            <h1 class="text-4xl font-extrabold tracking-tight mb-3">Featured Projects</h1>
-            <p class="text-slate-400 text-lg">A collection of systems, applications, and tools I've built.</p>
+            <h1 class="text-4xl font-extrabold tracking-tight mb-3 text-slate-900 dark:text-slate-100">Featured Projects</h1>
+            <p class="text-slate-600 dark:text-slate-400 text-lg">A collection of systems, applications, and tools I've built.</p>
         </div>
 
         <!-- Projects Grid -->
@@ -54,25 +81,25 @@
             
             <!-- Project Card 1: Serverless Portfolio -->
             <div onclick="openModal('project-serverless')" 
-                 class="bg-slate-800 border border-slate-700 rounded-xl p-6 flex flex-col justify-between hover:border-cyan-500/50 hover:scale-[1.01] transition-all cursor-pointer shadow-lg group">
+                 class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-6 flex flex-col justify-between hover:border-cyan-500/50 hover:scale-[1.01] transition-all cursor-pointer shadow-md dark:shadow-lg group">
                 <div>
                     <div class="flex justify-between items-center mb-4">
-                        <span class="text-xs font-semibold px-2.5 py-1 bg-cyan-950 text-cyan-400 rounded-full border border-cyan-800">Cloud / Serverless</span>
-                        <span class="text-xs text-slate-400">Azure / Cosmos DB</span>
+                        <span class="text-xs font-semibold px-2.5 py-1 bg-cyan-100 dark:bg-cyan-950 text-cyan-700 dark:text-cyan-400 rounded-full border border-cyan-300 dark:border-cyan-800">Cloud / Serverless</span>
+                        <span class="text-xs text-slate-500 dark:text-slate-400">Azure / Cosmos DB</span>
                     </div>
-                    <h3 class="text-xl font-bold mb-2 group-hover:text-cyan-400 transition">Cloud-Backed Portfolio</h3>
-                    <p class="text-slate-400 text-sm mb-4">
+                    <h3 class="text-xl font-bold mb-2 text-slate-900 dark:text-slate-100 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition">Cloud-Backed Portfolio</h3>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm mb-4">
                         A fully automated serverless portfolio featuring an Azure Functions visitor counter backed by Cosmos DB and deployed via GitHub Actions.
                     </p>
                 </div>
                 <div>
                     <div class="flex flex-wrap gap-2 mb-6">
-                        <span class="text-xs bg-slate-700 text-slate-300 px-2 py-1 rounded">Python</span>
-                        <span class="text-xs bg-slate-700 text-slate-300 px-2 py-1 rounded">Tailwind</span>
-                        <span class="text-xs bg-slate-700 text-slate-300 px-2 py-1 rounded">Terraform</span>
+                        <span class="text-xs bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-2 py-1 rounded">Python</span>
+                        <span class="text-xs bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-2 py-1 rounded">Tailwind</span>
+                        <span class="text-xs bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-2 py-1 rounded">Terraform</span>
                     </div>
-                    <div class="flex justify-between items-center pt-2 border-t border-slate-700/50">
-                        <span class="text-sm font-medium text-cyan-400 group-hover:underline">View Architecture & Details &rarr;</span>
+                    <div class="flex justify-between items-center pt-2 border-t border-slate-100 dark:border-slate-700/50">
+                        <span class="text-sm font-medium text-cyan-600 dark:text-cyan-400 group-hover:underline">View Architecture & Details &rarr;</span>
                     </div>
                 </div>
             </div>
@@ -84,45 +111,45 @@
 
     <!-- Project Detail Modal (Hidden Scrollbar) -->
     <div id="project-serverless" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 md:p-6 overflow-y-auto no-scrollbar">
-        <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto no-scrollbar p-6 md:p-8 shadow-2xl relative">
+        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto no-scrollbar p-6 md:p-8 shadow-2xl relative">
             
             <!-- Close Button -->
-            <button onclick="closeModal('project-serverless')" class="absolute top-4 right-4 text-slate-400 hover:text-white p-2 rounded-lg bg-slate-900/50 border border-slate-700 transition">
+            <button onclick="closeModal('project-serverless')" class="absolute top-4 right-4 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white p-2 rounded-lg bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 transition">
                 ✕
             </button>
 
             <!-- Modal Header -->
             <div class="mb-6">
-                <span class="text-xs font-semibold px-2.5 py-1 bg-cyan-950 text-cyan-400 rounded-full border border-cyan-800">Architecture & System Design</span>
-                <h2 class="text-3xl font-extrabold text-white tracking-tight mt-3">Cloud-Backed Portfolio</h2>
-                <p class="text-slate-400 text-sm mt-1">End-to-end serverless system architecture, automation pipelines, and dynamic counter API.</p>
+                <span class="text-xs font-semibold px-2.5 py-1 bg-cyan-100 dark:bg-cyan-950 text-cyan-700 dark:text-cyan-400 rounded-full border border-cyan-300 dark:border-cyan-800">Architecture & System Design</span>
+                <h2 class="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight mt-3">Cloud-Backed Portfolio</h2>
+                <p class="text-slate-600 dark:text-slate-400 text-sm mt-1">End-to-end serverless system architecture, automation pipelines, and dynamic counter API.</p>
             </div>
 
             <!-- Purpose & Problem Solved Section -->
             <div class="grid md:grid-cols-2 gap-4 mb-8">
-                <div class="bg-slate-900/70 border border-slate-700/80 p-5 rounded-xl">
-                    <div class="flex items-center space-x-2 text-cyan-400 mb-2">
+                <div class="bg-slate-50 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700/80 p-5 rounded-xl">
+                    <div class="flex items-center space-x-2 text-cyan-600 dark:text-cyan-400 mb-2">
                         <span class="text-lg">🎯</span>
                         <h4 class="font-bold text-sm uppercase tracking-wide">Project Purpose</h4>
                     </div>
-                    <p class="text-slate-300 text-sm leading-relaxed">
+                    <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
                         To build a high-performance, cost-effective portfolio that moves beyond static site hosting. It demonstrates production-ready DevOps principles—combining Infrastructure as Code, serverless API design, and automated CI/CD deployment.
                     </p>
                 </div>
 
-                <div class="bg-slate-900/70 border border-slate-700/80 p-5 rounded-xl">
-                    <div class="flex items-center space-x-2 text-cyan-400 mb-2">
+                <div class="bg-slate-50 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700/80 p-5 rounded-xl">
+                    <div class="flex items-center space-x-2 text-cyan-600 dark:text-cyan-400 mb-2">
                         <span class="text-lg">⚡</span>
                         <h4 class="font-bold text-sm uppercase tracking-wide">What It Solves</h4>
                     </div>
-                    <p class="text-slate-300 text-sm leading-relaxed">
+                    <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
                         Eliminates server management overhead and monthly idle server costs. By leveraging event-driven serverless architecture, the backend scales down to **close to $0/month at rest** while reliably persisting real-time visitor traffic.
                     </p>
                 </div>
             </div>
 
             <!-- Architectural Diagram PNG -->
-            <div class="mb-8 bg-slate-900 border border-slate-700/80 rounded-xl p-3 shadow-inner">
+            <div class="mb-8 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 rounded-xl p-3 shadow-inner">
                 <a href="assets/architectural-diagram-cloudbacked-portfolio.png" target="_blank" title="Click to open full size image">
                     <img src="assets/architectural-diagram-cloudbacked-portfolio.png" 
                         alt="Serverless Portfolio Architecture Diagram" 
@@ -133,9 +160,9 @@
 
             <!-- Tech Specs -->
             <div class="grid md:grid-cols-2 gap-6 mb-8 text-sm">
-                <div class="bg-slate-900/50 border border-slate-700/50 p-4 rounded-xl">
-                    <h4 class="font-bold text-cyan-400 mb-2">Key Highlights</h4>
-                    <ul class="list-disc list-inside text-slate-300 space-y-1">
+                <div class="bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 p-4 rounded-xl">
+                    <h4 class="font-bold text-cyan-600 dark:text-cyan-400 mb-2">Key Highlights</h4>
+                    <ul class="list-disc list-inside text-slate-600 dark:text-slate-300 space-y-1">
                         <li><strong>Infrastructure as Code:</strong> Standardized provisioning using Terraform.</li>
                         <li><strong>Backend API:</strong> Azure Functions v2 Python model (`getVisitorCount`).</li>
                         <li><strong>Database:</strong> Azure Cosmos DB (NoSQL) for serverless persistence.</li>
@@ -143,25 +170,25 @@
                     </ul>
                 </div>
 
-                <div class="bg-slate-900/50 border border-slate-700/50 p-4 rounded-xl">
-                    <h4 class="font-bold text-cyan-400 mb-2">Technologies Used</h4>
+                <div class="bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 p-4 rounded-xl">
+                    <h4 class="font-bold text-cyan-600 dark:text-cyan-400 mb-2">Technologies Used</h4>
                     <div class="flex flex-wrap gap-2 mt-2">
-                        <span class="bg-slate-800 text-cyan-300 px-2.5 py-1 rounded-md text-xs border border-slate-700">Python 3.11</span>
-                        <span class="bg-slate-800 text-cyan-300 px-2.5 py-1 rounded-md text-xs border border-slate-700">Azure Functions v2</span>
-                        <span class="bg-slate-800 text-cyan-300 px-2.5 py-1 rounded-md text-xs border border-slate-700">Azure Cosmos DB</span>
-                        <span class="bg-slate-800 text-cyan-300 px-2.5 py-1 rounded-md text-xs border border-slate-700">Terraform</span>
-                        <span class="bg-slate-800 text-cyan-300 px-2.5 py-1 rounded-md text-xs border border-slate-700">GitHub Actions</span>
-                        <span class="bg-slate-800 text-cyan-300 px-2.5 py-1 rounded-md text-xs border border-slate-700">Tailwind CSS</span>
+                        <span class="bg-white dark:bg-slate-800 text-cyan-700 dark:text-cyan-300 px-2.5 py-1 rounded-md text-xs border border-slate-200 dark:border-slate-700">Python 3.11</span>
+                        <span class="bg-white dark:bg-slate-800 text-cyan-700 dark:text-cyan-300 px-2.5 py-1 rounded-md text-xs border border-slate-200 dark:border-slate-700">Azure Functions v2</span>
+                        <span class="bg-white dark:bg-slate-800 text-cyan-700 dark:text-cyan-300 px-2.5 py-1 rounded-md text-xs border border-slate-200 dark:border-slate-700">Azure Cosmos DB</span>
+                        <span class="bg-white dark:bg-slate-800 text-cyan-700 dark:text-cyan-300 px-2.5 py-1 rounded-md text-xs border border-slate-200 dark:border-slate-700">Terraform</span>
+                        <span class="bg-white dark:bg-slate-800 text-cyan-700 dark:text-cyan-300 px-2.5 py-1 rounded-md text-xs border border-slate-200 dark:border-slate-700">GitHub Actions</span>
+                        <span class="bg-white dark:bg-slate-800 text-cyan-700 dark:text-cyan-300 px-2.5 py-1 rounded-md text-xs border border-slate-200 dark:border-slate-700">Tailwind CSS</span>
                     </div>
                 </div>
             </div>
 
             <!-- Action Buttons -->
-            <div class="flex justify-between items-center border-t border-slate-700 pt-6">
-                <a href="https://github.com/Jeysibn/portfolio" target="_blank" class="px-4 py-2 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold rounded-lg transition text-sm">
+            <div class="flex justify-between items-center border-t border-slate-200 dark:border-slate-700 pt-6">
+                <a href="https://github.com/Jeysibn/portfolio" target="_blank" class="px-4 py-2 bg-cyan-600 dark:bg-cyan-500 hover:bg-cyan-500 dark:hover:bg-cyan-400 text-white dark:text-slate-950 font-semibold rounded-lg transition text-sm">
                     View Code on GitHub &rarr;
                 </a>
-                <button onclick="closeModal('project-serverless')" class="text-sm text-slate-400 hover:text-white transition">
+                <button onclick="closeModal('project-serverless')" class="text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition">
                     Close
                 </button>
             </div>
@@ -170,7 +197,7 @@
     </div>
 
     <!-- Footer -->
-    <footer class="bg-slate-800/30 border-t border-slate-800 py-6 text-center text-sm text-slate-500">
+    <footer class="bg-slate-100 dark:bg-slate-800/30 border-t border-slate-200 dark:border-slate-800 py-6 text-center text-sm text-slate-500 dark:text-slate-500 transition-colors duration-300">
         <p>&copy; 2026 Portfolio. Built with Azure & Tailwind CSS.</p>
     </footer>
 
@@ -201,6 +228,42 @@
                     closeModal(modal.id);
                 }
             });
+        });
+    </script>
+
+    <!-- Theme Switcher JavaScript Logic -->
+    <script>
+        const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+        const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+        const themeToggleBtn = document.getElementById('theme-toggle');
+
+        if (document.documentElement.classList.contains('dark')) {
+            themeToggleLightIcon.classList.remove('hidden');
+        } else {
+            themeToggleDarkIcon.classList.remove('hidden');
+        }
+
+        themeToggleBtn.addEventListener('click', function() {
+            themeToggleDarkIcon.classList.toggle('hidden');
+            themeToggleLightIcon.classList.toggle('hidden');
+
+            if (localStorage.getItem('color-theme')) {
+                if (localStorage.getItem('color-theme') === 'light') {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('color-theme', 'dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('color-theme', 'light');
+                }
+            } else {
+                if (document.documentElement.classList.contains('dark')) {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('color-theme', 'light');
+                } else {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('color-theme', 'dark');
+                }
+            }
         });
     </script>
 
