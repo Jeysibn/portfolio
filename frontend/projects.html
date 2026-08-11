@@ -104,28 +104,48 @@
                 </div>
             </div>
 
-            <!-- Add more project cards here as needed -->
+            <!-- Project Card 2: Homelab GitOps Environment -->
+            <div onclick="openModal('project-homelab')" 
+                 class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-6 flex flex-col justify-between hover:border-cyan-500/50 hover:scale-[1.01] transition-all cursor-pointer shadow-md dark:shadow-lg group">
+                <div>
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-xs font-semibold px-2.5 py-1 bg-cyan-100 dark:bg-cyan-950 text-cyan-700 dark:text-cyan-400 rounded-full border border-cyan-300 dark:border-cyan-800">DevOps / Kubernetes</span>
+                        <span class="text-xs text-slate-500 dark:text-slate-400">ArgoCD / K3s</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2 text-slate-900 dark:text-slate-100 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition">Homelab GitOps Environment</h3>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm mb-4">
+                        A fully automated, self-healing, and observable Kubernetes homelab using Infrastructure as Code (IaC) and a strict GitOps methodology.
+                    </p>
+                </div>
+                <div>
+                    <div class="flex flex-wrap gap-2 mb-6">
+                        <span class="text-xs bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-2 py-1 rounded">Proxmox</span>
+                        <span class="text-xs bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-2 py-1 rounded">Terraform</span>
+                        <span class="text-xs bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-2 py-1 rounded">GitHub Actions</span>
+                    </div>
+                    <div class="flex justify-between items-center pt-2 border-t border-slate-100 dark:border-slate-700/50">
+                        <span class="text-sm font-medium text-cyan-600 dark:text-cyan-400 group-hover:underline">View Architecture & Details &rarr;</span>
+                    </div>
+                </div>
+            </div>
 
         </div>
     </main>
 
-    <!-- Project Detail Modal (Hidden Scrollbar) -->
+    <!-- Project Detail Modal 1: Serverless -->
     <div id="project-serverless" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 md:p-6 overflow-y-auto no-scrollbar">
         <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto no-scrollbar p-6 md:p-8 shadow-2xl relative">
             
-            <!-- Close Button -->
             <button onclick="closeModal('project-serverless')" class="absolute top-4 right-4 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white p-2 rounded-lg bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 transition">
                 ✕
             </button>
 
-            <!-- Modal Header -->
             <div class="mb-6">
                 <span class="text-xs font-semibold px-2.5 py-1 bg-cyan-100 dark:bg-cyan-950 text-cyan-700 dark:text-cyan-400 rounded-full border border-cyan-300 dark:border-cyan-800">Architecture & System Design</span>
                 <h2 class="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight mt-3">Cloud-Backed Portfolio</h2>
                 <p class="text-slate-600 dark:text-slate-400 text-sm mt-1">End-to-end serverless system architecture, automation pipelines, and dynamic counter API.</p>
             </div>
 
-            <!-- Purpose & Problem Solved Section -->
             <div class="grid md:grid-cols-2 gap-4 mb-8">
                 <div class="bg-slate-50 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700/80 p-5 rounded-xl">
                     <div class="flex items-center space-x-2 text-cyan-600 dark:text-cyan-400 mb-2">
@@ -148,7 +168,6 @@
                 </div>
             </div>
 
-            <!-- Architectural Diagram PNG -->
             <div class="mb-8 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 rounded-xl p-3 shadow-inner">
                 <a href="assets/architectural-diagram-cloudbacked-portfolio.png" target="_blank" title="Click to open full size image">
                     <img src="assets/architectural-diagram-cloudbacked-portfolio.png" 
@@ -158,7 +177,6 @@
                 <p class="text-center text-xs text-slate-500 mt-2">💡 Click diagram to expand in full resolution</p>
             </div>
 
-            <!-- Tech Specs -->
             <div class="grid md:grid-cols-2 gap-6 mb-8 text-sm">
                 <div class="bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 p-4 rounded-xl">
                     <h4 class="font-bold text-cyan-600 dark:text-cyan-400 mb-2">Key Highlights</h4>
@@ -183,7 +201,6 @@
                 </div>
             </div>
 
-            <!-- Action Buttons -->
             <div class="flex justify-between items-center border-t border-slate-200 dark:border-slate-700 pt-6">
                 <a href="https://github.com/Jeysibn/portfolio" target="_blank" class="px-4 py-2 bg-cyan-600 dark:bg-cyan-500 hover:bg-cyan-500 dark:hover:bg-cyan-400 text-white dark:text-slate-950 font-semibold rounded-lg transition text-sm">
                     View Code on GitHub &rarr;
@@ -192,7 +209,92 @@
                     Close
                 </button>
             </div>
+        </div>
+    </div>
 
+    <!-- Project Detail Modal 2: Homelab GitOps -->
+    <div id="project-homelab" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 md:p-6 overflow-y-auto no-scrollbar">
+        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto no-scrollbar p-6 md:p-8 shadow-2xl relative">
+            
+            <button onclick="closeModal('project-homelab')" class="absolute top-4 right-4 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white p-2 rounded-lg bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 transition">
+                ✕
+            </button>
+
+            <div class="mb-6">
+                <span class="text-xs font-semibold px-2.5 py-1 bg-cyan-100 dark:bg-cyan-950 text-cyan-700 dark:text-cyan-400 rounded-full border border-cyan-300 dark:border-cyan-800">DevOps & Infrastructure</span>
+                <h2 class="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight mt-3">Homelab GitOps Environment</h2>
+                <p class="text-slate-600 dark:text-slate-400 text-sm mt-1">Automated, self-healing Kubernetes cluster powered by IaC and GitOps pipelines.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-4 mb-8">
+                <div class="bg-slate-50 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700/80 p-5 rounded-xl">
+                    <div class="flex items-center space-x-2 text-cyan-600 dark:text-cyan-400 mb-2">
+                        <span class="text-lg">🎯</span>
+                        <h4 class="font-bold text-sm uppercase tracking-wide">Project Purpose</h4>
+                    </div>
+                    <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
+                        To build a fully automated, self-healing, and observable Kubernetes homelab using Infrastructure as Code (IaC) and a strict GitOps methodology.
+                    </p>
+                </div>
+
+                <div class="bg-slate-50 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700/80 p-5 rounded-xl">
+                    <div class="flex items-center space-x-2 text-cyan-600 dark:text-cyan-400 mb-2">
+                        <span class="text-lg">⚡</span>
+                        <h4 class="font-bold text-sm uppercase tracking-wide">What It Solves</h4>
+                    </div>
+                    <ul class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed list-disc list-inside space-y-1">
+                        <li><strong>Configuration Drift:</strong> Ensures cluster state perfectly matches the Git repository.</li>
+                        <li><strong>Manual Deployments:</strong> Replaces manual deployments with an automated sync pipeline.</li>
+                        <li><strong>Deployment Failures:</strong> Catches syntax errors, invalid schemas, and security issues in CI.</li>
+                        <li><strong>Service Availability:</strong> Highly available local DNS, automated TLS, and distributed storage out-of-the-box.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Architectural Diagram -->
+            <div class="mb-8 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 rounded-xl p-3 shadow-inner">
+                <a href="https://raw.githubusercontent.com/Jeysibn/homelab-gitops/main/docs/Architecture.png" target="_blank" title="Click to open full size image">
+                    <img src="https://raw.githubusercontent.com/Jeysibn/homelab-gitops/main/docs/Architecture.png" 
+                        alt="Homelab Architecture Diagram" 
+                        class="w-full h-auto rounded-lg hover:opacity-95 transition">
+                </a>
+                <p class="text-center text-xs text-slate-500 mt-2">💡 Click diagram to expand in full resolution</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6 mb-8 text-sm">
+                <div class="bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 p-4 rounded-xl">
+                    <h4 class="font-bold text-cyan-600 dark:text-cyan-400 mb-2">Key Highlights</h4>
+                    <ul class="list-disc list-inside text-slate-600 dark:text-slate-300 space-y-1">
+                        <li><strong>Infrastructure as Code:</strong> Automated VM provisioning on Proxmox using Terraform.</li>
+                        <li><strong>App-of-Apps Architecture:</strong> ArgoCD automatically discovers and deploys hierarchical "waves" of applications.</li>
+                        <li><strong>CI/CD Quality Gates:</strong> GitHub Actions render Helm templates, validate schemas, and scan for security misconfigurations on push.</li>
+                        <li><strong>Separation of Concerns:</strong> Clean repository structure separating raw Kubernetes manifests from Helm value overrides.</li>
+                    </ul>
+                </div>
+
+                <div class="bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 p-4 rounded-xl">
+                    <h4 class="font-bold text-cyan-600 dark:text-cyan-400 mb-2">Technologies Used</h4>
+                    <div class="flex flex-wrap gap-2 mt-2">
+                        <span class="bg-white dark:bg-slate-800 text-cyan-700 dark:text-cyan-300 px-2.5 py-1 rounded-md text-xs border border-slate-200 dark:border-slate-700">Proxmox</span>
+                        <span class="bg-white dark:bg-slate-800 text-cyan-700 dark:text-cyan-300 px-2.5 py-1 rounded-md text-xs border border-slate-200 dark:border-slate-700">Terraform</span>
+                        <span class="bg-white dark:bg-slate-800 text-cyan-700 dark:text-cyan-300 px-2.5 py-1 rounded-md text-xs border border-slate-200 dark:border-slate-700">K3s</span>
+                        <span class="bg-white dark:bg-slate-800 text-cyan-700 dark:text-cyan-300 px-2.5 py-1 rounded-md text-xs border border-slate-200 dark:border-slate-700">ArgoCD</span>
+                        <span class="bg-white dark:bg-slate-800 text-cyan-700 dark:text-cyan-300 px-2.5 py-1 rounded-md text-xs border border-slate-200 dark:border-slate-700">GitHub Actions</span>
+                        <span class="bg-white dark:bg-slate-800 text-cyan-700 dark:text-cyan-300 px-2.5 py-1 rounded-md text-xs border border-slate-200 dark:border-slate-700">Helm</span>
+                        <span class="bg-white dark:bg-slate-800 text-cyan-700 dark:text-cyan-300 px-2.5 py-1 rounded-md text-xs border border-slate-200 dark:border-slate-700">Traefik & Cert-Manager</span>
+                        <span class="bg-white dark:bg-slate-800 text-cyan-700 dark:text-cyan-300 px-2.5 py-1 rounded-md text-xs border border-slate-200 dark:border-slate-700">Prometheus & Grafana</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center border-t border-slate-200 dark:border-slate-700 pt-6">
+                <a href="https://github.com/Jeysibn/homelab-gitops" target="_blank" class="px-4 py-2 bg-cyan-600 dark:bg-cyan-500 hover:bg-cyan-500 dark:hover:bg-cyan-400 text-white dark:text-slate-950 font-semibold rounded-lg transition text-sm">
+                    View Code on GitHub &rarr;
+                </a>
+                <button onclick="closeModal('project-homelab')" class="text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition">
+                    Close
+                </button>
+            </div>
         </div>
     </div>
 
