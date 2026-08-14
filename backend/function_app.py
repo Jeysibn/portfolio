@@ -236,7 +236,7 @@ def AiChatAssistant(req: func.HttpRequest) -> func.HttpResponse:
 
         # 4. Call OpenCode Zen API (Fixed model name)
         response = ai_client.chat.completions.create(
-            model="deepseek-v4-flash-free", 
+            model="mimo-v2.5-free", 
             messages=messages,
             temperature=0.7,
             max_tokens=350
