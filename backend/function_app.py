@@ -234,9 +234,9 @@ def AiChatAssistant(req: func.HttpRequest) -> func.HttpResponse:
 
         messages.append({"role": "user", "content": user_message})
 
-        # 4. Call OpenCode Zen API
+        # 4. Call OpenCode Zen API (Fixed model name)
         response = ai_client.chat.completions.create(
-            model="deepseek-v4-flash-free",
+            model="deepseek-v4-flash", 
             messages=messages,
             temperature=0.7,
             max_tokens=350
@@ -253,8 +253,9 @@ def AiChatAssistant(req: func.HttpRequest) -> func.HttpResponse:
 
     except Exception as e:
         logging.error(f"AI Chat Assistant Error: {str(e)}")
+        # Send the exact Python error back to the browser for debugging!
         return func.HttpResponse(
-            body=json.dumps({"error": "Internal server error processing AI chat."}),
+            body=json.dumps({"error": f"Backend Error: {str(e)}"}),
             mimetype="application/json",
             status_code=500,
             headers=headers

@@ -117,7 +117,9 @@ async function handleChatSubmit(event) {
             chatHistory.push({ role: "assistant", content: data.reply });
             sessionStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(chatHistory));
         } else {
-            appendMessageUI("assistant", "⚠️ Sorry, I ran into an issue retrieving an answer. Please try again later.");
+            // Unmask the exact backend error to the UI
+            const errorMessage = data.error ? `⚠️ ${data.error}` : "⚠️ Sorry, I ran into an issue retrieving an answer. Please try again later.";
+            appendMessageUI("assistant", errorMessage);
         }
     } catch (error) {
         removeTypingIndicator();
