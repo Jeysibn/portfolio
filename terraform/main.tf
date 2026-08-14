@@ -73,7 +73,7 @@ resource "azurerm_linux_function_app" "function" {
       python_version = "3.11"
     }
     cors {
-      allowed_origins = ["[https://Jeysibn.github.io](https://Jeysibn.github.io)"]
+      allowed_origins = ["[https://jeysibn.github.io](https://jeysibn.github.io)"]
     }
   }
 

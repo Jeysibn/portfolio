@@ -5,6 +5,7 @@ import os
 import json
 import logging
 import hashlib
+import time
 
 # 1. Initialize Azure Function App (Anonymous auth)
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
@@ -133,7 +134,7 @@ def GetVisitorCount(req: func.HttpRequest) -> func.HttpResponse:
 
 
 # ---------------------------------------------------------
-# ROUTE 2: AI CHAT ASSISTANT API (With Rate Limiting)
+# ROUTE 2: AI CHAT ASSISTANT API (With Robust IP Parsing & Rolling Window)
 # ---------------------------------------------------------
 @app.route(route="AiChatAssistant", methods=["POST", "OPTIONS"])
 def AiChatAssistant(req: func.HttpRequest) -> func.HttpResponse:
@@ -149,34 +150,65 @@ def AiChatAssistant(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse(status_code=200, headers=headers)
 
     try:
-        # 1. Get and Hash Client IP for Rate Limiting
-        raw_ip = req.headers.get("x-client-ip") or req.headers.get("x-forwarded-for", "127.0.0.1")
-        client_ip = raw_ip.split(',')[0].strip()
-        if client_ip.count(":") == 1:
+        # 1. Robust IP Extraction (Handles Azure App Service & Proxy Headers)
+        forwarded_for = (
+            req.headers.get("x-forwarded-for") or 
+            req.headers.get("x-client-ip") or 
+            req.headers.get("x-original-forwarded-for") or 
+            "127.0.0.1"
+        )
+        
+        # Take the first IP in the X-Forwarded-For chain (the true client IP)
+        client_ip = forwarded_for.split(',')[0].strip()
+        
+        # Strip port number if present (e.g. 203.0.113.195:50422 -> 203.0.113.195)
+        if ":" in client_ip and client_ip.count(":") == 1:
             client_ip = client_ip.split(":")[0]
             
         ip_hash = hashlib.sha256(client_ip.encode('utf-8')).hexdigest()
         rate_limit_id = f"chat_limit_{ip_hash}"
 
-        # 2. Check Rate Limit in Cosmos DB (Max 10 messages)
+        logging.info(f"Chat request received. Hashed IP ID: {rate_limit_id}")
+
+        # 2. Rate Limiting with 1-Hour (3600s) Rolling Window Reset
         db_client = get_cosmos_client()
         database = db_client.get_database_client("PortfolioDB")
         ips_container = database.get_container_client("VisitorIPs")
 
+        MAX_MESSAGES = 10
+        RESET_PERIOD_SECONDS = 3600  # 1 hour window (change to 86400 for 24 hours)
+        current_time = int(time.time())
+
+        RATE_LIMIT_MESSAGE = "⏳ You've reached the maximum limit of 10 messages for this chat session. Feel free to connect with Jerome directly via email at jeysibn@gmail.com or on LinkedIn!"
+
         try:
             rate_doc = ips_container.read_item(item=rate_limit_id, partition_key=rate_limit_id)
-            if rate_doc.get("count", 0) >= 10:
-                return func.HttpResponse(
-                    body=json.dumps({"reply": "⚠️ You've reached the maximum limit of 10 AI questions per session. Please try again later or reach out to Jerome directly via email!"}),
-                    mimetype="application/json",
-                    status_code=429, # 429 Too Many Requests
-                    headers=headers
-                )
-            rate_doc["count"] += 1
-            ips_container.replace_item(item=rate_limit_id, body=rate_doc)
+            last_updated = rate_doc.get("last_updated", 0)
+
+            # If 1 hour has passed since the first message, RESET the counter
+            if (current_time - last_updated) > RESET_PERIOD_SECONDS:
+                rate_doc["count"] = 1
+                rate_doc["last_updated"] = current_time
+                ips_container.replace_item(item=rate_limit_id, body=rate_doc)
+            else:
+                # Still within the 1-hour window -> Check limit
+                if rate_doc.get("count", 0) >= MAX_MESSAGES:
+                    return func.HttpResponse(
+                        body=json.dumps({"reply": RATE_LIMIT_MESSAGE}),
+                        mimetype="application/json",
+                        status_code=200,
+                        headers=headers
+                    )
+                rate_doc["count"] += 1
+                ips_container.replace_item(item=rate_limit_id, body=rate_doc)
+
         except exceptions.CosmosResourceNotFoundError:
-            # First message from this IP -> Create rate limit doc
-            ips_container.create_item(body={"id": rate_limit_id, "count": 1})
+            # First message from this unique IP -> Create new doc with timestamp
+            ips_container.create_item(body={
+                "id": rate_limit_id, 
+                "count": 1,
+                "last_updated": current_time
+            })
 
         # 3. Process Request
         req_body = req.get_json()
@@ -206,7 +238,7 @@ def AiChatAssistant(req: func.HttpRequest) -> func.HttpResponse:
         response = ai_client.chat.completions.create(
             model="deepseek-v4-flash-free",
             messages=messages,
-            temperature=0.4,
+            temperature=0.7,
             max_tokens=350
         )
 
