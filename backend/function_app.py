@@ -1,40 +1,82 @@
 import azure.functions as func
 from azure.cosmos import CosmosClient, exceptions
+from openai import OpenAI
 import os
 import json
 import logging
 import hashlib
 
+# 1. Initialize Azure Function App (Anonymous auth)
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 
-# Global client initialization for connection pooling (Serverless Best Practice)
-client = None
+# ---------------------------------------------------------
+# GLOBAL CLIENTS (Serverless Best Practice for Connection Pooling)
+# ---------------------------------------------------------
+cosmos_client = None
 
 def get_cosmos_client():
-    global client
-    if not client:
+    global cosmos_client
+    if not cosmos_client:
         connection_string = os.environ["CosmosDbConnectionString"]
-        client = CosmosClient.from_connection_string(connection_string)
-    return client
+        cosmos_client = CosmosClient.from_connection_string(connection_string)
+    return cosmos_client
 
-# Added OPTIONS to handle the browser's preflight check
+# OpenCode Zen AI Client (DeepSeek V4 Flash)
+ai_client = OpenAI(
+    api_key=os.environ.get("OPENCODE_API_KEY"),
+    base_url="https://opencode.ai/zen/v1"
+)
+
+# ---------------------------------------------------------
+# HELPER FUNCTIONS FOR AI CHAT ASSISTANT
+# ---------------------------------------------------------
+def load_knowledge_base() -> dict:
+    """Loads knowledge base JSON file dynamically."""
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(base_dir, "data", "knowledge_base.json")
+    
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception as e:
+        logging.error(f"Error loading knowledge base: {e}")
+        return {}
+
+def build_system_prompt(kb_data: dict) -> str:
+    """Formats the JSON knowledge base into the AI System Prompt."""
+    kb_string = json.dumps(kb_data, indent=2)
+    
+    return f"""
+You are Jerome Ibon's AI Assistant on his portfolio website (jeysibn.dev).
+Your primary job is to politely and accurately answer questions about Jerome using ONLY the Knowledge Base provided below.
+
+=== JEROME'S KNOWLEDGE BASE ===
+{kb_string}
+
+=== RULES ===
+1. Be professional, friendly, and concise (under 3-4 sentences when possible).
+2. Base your answers strictly on the facts provided in the Knowledge Base above.
+3. If a user asks something not covered in the Knowledge Base or asks off-topic questions (e.g. general math, writing random code), politely decline: "I can only answer questions related to Jerome's background and experience."
+"""
+
+
+# ---------------------------------------------------------
+# ROUTE 1: VISITOR COUNTER API
+# ---------------------------------------------------------
 @app.route(route="GetVisitorCount", methods=["GET", "POST", "OPTIONS"])
 def GetVisitorCount(req: func.HttpRequest) -> func.HttpResponse:
-    logging.info('Python HTTP trigger function processing a request.')
+    logging.info('Python HTTP trigger function processing visitor count request.')
 
-    # Bulletproof CORS headers
     headers = {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
         "Access-Control-Allow-Headers": "Content-Type"
     }
 
-    # Intercept the browser's automatic OPTIONS request and approve it
     if req.method == "OPTIONS":
         return func.HttpResponse(status_code=200, headers=headers)
 
     try:
-        # Connect to Cosmos DB
         db_client = get_cosmos_client()
         database = db_client.get_database_client("PortfolioDB")
         counter_container = database.get_container_client("Counter")
@@ -42,41 +84,38 @@ def GetVisitorCount(req: func.HttpRequest) -> func.HttpResponse:
         
         document_id = "1"
 
-        # 1. Get the client IP robustly
+        # Get client IP
         raw_ip = req.headers.get("x-client-ip") or req.headers.get("x-forwarded-for", "127.0.0.1")
         client_ip = raw_ip.split(',')[0].strip()
         
         if client_ip.count(":") == 1:
             client_ip = client_ip.split(":")[0]
 
-        # 2. Hash the IP for privacy (GDPR compliance)
+        # Hash IP for privacy
         ip_hash = hashlib.sha256(client_ip.encode('utf-8')).hexdigest()
 
-        # 3. Check if this IP hash exists in the VisitorIPs container
+        # Check existing visits
         has_visited = True
         try:
             ips_container.read_item(item=ip_hash, partition_key=ip_hash)
         except exceptions.CosmosResourceNotFoundError:
             has_visited = False
 
-        # 4. Read the current counter document
+        # Read counter
         try:
             item = counter_container.read_item(item=document_id, partition_key=document_id)
         except exceptions.CosmosResourceNotFoundError:
             item = {"id": document_id, "count": 0}
             item = counter_container.create_item(body=item)
 
-        # 5. Increment ONLY if it's a new visitor
+        # Increment if unique
         if not has_visited:
             item['count'] += 1
             updated_item = counter_container.replace_item(item=document_id, body=item)
-            
-            # Log the IP hash in the tracking container
             ips_container.create_item(body={"id": ip_hash})
         else:
             updated_item = item 
 
-        # 6. Return the secure count
         return func.HttpResponse(
             body=json.dumps({"count": updated_item['count']}),
             mimetype="application/json",
@@ -85,9 +124,106 @@ def GetVisitorCount(req: func.HttpRequest) -> func.HttpResponse:
         )
             
     except Exception as e:
-        logging.error(f"Error: {str(e)}")
+        logging.error(f"Error in Visitor Counter: {str(e)}")
         return func.HttpResponse(
             body="Error connecting to the database.",
+            status_code=500,
+            headers=headers
+        )
+
+
+# ---------------------------------------------------------
+# ROUTE 2: AI CHAT ASSISTANT API (With Rate Limiting)
+# ---------------------------------------------------------
+@app.route(route="AiChatAssistant", methods=["POST", "OPTIONS"])
+def AiChatAssistant(req: func.HttpRequest) -> func.HttpResponse:
+    logging.info('Python HTTP trigger function processing AI chat request.')
+
+    headers = {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type"
+    }
+
+    if req.method == "OPTIONS":
+        return func.HttpResponse(status_code=200, headers=headers)
+
+    try:
+        # 1. Get and Hash Client IP for Rate Limiting
+        raw_ip = req.headers.get("x-client-ip") or req.headers.get("x-forwarded-for", "127.0.0.1")
+        client_ip = raw_ip.split(',')[0].strip()
+        if client_ip.count(":") == 1:
+            client_ip = client_ip.split(":")[0]
+            
+        ip_hash = hashlib.sha256(client_ip.encode('utf-8')).hexdigest()
+        rate_limit_id = f"chat_limit_{ip_hash}"
+
+        # 2. Check Rate Limit in Cosmos DB (Max 10 messages)
+        db_client = get_cosmos_client()
+        database = db_client.get_database_client("PortfolioDB")
+        ips_container = database.get_container_client("VisitorIPs")
+
+        try:
+            rate_doc = ips_container.read_item(item=rate_limit_id, partition_key=rate_limit_id)
+            if rate_doc.get("count", 0) >= 10:
+                return func.HttpResponse(
+                    body=json.dumps({"reply": "⚠️ You've reached the maximum limit of 10 AI questions per session. Please try again later or reach out to Jerome directly via email!"}),
+                    mimetype="application/json",
+                    status_code=429, # 429 Too Many Requests
+                    headers=headers
+                )
+            rate_doc["count"] += 1
+            ips_container.replace_item(item=rate_limit_id, body=rate_doc)
+        except exceptions.CosmosResourceNotFoundError:
+            # First message from this IP -> Create rate limit doc
+            ips_container.create_item(body={"id": rate_limit_id, "count": 1})
+
+        # 3. Process Request
+        req_body = req.get_json()
+        user_message = req_body.get("message", "").strip()
+        chat_history = req_body.get("history", [])
+
+        if not user_message:
+            return func.HttpResponse(
+                body=json.dumps({"error": "Message body cannot be empty."}),
+                mimetype="application/json",
+                status_code=400,
+                headers=headers
+            )
+
+        kb_data = load_knowledge_base()
+        system_prompt = build_system_prompt(kb_data)
+
+        messages = [{"role": "system", "content": system_prompt}]
+
+        for msg in chat_history:
+            if msg.get("role") in ["user", "assistant"] and msg.get("content"):
+                messages.append({"role": msg["role"], "content": msg["content"]})
+
+        messages.append({"role": "user", "content": user_message})
+
+        # 4. Call OpenCode Zen API
+        response = ai_client.chat.completions.create(
+            model="deepseek-v4-flash-free",
+            messages=messages,
+            temperature=0.4,
+            max_tokens=350
+        )
+
+        bot_reply = response.choices[0].message.content.strip()
+
+        return func.HttpResponse(
+            body=json.dumps({"reply": bot_reply}),
+            mimetype="application/json",
+            status_code=200,
+            headers=headers
+        )
+
+    except Exception as e:
+        logging.error(f"AI Chat Assistant Error: {str(e)}")
+        return func.HttpResponse(
+            body=json.dumps({"error": "Internal server error processing AI chat."}),
+            mimetype="application/json",
             status_code=500,
             headers=headers
         )

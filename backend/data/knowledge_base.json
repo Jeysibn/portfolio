@@ -1,0 +1,62 @@
+{
+  "profile": {
+    "name": "Jerome Christian V. Ibon",
+    "role": "Aspiring Cloud & DevOps Engineer",
+    "location": "Malolos, Bulacan, Philippines",
+    "email": "jeysibn@gmail.com",
+    "portfolio": "https://jeysibn.dev",
+    "linkedin": "https://linkedin.com/in/jeromeibon",
+    "github": "https://github.com/Jeysibn"
+  },
+  "summary": "Computer Engineering graduate and OCI-certified engineer who builds and operates production-style Kubernetes infrastructure using AI-assisted workflows. Backed by 6 months of enterprise SaaS technical support.",
+  "skills": {
+    "cloud_platforms": ["AWS (EC2, VPC, Security Groups, Subnets, S3)", "Azure (VNET, VM, Subnets, Function App)"],
+    "infrastructure_as_code": ["HashiCorp Terraform"],
+    "cicd_automation": ["GitHub Actions", "Argo CD"],
+    "containers_orchestration": ["Docker", "Kubernetes (k3s)"],
+    "monitoring_observability": ["Prometheus", "Grafana"],
+    "os_scripting": ["Linux (Ubuntu)", "Bash", "Python", "PowerShell"],
+    "ai_tools": ["Gemini", "Claude", "ChatGPT", "Hermes Agent", "OpenCode Zen"]
+  },
+  "experience": [
+    {
+      "title": "Technical Support Engineer, Endpoint Security SaaS",
+      "company": "TrendAI",
+      "duration": "August 2025 – February 2026",
+      "highlights": [
+        "Troubleshot agent deployments and cloud policy configurations in Trend Vision One environments.",
+        "Resolved 80+ enterprise cases adhering to strict SLAs.",
+        "Provisioned AWS test environments to replicate client setups."
+      ]
+    },
+    {
+      "title": "IT Helpdesk Intern",
+      "company": "Philippine Transmarine Carriers",
+      "duration": "March 2025 – May 2025",
+      "highlights": [
+        "Administered Active Directory accounts and user access controls.",
+        "Reformatted and redeployed Windows workstations securely."
+      ]
+    }
+  ],
+  "certifications": [
+    "Oracle Cloud Infrastructure (OCI) Foundations Associate",
+    "Trend Vision One Server and Workload Protection Professional",
+    "GitHub Foundations"
+  ],
+  "education": {
+    "degree": "B.S. in Computer Engineering",
+    "institution": "National University Baliwag",
+    "period": "August 2021 – August 2025"
+  },
+  "frequently_asked_questions": [
+    {
+      "question": "Is Jerome open to remote or hybrid work?",
+      "answer": "Yes, Jerome is open to remote, hybrid, or on-site roles for Cloud Support, Junior DevOps, or Junior Site Reliability Engineering positions."
+    },
+    {
+      "question": "What is Jerome's primary cloud focus?",
+      "answer": "Jerome works across both AWS and Azure, with a heavy emphasis on Infrastructure as Code (Terraform) and Kubernetes orchestration."
+    }
+  ]
+}
