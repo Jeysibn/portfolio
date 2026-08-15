@@ -1,3 +1,5 @@
+import pytest
+
 import function_app
 
 
@@ -19,3 +21,15 @@ def test_load_knowledge_base_returns_dictionary():
 
     assert isinstance(knowledge_base, dict)
     assert knowledge_base
+
+
+def test_ai_client_is_lazy_at_module_import():
+    assert function_app.ai_client is None
+
+
+def test_get_ai_client_requires_runtime_key(monkeypatch):
+    monkeypatch.delenv("OPENCODE_API_KEY", raising=False)
+    monkeypatch.setattr(function_app, "ai_client", None)
+
+    with pytest.raises(RuntimeError, match="OPENCODE_API_KEY"):
+        function_app.get_ai_client()
