@@ -1,35 +1,268 @@
-# Jeysibn's Cloud Resume Challenge
+# Cloud-Backed Portfolio
 
-Welcome to the repository for my Cloud Resume portfolio. I am an aspiring Cloud and DevOps Engineer passionate about IT infrastructure. I hold an OCI Foundation Associate certificate and enjoy building projects to expand my skills. I am also an active AI utilizer, leveraging modern tools to accelerate learning and development.
+[![Development CI](https://github.com/Jeysibn/portfolio/actions/workflows/dev-ci.yml/badge.svg?branch=dev)](https://github.com/Jeysibn/portfolio/actions/workflows/dev-ci.yml)
+[![Main PR Validation](https://github.com/Jeysibn/portfolio/actions/workflows/pr-main.yml/badge.svg)](https://github.com/Jeysibn/portfolio/actions/workflows/pr-main.yml)
+[![Terraform](https://img.shields.io/badge/IaC-Terraform-7B42BC?logo=terraform)](https://developer.hashicorp.com/terraform)
+[![Azure](https://img.shields.io/badge/Cloud-Microsoft%20Azure-0078D4?logo=microsoftazure)](https://azure.microsoft.com/)
 
-## 🔗 Links
-- **Portfolio Website:** [Jeysibn Profile](https://jeysibn.github.io/portfolio)
-- **LinkedIn:** [Jerome Christian Ibon](https://www.linkedin.com/in/jeromeibon)
-- **GitHub:** [@Jeysibn](https://github.com/Jeysibn)
+A production-oriented cloud portfolio built as a hands-on DevOps project. The site combines a static frontend, a Python serverless API, Azure Cosmos DB, Terraform-managed infrastructure, an AI portfolio assistant, and GitHub Actions CI/CD with OpenID Connect (OIDC) authentication to Azure.
 
-## 🏗️ Architecture
+The project is intentionally small enough to understand end-to-end, while applying real engineering practices around infrastructure as code, automated validation, protected production releases, remote state, short-lived cloud credentials, and operational documentation.
+
+## Live Project
+
+- **Portfolio:** https://jeysibn.github.io/portfolio
+- **GitHub:** https://github.com/Jeysibn
+- **LinkedIn:** https://www.linkedin.com/in/jeromeibon
+
+## Architecture
+
 ![System Architecture Diagram](frontend/assets/architectural-diagram-cloudbacked-portfolio.png)
 
-- **Frontend:** HTML/JS + Tailwind CSS, hosted on GitHub Pages.
-- **Backend:** Azure Functions (Python) serverless API.
-- **Database:** Azure Cosmos DB (Table API / Serverless).
-- **IaC:** Terraform managing Azure resources (deployed to `koreacentral`).
-- **CI/CD:** GitHub Actions.
+### Components
 
-## 🚀 Bootstrap: Terraform Remote State
-Before running the CI/CD pipeline, the Terraform remote state storage must be created in Azure. 
+| Layer | Technology | Responsibility |
+|---|---|---|
+| Frontend | HTML, JavaScript, Tailwind CSS, GitHub Pages | Static portfolio UI, visitor counter, AI chat interface |
+| Backend | Azure Functions, Python 3.11 | Visitor counter API and AI assistant API |
+| Database | Azure Cosmos DB for NoSQL | Persistent visitor count, hashed visitor records, chat rate-limit records |
+| AI | OpenCode Zen OpenAI-compatible API | Portfolio-specific conversational assistant |
+| Infrastructure | Terraform + AzureRM | Azure resource provisioning and lifecycle management |
+| CI/CD | GitHub Actions | Validation, security checks, build packaging, Terraform planning, production deployment |
+| Cloud authentication | GitHub OIDC + Microsoft Entra ID | Short-lived Azure authentication without stored client secrets |
 
-Run these Azure CLI commands locally to create the Storage Account for the `.tfstate` file:
+For a deeper system walkthrough, see [`docs/architecture.md`](docs/architecture.md).
+
+## Repository Structure
+
+```text
+portfolio/
+├── .github/
+│   ├── dependabot.yml
+│   └── workflows/
+│       ├── dev-ci.yml
+│       ├── pr-main.yml
+│       ├── frontend-deploy.yml
+│       ├── backend-deploy.yml
+│       └── terraform-deploy.yml
+├── backend/
+│   ├── data/
+│   ├── tests/
+│   ├── function_app.py
+│   ├── host.json
+│   └── requirements.txt
+├── docs/
+│   ├── architecture.md
+│   ├── azure-oidc.md
+│   ├── cicd.md
+│   ├── runbook.md
+│   └── Changelog.md
+├── frontend/
+├── terraform/
+├── .gitignore
+├── CONTRIBUTING.md
+├── LICENSE
+├── SECURITY.md
+└── README.md
+```
+
+## CI/CD Model
+
+The repository uses a deliberately simple two-branch model:
+
+```text
+dev  → development and integration
+main → protected production
+```
+
+### Development
+
+A push to `dev` runs automated validation for the frontend, backend, and Terraform configuration.
+
+### Pull Request to `main`
+
+A `dev → main` pull request runs production-readiness checks including:
+
+- HTML and JavaScript validation
+- Python dependency compatibility checks
+- Ruff linting
+- dependency security auditing
+- backend tests
+- Azure Function deployment package build
+- Azure OIDC authentication
+- Terraform initialization against the real remote backend
+- authenticated Terraform production plan
+- final `Production Ready` merge gate
+
+No infrastructure or application deployment occurs from a pull request.
+
+### Production
+
+After a successful PR is merged into `main`, path-specific workflows deploy only the affected part of the system:
+
+```text
+frontend/**  → GitHub Pages
+backend/**   → Azure Functions
+terraform/** → Terraform plan + apply
+```
+
+Production Azure workflows authenticate using GitHub-issued OIDC tokens rather than stored Azure client secrets.
+
+See [`docs/cicd.md`](docs/cicd.md) for the complete pipeline design.
+
+## Security Design
+
+Key security decisions include:
+
+- GitHub OIDC federation with Microsoft Entra ID for Azure Actions authentication
+- no reusable Azure service principal client secret in GitHub
+- protected `main` branch with required PR validation
+- separate OIDC trust subjects for pull-request planning and production environment deployment
+- hashed client IP addresses before storage in Cosmos DB
+- Terraform state stored remotely in Azure Blob Storage
+- backend dependency auditing in PR validation
+- environment and local-secret files excluded from Git
+
+See [`docs/azure-oidc.md`](docs/azure-oidc.md) and [`SECURITY.md`](SECURITY.md).
+
+## Local Development
+
+### Prerequisites
+
+- Python 3.11+
+- Azure Functions Core Tools
+- Terraform
+- Azure CLI
+- Node.js (for frontend validation tools)
+
+### Backend
 
 ```bash
-# 1. Login to Azure
+cd backend
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+Create `backend/local.settings.json` locally with the required application settings. This file is intentionally ignored by Git.
+
+Typical settings include:
+
+```json
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "python",
+    "CosmosDbConnectionString": "<local-or-development-connection-string>",
+    "OPENCODE_API_KEY": "<api-key>"
+  }
+}
+```
+
+Run the Function App locally:
+
+```bash
+func start
+```
+
+### Tests and linting
+
+```bash
+cd backend
+ruff check .
+pytest -v
+```
+
+### Terraform validation
+
+```bash
+cd terraform
+terraform fmt -check -recursive
+terraform init -backend=false
+terraform validate
+```
+
+Use the real backend only when intentionally working with the shared Azure state.
+
+## Terraform Remote State Bootstrap
+
+The application infrastructure uses an Azure Blob Storage backend. The state storage must exist before Terraform can initialize the remote backend.
+
+```bash
 az login
 
-# 2. Create the Resource Group for Terraform State
-az group create --name rg-terraform-state --location koreacentral
+az group create \
+  --name rg-terraform-state \
+  --location koreacentral
 
-# 3. Create the Storage Account
-az storage account create --name sttfstatejeysibn --resource-group rg-terraform-state --location koreacentral --sku Standard_LRS --encryption-services blob
+az storage account create \
+  --name sttfstatejeysibn \
+  --resource-group rg-terraform-state \
+  --location koreacentral \
+  --sku Standard_LRS \
+  --encryption-services blob
 
-# 4. Create the Blob Container
-az storage container create --name tfstate --account-name sttfstatejeysibn
+az storage container create \
+  --name tfstate \
+  --account-name sttfstatejeysibn
+```
+
+Terraform backend configuration:
+
+```text
+Resource group:  rg-terraform-state
+Storage account: sttfstatejeysibn
+Container:       tfstate
+State key:       portfolio.terraform.tfstate
+```
+
+The CI/CD identity also requires permission to access the remote state blob.
+
+## Azure Resources Managed by Terraform
+
+Terraform currently provisions:
+
+- Azure Resource Group
+- Azure Storage Account for the Function App
+- Azure Cosmos DB account
+- Cosmos DB SQL database (`PortfolioDB`)
+- `Counter` container
+- `VisitorIPs` container with TTL
+- Linux Consumption App Service Plan
+- Python 3.11 Azure Function App
+- application configuration and CORS settings
+
+## Operational Notes
+
+The portfolio is designed to remain low-cost and suitable for a personal cloud project. The architecture uses serverless/consumption-oriented services and Cosmos DB free-tier configuration where applicable.
+
+For troubleshooting and deployment operations, see [`docs/runbook.md`](docs/runbook.md).
+
+## Documentation
+
+- [`docs/architecture.md`](docs/architecture.md) — system design and data flows
+- [`docs/cicd.md`](docs/cicd.md) — branch model and GitHub Actions pipelines
+- [`docs/azure-oidc.md`](docs/azure-oidc.md) — Azure federation design and trust subjects
+- [`docs/runbook.md`](docs/runbook.md) — common operational and recovery procedures
+- [`docs/Changelog.md`](docs/Changelog.md) — project release history
+- [`CONTRIBUTING.md`](CONTRIBUTING.md) — development workflow and contribution standards
+- [`SECURITY.md`](SECURITY.md) — security model and reporting guidance
+
+## Project Goals
+
+This repository is both a live portfolio and a learning project focused on demonstrating practical Cloud and DevOps engineering skills:
+
+- designing cloud architecture
+- managing infrastructure with Terraform
+- building CI/CD pipelines
+- implementing secure workload identity
+- managing remote state
+- enforcing production release gates
+- testing and validating application changes
+- documenting engineering decisions and operational procedures
+
+## License
+
+This project is licensed under the MIT License. See [`LICENSE`](LICENSE).

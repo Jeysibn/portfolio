@@ -1,4 +1,6 @@
 terraform {
+  required_version = ">= 1.6.0, < 2.0.0"
+
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
@@ -6,8 +8,8 @@ terraform {
     }
   }
 
-  # This tells Terraform to store the state file in the Azure Storage Account
-  # you create via the CLI/Portal.
+  # Remote state is stored outside the application resource group so the
+  # Terraform control state is independent from the resources it manages.
   backend "azurerm" {
     resource_group_name  = "rg-terraform-state"
     storage_account_name = "sttfstatejeysibn"
