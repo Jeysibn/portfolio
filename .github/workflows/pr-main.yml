@@ -169,7 +169,7 @@ jobs:
 
 
   # =========================================================
-  # TERRAFORM AUTHENTICATED PLAN
+  # TERRAFORM VALIDATION / AUTHENTICATED PLAN
   # =========================================================
   terraform:
     name: Terraform Production Plan
@@ -186,23 +186,30 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
+      - name: Terraform format check
+        run: terraform fmt -check -recursive
+
       - name: Login to Azure using OIDC
+        if: github.actor != 'dependabot[bot]'
         uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Terraform format check
-        run: terraform fmt -check -recursive
-
       - name: Terraform initialize remote backend
+        if: github.actor != 'dependabot[bot]'
         run: terraform init -input=false
+
+      - name: Terraform initialize without backend for Dependabot
+        if: github.actor == 'dependabot[bot]'
+        run: terraform init -backend=false -input=false
 
       - name: Terraform validate
         run: terraform validate
 
       - name: Terraform production plan
+        if: github.actor != 'dependabot[bot]'
         run: |
           terraform plan \
             -input=false \
@@ -210,12 +217,21 @@ jobs:
             -out=tfplan
 
       - name: Terraform plan summary
+        if: github.actor != 'dependabot[bot]'
         run: |
           echo "## Terraform Production Plan" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
           terraform show -no-color tfplan >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Dependabot Terraform validation summary
+        if: github.actor == 'dependabot[bot]'
+        run: |
+          echo "## Terraform Validation" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Dependabot PR: Azure authentication and remote-state planning were intentionally skipped." >> "$GITHUB_STEP_SUMMARY"
+          echo "Terraform formatting, initialization without backend, and validation passed." >> "$GITHUB_STEP_SUMMARY"
 
 
   # =========================================================
@@ -243,6 +259,10 @@ jobs:
           echo "Backend tests:            PASSED"
           echo "Dependency audit:         PASSED"
           echo "Backend build:            PASSED"
-          echo "Terraform plan:           PASSED"
+          if [ "${{ github.actor }}" = "dependabot[bot]" ]; then
+            echo "Terraform validation:     PASSED (no Azure plan for Dependabot)"
+          else
+            echo "Terraform plan:           PASSED"
+          fi
           echo ""
           echo "Pull Request is ready for merge into main."
