@@ -19,9 +19,9 @@ resource "azurerm_cosmosdb_account" "db" {
   resource_group_name = azurerm_resource_group.rg.name
   offer_type          = "Standard"
   kind                = "GlobalDocumentDB"
-  
+
   # Protects your student credits
-  enable_free_tier = true 
+  enable_free_tier = true
 
   consistency_policy {
     consistency_level = "Session"
@@ -73,7 +73,7 @@ resource "azurerm_linux_function_app" "function" {
       python_version = "3.11"
     }
     cors {
-      allowed_origins = ["[https://jeysibn.github.io](https://jeysibn.github.io)"]
+      allowed_origins = ["https://jeysibn.github.io"]
     }
   }
 
@@ -87,9 +87,9 @@ resource "azurerm_cosmosdb_sql_container" "visitor_ips" {
   resource_group_name   = azurerm_resource_group.rg.name
   account_name          = azurerm_cosmosdb_account.db.name
   database_name         = azurerm_cosmosdb_sql_database.sqldb.name
-  partition_key_path   = "/id"
+  partition_key_path    = "/id"
   partition_key_version = 1
-  
+
   # The DevOps flex: Automatically delete records after 24 hours (86400 seconds)
-  default_ttl           = 86400 
+  default_ttl = 86400
 }
