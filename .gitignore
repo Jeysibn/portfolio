@@ -1,13 +1,46 @@
-# Azure Functions Local Settings
+# Environment and secrets
+.env
+.env.*
+!.env.example
 local.settings.json
 
-# Python Cache
+# Python virtual environments
+.venv/
+venv/
+env/
+
+# Python cache and tooling
 __pycache__/
 *.py[cod]
 *$py.class
+.pytest_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Python build artifacts
+build/
+dist/
+*.egg-info/
+.python_packages/
 
 # Terraform
 .terraform/
 *.tfstate
-*.tfstate.backup
+*.tfstate.*
 .terraform.tfstate.lock.info
+*.tfplan
+tfplan
+crash.log
+crash.*.log
+
+# Deployment artifacts
+*.zip
+*.tar.gz
+
+# OS / editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
