@@ -1,0 +1,113 @@
+name: Deploy Azure Infrastructure
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "terraform/**"
+      - ".github/workflows/terraform-deploy.yml"
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: production-terraform
+  cancel-in-progress: false
+
+jobs:
+  terraform-deploy:
+    name: Terraform Production Deployment
+    runs-on: ubuntu-latest
+
+    environment:
+      name: production
+
+    defaults:
+      run:
+        working-directory: terraform
+
+    steps:
+      # =====================================================
+      # CHECKOUT
+      # =====================================================
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+
+      # =====================================================
+      # TERRAFORM
+      # =====================================================
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+
+      # =====================================================
+      # AZURE AUTHENTICATION
+      # =====================================================
+      - name: Login to Azure using OIDC
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+
+      # =====================================================
+      # FORMAT
+      # =====================================================
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+
+
+      # =====================================================
+      # INITIALIZE REMOTE BACKEND
+      # =====================================================
+      - name: Terraform Init
+        run: terraform init -input=false
+
+
+      # =====================================================
+      # VALIDATE
+      # =====================================================
+      - name: Terraform Validate
+        run: terraform validate
+
+
+      # =====================================================
+      # PRODUCTION PLAN
+      # =====================================================
+      - name: Terraform Plan
+        run: |
+          terraform plan \
+            -input=false \
+            -out=tfplan
+
+
+      # =====================================================
+      # APPLY
+      # =====================================================
+      - name: Terraform Apply
+        run: |
+          terraform apply \
+            -input=false \
+            -auto-approve \
+            tfplan
+
+
+      # =====================================================
+      # SUMMARY
+      # =====================================================
+      - name: Terraform Deployment Summary
+        if: success()
+        run: |
+          echo "## Terraform Production Deployment ✅" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Infrastructure deployment completed successfully." >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Branch:** main" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Commit:** ${{ github.sha }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Triggered by:** ${{ github.actor }}" >> "$GITHUB_STEP_SUMMARY"
