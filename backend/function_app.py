@@ -9,7 +9,6 @@ import azure.functions as func
 from azure.cosmos import CosmosClient, exceptions
 from openai import OpenAI, OpenAIError
 
-
 # ---------------------------------------------------------
 # LOGGING
 # ---------------------------------------------------------
@@ -129,10 +128,9 @@ def load_knowledge_base() -> dict:
         with file_path.open("r", encoding="utf-8") as file:
             return json.load(file)
 
-    except (OSError, json.JSONDecodeError) as error:
+    except (OSError, json.JSONDecodeError):
         logger.exception(
             "Unable to load the portfolio knowledge base: %s",
-            error,
         )
         return {}
 
@@ -256,10 +254,9 @@ def GetVisitorCount(req: func.HttpRequest) -> func.HttpResponse:
         exceptions.CosmosHttpResponseError,
         KeyError,
         ValueError,
-    ) as error:
+    ):
         logger.exception(
             "Visitor counter request failed: %s",
-            error,
         )
 
         return func.HttpResponse(
@@ -469,10 +466,9 @@ def AiChatAssistant(req: func.HttpRequest) -> func.HttpResponse:
             headers=AI_HEADERS,
         )
 
-    except exceptions.CosmosHttpResponseError as error:
+    except exceptions.CosmosHttpResponseError:
         logger.exception(
             "Cosmos DB error while processing AI request: %s",
-            error,
         )
 
         return func.HttpResponse(
@@ -488,10 +484,9 @@ def AiChatAssistant(req: func.HttpRequest) -> func.HttpResponse:
             headers=AI_HEADERS,
         )
 
-    except OpenAIError as error:
+    except OpenAIError:
         logger.exception(
             "AI provider request failed: %s",
-            error,
         )
 
         return func.HttpResponse(
@@ -508,10 +503,9 @@ def AiChatAssistant(req: func.HttpRequest) -> func.HttpResponse:
             headers=AI_HEADERS,
         )
 
-    except (KeyError, TypeError, AttributeError, ValueError) as error:
+    except (KeyError, TypeError, AttributeError, ValueError):
         logger.exception(
             "Invalid data encountered while processing AI request: %s",
-            error,
         )
 
         return func.HttpResponse(
