@@ -12,6 +12,7 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 
 concurrency:
   group: main-pr-${{ github.event.pull_request.number }}
@@ -174,10 +175,10 @@ jobs:
 
 
   # =========================================================
-  # TERRAFORM VALIDATION
+  # TERRAFORM AUTHENTICATED PLAN
   # =========================================================
   terraform:
-    name: Terraform Production Readiness
+    name: Terraform Production Plan
     runs-on: ubuntu-latest
 
     defaults:
@@ -191,14 +192,36 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
+      - name: Login to Azure using OIDC
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
       - name: Terraform format check
         run: terraform fmt -check -recursive
 
-      - name: Terraform initialize
-        run: terraform init -backend=false
+      - name: Terraform initialize remote backend
+        run: terraform init -input=false
 
       - name: Terraform validate
         run: terraform validate
+
+      - name: Terraform production plan
+        run: |
+          terraform plan \
+            -input=false \
+            -no-color \
+            -out=tfplan
+
+      - name: Terraform plan summary
+        run: |
+          echo "## Terraform Production Plan" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          terraform show -no-color tfplan >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
 
 
   # =========================================================
@@ -225,6 +248,6 @@ jobs:
           echo "Backend validation:       PASSED"
           echo "Dependency audit:         PASSED"
           echo "Backend build:            PASSED"
-          echo "Terraform validation:     PASSED"
+          echo "Terraform plan:           PASSED"
           echo ""
           echo "Pull Request is ready for merge into main."
