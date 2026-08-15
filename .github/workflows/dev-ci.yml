@@ -87,14 +87,8 @@ jobs:
         run: |
           ruff check .
 
-      - name: Run tests when tests contain code
-        shell: bash
-        run: |
-          if find tests -name "test_*.py" -type f -size +0c | grep -q .; then
-            pytest -v
-          else
-            echo "No implemented tests yet — skipping pytest."
-          fi
+      - name: Run backend tests
+        run: pytest -v
 
   # =========================================================
   # TERRAFORM
@@ -138,6 +132,6 @@ jobs:
       - name: CI Summary
         run: |
           echo "Frontend checks passed."
-          echo "Backend checks passed."
+          echo "Backend checks and tests passed."
           echo "Terraform checks passed."
           echo "Development branch is ready for Pull Request."
