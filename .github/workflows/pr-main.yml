@@ -115,13 +115,7 @@ jobs:
           pip-audit -r requirements.txt
 
       - name: Run backend tests
-        shell: bash
-        run: |
-          if find tests -name "test_*.py" -type f -size +0c | grep -q .; then
-            pytest -v
-          else
-            echo "No implemented backend tests yet."
-          fi
+        run: pytest -v
 
 
   # =========================================================
@@ -246,6 +240,7 @@ jobs:
           echo ""
           echo "Frontend validation:      PASSED"
           echo "Backend validation:       PASSED"
+          echo "Backend tests:            PASSED"
           echo "Dependency audit:         PASSED"
           echo "Backend build:            PASSED"
           echo "Terraform plan:           PASSED"
