@@ -115,7 +115,7 @@ jobs:
           pip-audit -r requirements.txt
 
       - name: Run backend tests
-        run: pytest -v
+        run: python -m pytest -v
 
 
   # =========================================================
