@@ -1,11 +1,20 @@
 // Replace with your actual deployed Azure Function endpoint
 const CHAT_API_ENDPOINT = "https://func-jeysibn-portfolio.azurewebsites.net/api/AiChatAssistant";
 
+// Keep the UI provider-neutral so model changes do not require frontend edits.
+const CHAT_PLATFORM_LABEL = "AI Assistant • Azure Functions";
+
 // Session storage memory key
 const CHAT_STORAGE_KEY = "jeysibn_chat_history";
 
 // Manage conversation history in memory
 let chatHistory = JSON.parse(sessionStorage.getItem(CHAT_STORAGE_KEY)) || [];
+
+// Replace any stale model-specific label embedded in the page markup.
+const chatPlatformLabel = document.querySelector("#chat-window h3 + p");
+if (chatPlatformLabel) {
+    chatPlatformLabel.textContent = CHAT_PLATFORM_LABEL;
+}
 
 // Toggle chat window open/close
 function toggleChatWindow() {
