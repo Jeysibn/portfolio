@@ -77,14 +77,9 @@ jobs:
             if response=$(curl --silent --show-error --fail \
               --max-time 15 \
               "$HEALTH_URL"); then
-              python -c '
-import json, os
-payload = json.loads(os.environ["HEALTH_RESPONSE"])
-assert payload["status"] == "healthy"
-assert payload["service"] == "portfolio-api"
-print("Health response validated:", payload)
-' HEALTH_RESPONSE="$response"
-              exit 0
+              if printf '%s' "$response" | python -c 'import json,sys; payload=json.load(sys.stdin); assert payload["status"] == "healthy"; assert payload["service"] == "portfolio-api"; print("Health response validated:", payload)'; then
+                exit 0
+              fi
             fi
 
             echo "Health check attempt $attempt/12 failed; retrying in 10 seconds..."
