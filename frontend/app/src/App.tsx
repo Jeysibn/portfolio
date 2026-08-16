@@ -17,14 +17,116 @@ import type { ChatMessage, Project, ThemePreference } from "./portfolio";
 const sectionIds = navigation.map((item) => item.id);
 const CHAT_STORAGE_KEY = "jeysibn_chat_history";
 
+const certificationDetails = [
+  {
+    name: certifications[0],
+    provider: "Oracle",
+    mark: "ORACLE",
+    tone: "oracle",
+    description:
+      "Foundational validation of OCI services, cloud concepts, architecture, security, pricing, and support fundamentals.",
+  },
+  {
+    name: certifications[1],
+    provider: "TrendAI",
+    mark: "TrendAI",
+    tone: "trend",
+    description:
+      "Professional credential focused on protecting and operating server and workload environments with Trend Vision One.",
+  },
+  {
+    name: certifications[2],
+    provider: "GitHub",
+    mark: "GitHub",
+    tone: "github",
+    description:
+      "Covers Git and GitHub fundamentals, repositories, collaboration workflows, project management, and modern development practices.",
+  },
+] as const;
+
+const skillCodes = ["CLOUD", "K8S", "CI/CD", "OBS", "NET", "OPS"] as const;
+
+function useScrollReveal() {
+  useEffect(() => {
+    const elements = Array.from(document.querySelectorAll<HTMLElement>("[data-reveal]"));
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (reduceMotion || !("IntersectionObserver" in window)) {
+      elements.forEach((element) => element.classList.add("is-visible"));
+      return;
+    }
+
+    document.documentElement.classList.add("motion-ready");
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add("is-visible");
+          observer.unobserve(entry.target);
+        });
+      },
+      {
+        threshold: 0.12,
+        rootMargin: "0px 0px -8% 0px",
+      },
+    );
+
+    elements.forEach((element) => observer.observe(element));
+
+    return () => {
+      observer.disconnect();
+      document.documentElement.classList.remove("motion-ready");
+    };
+  }, []);
+}
+
+function ScrollProgress() {
+  const progressRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    let frame = 0;
+
+    const update = () => {
+      const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = scrollable > 0 ? Math.min(1, Math.max(0, window.scrollY / scrollable)) : 0;
+      if (progressRef.current) progressRef.current.style.transform = `scaleX(${progress})`;
+    };
+
+    const requestUpdate = () => {
+      window.cancelAnimationFrame(frame);
+      frame = window.requestAnimationFrame(update);
+    };
+
+    update();
+    window.addEventListener("scroll", requestUpdate, { passive: true });
+    window.addEventListener("resize", requestUpdate);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", requestUpdate);
+      window.removeEventListener("resize", requestUpdate);
+    };
+  }, []);
+
+  return (
+    <div className="scroll-progress-track" aria-hidden="true">
+      <div ref={progressRef} className="scroll-progress-bar" />
+    </div>
+  );
+}
+
 function App() {
   const activeSection = useActiveSection(sectionIds);
   const { preference, setPreference } = useTheme();
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
+  useScrollReveal();
+
   return (
     <>
       <div className="site-shell">
+        <ScrollProgress />
         <Header
           activeSection={activeSection}
           themePreference={preference}
@@ -145,9 +247,17 @@ function Hero() {
     <section className="hero-section" aria-labelledby="hero-title">
       <div className="hero-grid">
         <div className="hero-copy">
+          <div className="availability-pill">
+            <span className="availability-dot" aria-hidden="true" />
+            <span>Open to opportunities</span>
+            <span className="availability-detail">Cloud · DevOps · SRE</span>
+          </div>
           <h1 id="hero-title">I build cloud systems that are easier to ship, observe, and recover.</h1>
           <p className="hero-intro">
             I’m Jerome, a Computer Engineering graduate focused on Cloud, DevOps, and reliability engineering. I turn infrastructure, delivery, and operations into version-controlled systems instead of manual checklists.
+          </p>
+          <p className="hero-opportunity">
+            I’m currently open to entry-level Cloud Support, DevOps, and Junior Site Reliability opportunities.
           </p>
           <div className="hero-actions">
             <a href="#projects" className="button button-primary">
@@ -203,6 +313,20 @@ function SystemStatus() {
         <StatusRow label="Infrastructure" value="Terraform" />
         <StatusRow label="Telemetry" value="Application Insights" />
       </dl>
+      <div className="monitor-summary" aria-label="Serverless monitoring summary">
+        <div>
+          <span>runtime</span>
+          <strong>serverless</strong>
+        </div>
+        <div>
+          <span>probe</span>
+          <strong>{state === "healthy" ? "passing" : stateLabel.toLowerCase()}</strong>
+        </div>
+        <div>
+          <span>telemetry</span>
+          <strong>enabled</strong>
+        </div>
+      </div>
       <p className="status-note">Health is checked against the production API when this page loads.</p>
     </aside>
   );
@@ -227,7 +351,7 @@ function About() {
 
   return (
     <Section id="about" title="Reliability started for me at the troubleshooting desk.">
-      <div className="about-layout">
+      <div className="about-layout" data-reveal="">
         <div className="prose-column">
           <p>
             Supporting real users taught me that infrastructure diagrams only matter when the system still makes sense under pressure. Manual fixes may solve one incident, but they don’t scale into reliable operations.
@@ -259,7 +383,7 @@ function Experience() {
     >
       <div className="timeline">
         {experience.map((item) => (
-          <article key={`${item.organization}-${item.role}`} className="timeline-item">
+          <article key={`${item.organization}-${item.role}`} className="timeline-item" data-reveal="">
             <div className="timeline-meta">
               <time>{item.period}</time>
               <span>{item.location}</span>
@@ -290,7 +414,11 @@ function Projects({ onOpenProject }: { onOpenProject: (project: Project) => void
     >
       <div className="project-list">
         {projects.map((project, index) => (
-          <article key={project.id} className={index % 2 ? "project-row project-row-reverse" : "project-row"}>
+          <article
+            key={project.id}
+            className={index % 2 ? "project-row project-row-reverse" : "project-row"}
+            data-reveal=""
+          >
             <div className="project-visual" aria-hidden="true">
               <div className="project-diagram">
                 <span className="diagram-node">Git</span>
@@ -328,18 +456,24 @@ function Skills() {
       title="A toolkit built around delivery and operations, not badge collecting."
       intro="These are the technologies I use across cloud projects, labs, troubleshooting, automation, and deployment workflows."
     >
-      <dl className="skills-table">
-        {skillGroups.map((group) => (
-          <div key={group.label} className="skill-row">
-            <dt>{group.label}</dt>
-            <dd>
+      <div className="skills-grid" aria-label="Technical skill groups">
+        {skillGroups.map((group, index) => (
+          <article key={group.label} className="skill-card" data-reveal="">
+            <div className="skill-card-head">
+              <span className="skill-code" aria-hidden="true">{skillCodes[index]}</span>
+              <div>
+                <span className="skill-card-index">0{index + 1}</span>
+                <h3>{group.label}</h3>
+              </div>
+            </div>
+            <div className="skill-chip-list">
               {group.items.map((item) => (
                 <span key={item}>{item}</span>
               ))}
-            </dd>
-          </div>
+            </div>
+          </article>
         ))}
-      </dl>
+      </div>
     </Section>
   );
 }
@@ -348,28 +482,49 @@ function Credentials() {
   return (
     <section className="credentials-section" aria-labelledby="credentials-title">
       <div className="section-inner credentials-layout">
-        <div>
+        <div data-reveal="">
           <h2 id="credentials-title">Education & credentials</h2>
           <p className="section-intro">Formal foundations paired with continuous hands-on infrastructure work.</p>
         </div>
 
         <div className="credentials-content">
-          <article className="education-block">
+          <article className="education-block" data-reveal="">
             <p className="detail-label">Education</p>
-            <h3>{education.degree}</h3>
-            <p>{education.school} · {education.location}</p>
-            <p>{education.period}</p>
+            <div className="education-heading">
+              <span className="education-mark" aria-hidden="true">NU</span>
+              <div>
+                <h3>{education.degree}</h3>
+                <p>{education.school} · {education.location}</p>
+              </div>
+            </div>
+            <p className="education-period">{education.period}</p>
             <p className="thesis">Thesis: {education.thesis}</p>
           </article>
 
-          <article className="certification-block">
-            <p className="detail-label">Certifications</p>
-            <ul>
-              {certifications.map((certification) => (
-                <li key={certification}>{certification}</li>
+          <section className="certification-block" aria-labelledby="certifications-heading">
+            <div className="credential-subheading" data-reveal="">
+              <p className="detail-label">Certifications</p>
+              <p>Hover or focus a credential to see what it validates.</p>
+            </div>
+            <div className="certification-grid">
+              {certificationDetails.map((certification) => (
+                <article
+                  key={certification.name}
+                  className={`cert-card cert-card-${certification.tone}`}
+                  tabIndex={0}
+                  data-reveal=""
+                >
+                  <div className="cert-card-topline">
+                    <span className="cert-provider-mark" aria-hidden="true">{certification.mark}</span>
+                    <span className="cert-provider">{certification.provider}</span>
+                  </div>
+                  <h3 id={certification.name === certifications[0] ? "certifications-heading" : undefined}>{certification.name}</h3>
+                  <p className="cert-description">{certification.description}</p>
+                  <span className="cert-hover-hint" aria-hidden="true">inspect credential ↗</span>
+                </article>
               ))}
-            </ul>
-          </article>
+            </div>
+          </section>
         </div>
       </div>
     </section>
@@ -380,33 +535,147 @@ function Resume() {
   return (
     <Section
       id="resume"
-      title="The short version: cloud support instincts, DevOps execution."
-      intro={professionalSummary}
+      title="Resume, without making you download it first."
+      intro="Everything important is visible here. The print action simply gives you a clean copy when you want one."
     >
-      <div className="resume-strip">
-        <div>
-          <h3>Jerome Christian V. Ibon</h3>
-          <p>Cloud Support · DevOps · Kubernetes · GitOps · Infrastructure Automation</p>
+      <article className="resume-preview" data-reveal="">
+        <header className="resume-preview-header">
+          <div>
+            <p className="detail-label">Resume / CV</p>
+            <h3>Jerome Christian V. Ibon</h3>
+            <p>Cloud Support · DevOps · Kubernetes · GitOps · Infrastructure Automation</p>
+            <p className="resume-contact-line">Malolos, Bulacan, Philippines · jeysibn@gmail.com · linkedin.com/in/jeromeibon</p>
+          </div>
+          <button type="button" className="button button-secondary" onClick={() => window.print()}>
+            Print / save resume <PrintIcon />
+          </button>
+        </header>
+
+        <div className="resume-preview-grid">
+          <div className="resume-main-column">
+            <ResumePreviewSection title="Professional summary">
+              <p>{professionalSummary}</p>
+            </ResumePreviewSection>
+
+            <ResumePreviewSection title="Professional experience">
+              {experience.map((item) => (
+                <article key={`${item.organization}-resume`} className="resume-entry">
+                  <div className="resume-entry-heading">
+                    <div>
+                      <h4>{item.role}</h4>
+                      <p>{item.organization} · {item.location}</p>
+                    </div>
+                    <time>{item.period}</time>
+                  </div>
+                  <p>{item.summary}</p>
+                  <ul>
+                    {item.highlights.map((highlight) => <li key={highlight}>{highlight}</li>)}
+                  </ul>
+                </article>
+              ))}
+            </ResumePreviewSection>
+
+            <ResumePreviewSection title="Projects / home lab">
+              {projects.map((project) => (
+                <article key={`${project.id}-resume`} className="resume-entry">
+                  <div className="resume-entry-heading">
+                    <div>
+                      <h4>{project.title}</h4>
+                      <p>{project.category}</p>
+                    </div>
+                  </div>
+                  <ul>
+                    {project.highlights.slice(0, 3).map((highlight) => <li key={highlight}>{highlight}</li>)}
+                  </ul>
+                </article>
+              ))}
+            </ResumePreviewSection>
+          </div>
+
+          <aside className="resume-side-column">
+            <ResumePreviewSection title="Technical skills">
+              <div className="resume-skill-groups">
+                {skillGroups.map((group) => (
+                  <div key={`${group.label}-resume`}>
+                    <h4>{group.label}</h4>
+                    <p>{group.items.join(" · ")}</p>
+                  </div>
+                ))}
+              </div>
+            </ResumePreviewSection>
+
+            <ResumePreviewSection title="Education">
+              <div className="resume-entry compact">
+                <h4>{education.degree}</h4>
+                <p>{education.school} · {education.location}</p>
+                <p>{education.period}</p>
+                <p>Thesis: {education.thesis}</p>
+              </div>
+            </ResumePreviewSection>
+
+            <ResumePreviewSection title="Certifications">
+              <ul className="resume-cert-list">
+                {certifications.map((certification) => <li key={`${certification}-resume`}>{certification}</li>)}
+              </ul>
+            </ResumePreviewSection>
+          </aside>
         </div>
-        <button type="button" className="button button-secondary" onClick={() => window.print()}>
-          Print / save full resume <PrintIcon />
-        </button>
-      </div>
+      </article>
     </Section>
+  );
+}
+
+function ResumePreviewSection({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <section className="resume-preview-section">
+      <h3>{title}</h3>
+      {children}
+    </section>
   );
 }
 
 function Contact() {
   return (
-    <Section id="contact" title="If the work is about making systems clearer and more reliable, I’d like to hear about it.">
-      <div className="contact-layout">
-        <p>
-          I’m interested in entry-level Cloud Support, DevOps, and Junior Site Reliability opportunities where I can keep building production judgment alongside strong engineering teams.
-        </p>
-        <div className="contact-links">
-          <a href="mailto:jeysibn@gmail.com">Email <ExternalIcon /></a>
-          <a href="https://linkedin.com/in/jeromeibon" target="_blank" rel="noreferrer">LinkedIn <ExternalIcon /></a>
-          <a href="https://github.com/Jeysibn" target="_blank" rel="noreferrer">GitHub <ExternalIcon /></a>
+    <Section id="contact" title="Open to the right team, the right problems, and systems worth improving.">
+      <div className="contact-panel" data-reveal="">
+        <div className="contact-intro">
+          <div className="contact-availability">
+            <span className="availability-dot" aria-hidden="true" />
+            <span>Open to opportunities</span>
+          </div>
+          <h3>Let’s talk about Cloud, DevOps, reliability, or the infrastructure problem your team is trying to untangle.</h3>
+          <p>
+            I’m interested in entry-level Cloud Support, DevOps, and Junior Site Reliability roles where I can keep building production judgment alongside strong engineering teams.
+          </p>
+          <div className="role-tags" aria-label="Roles of interest">
+            <span>Cloud Support</span>
+            <span>DevOps</span>
+            <span>Junior SRE</span>
+          </div>
+        </div>
+
+        <div className="contact-actions" aria-label="Contact links">
+          <a className="contact-action contact-action-primary" href="mailto:jeysibn@gmail.com">
+            <span>
+              <small>Best way to reach me</small>
+              <strong>jeysibn@gmail.com</strong>
+            </span>
+            <ExternalIcon />
+          </a>
+          <a className="contact-action" href="https://linkedin.com/in/jeromeibon" target="_blank" rel="noreferrer">
+            <span>
+              <small>Professional profile</small>
+              <strong>LinkedIn</strong>
+            </span>
+            <ExternalIcon />
+          </a>
+          <a className="contact-action" href="https://github.com/Jeysibn" target="_blank" rel="noreferrer">
+            <span>
+              <small>Code & infrastructure</small>
+              <strong>GitHub</strong>
+            </span>
+            <ExternalIcon />
+          </a>
         </div>
       </div>
     </Section>
@@ -427,7 +696,7 @@ function Section({
   return (
     <section id={id} className="content-section" aria-labelledby={`${id}-title`}>
       <div className="section-inner">
-        <div className="section-heading">
+        <div className="section-heading" data-reveal="">
           <h2 id={`${id}-title`}>{title}</h2>
           {intro ? <p className="section-intro">{intro}</p> : null}
         </div>
