@@ -1,62 +1,351 @@
 {
+  "metadata": {
+    "purpose": "Authoritative knowledge source for Jerome's portfolio AI assistant.",
+    "last_updated": "2026-08-16",
+    "maintenance_note": "Prefer verified facts from Jerome's resume, portfolio, and repositories. Do not infer professional experience from personal projects or home labs."
+  },
   "profile": {
     "name": "Jerome Christian V. Ibon",
+    "preferred_name": "Jerome",
+    "online_alias": "Jeysibn",
     "role": "Aspiring Cloud & DevOps Engineer",
     "location": "Malolos, Bulacan, Philippines",
     "email": "jeysibn@gmail.com",
-    "portfolio": "https://jeysibn.dev",
+    "portfolio": "https://jeysibn.github.io/portfolio",
     "linkedin": "https://linkedin.com/in/jeromeibon",
     "github": "https://github.com/Jeysibn"
   },
-  "summary": "Computer Engineering graduate and OCI-certified engineer who builds and operates production-style Kubernetes infrastructure using AI-assisted workflows. Backed by 6 months of enterprise SaaS technical support.",
-  "skills": {
-    "cloud_platforms": ["AWS (EC2, VPC, Security Groups, Subnets, S3)", "Azure (VNET, VM, Subnets, Function App)"],
-    "infrastructure_as_code": ["HashiCorp Terraform"],
-    "cicd_automation": ["GitHub Actions", "Argo CD"],
-    "containers_orchestration": ["Docker", "Kubernetes (k3s)"],
-    "monitoring_observability": ["Prometheus", "Grafana"],
-    "os_scripting": ["Linux (Ubuntu)", "Bash", "Python", "PowerShell"],
-    "ai_tools": ["Gemini", "Claude", "ChatGPT", "Hermes Agent", "OpenCode Zen"]
+  "professional_summary": "Computer Engineering graduate and OCI-certified engineer with hands-on Cloud, DevOps, Kubernetes, GitOps, Infrastructure as Code, CI/CD, observability, and automation experience through personal projects and home labs. Jerome also has 6 months of enterprise SaaS technical support experience in cloud-based endpoint security environments and prior IT helpdesk internship experience.",
+  "career_objective": {
+    "target_roles": [
+      "Cloud Support Engineer",
+      "Junior DevOps Engineer",
+      "Junior Site Reliability Engineer",
+      "Entry-Level Cloud Engineer"
+    ],
+    "work_arrangements": [
+      "Remote",
+      "Hybrid",
+      "On-site"
+    ],
+    "focus": "Apply hands-on cloud infrastructure, automation, troubleshooting, CI/CD, Infrastructure as Code, and Kubernetes skills in a production engineering environment."
   },
-  "experience": [
+  "experience_context": {
+    "professional_experience": "Jerome's professional experience is primarily enterprise SaaS technical support and IT helpdesk support.",
+    "devops_experience": "Jerome's DevOps, Kubernetes, GitOps, Terraform, CI/CD, and observability experience is primarily hands-on personal project and home-lab experience.",
+    "important_boundary": "Do not describe Jerome as having professionally administered production Kubernetes or DevOps platforms unless explicitly supported by professional experience data. His projects intentionally apply production-oriented engineering practices in personal and home-lab environments."
+  },
+  "skills": {
+    "cloud_platforms": [
+      "Amazon Web Services (AWS): EC2, VPC, Security Groups, Subnets, Routing, S3",
+      "Microsoft Azure: Virtual Networks, Virtual Machines, Subnets, Azure Functions, Azure Cosmos DB, Azure Storage, Microsoft Entra ID",
+      "Oracle Cloud Infrastructure (OCI) foundations"
+    ],
+    "virtualization": [
+      "Proxmox",
+      "VMware vSphere"
+    ],
+    "infrastructure_as_code": [
+      "HashiCorp Terraform",
+      "Terraform remote state with Azure Blob Storage",
+      "AzureRM provider"
+    ],
+    "cicd_gitops": [
+      "GitHub Actions",
+      "Argo CD",
+      "Git",
+      "YAML",
+      "GitHub OpenID Connect (OIDC) federation with Microsoft Entra ID"
+    ],
+    "containers_orchestration": [
+      "Docker",
+      "Kubernetes",
+      "k3s",
+      "Helm"
+    ],
+    "monitoring_observability": [
+      "Prometheus",
+      "Grafana"
+    ],
+    "networking": [
+      "TCP/IP",
+      "DNS",
+      "VPN",
+      "SSH",
+      "RDP",
+      "VPC and subnet design",
+      "Security Groups",
+      "Routing fundamentals"
+    ],
+    "systems": [
+      "Linux (Ubuntu)",
+      "Windows Server",
+      "Active Directory"
+    ],
+    "scripting_programming": [
+      "Python",
+      "Bash",
+      "PowerShell",
+      "JavaScript"
+    ],
+    "security_support_tools": [
+      "Trend Vision One",
+      "Endpoint Security",
+      "Jira",
+      "ITIL practices"
+    ],
+    "ai_tools": [
+      "Gemini",
+      "Claude",
+      "ChatGPT",
+      "Hermes Agent",
+      "OpenCode Zen"
+    ]
+  },
+  "professional_experience": [
     {
       "title": "Technical Support Engineer, Endpoint Security SaaS",
       "company": "TrendAI",
+      "location": "Pasig City, Philippines",
       "duration": "August 2025 – February 2026",
+      "context": "Enterprise SaaS technical support in cloud-based endpoint security environments.",
       "highlights": [
-        "Troubleshot agent deployments and cloud policy configurations in Trend Vision One environments.",
-        "Resolved 80+ enterprise cases adhering to strict SLAs.",
-        "Provisioned AWS test environments to replicate client setups."
+        "Troubleshot endpoint security agent deployment, policy configuration, and connectivity issues across hybrid Windows and Linux environments and cloud-based Trend Vision One Server and Workload Protection environments for global SMB clients.",
+        "Resolved 80+ enterprise technical cases involving network, system, and cloud infrastructure issues while working within SLA requirements.",
+        "Provisioned AWS environments including EC2, VPCs, security groups, subnets, and routing to reproduce customer environments and troubleshoot reported issues.",
+        "Completed a 640-hour New Engineer Training program covering enterprise networking, server administration, VMware vSphere virtualization, Azure fundamentals, and AWS cloud fundamentals.",
+        "Produced detailed customer-facing technical resolution emails that served as official case documentation."
       ]
     },
     {
       "title": "IT Helpdesk Intern",
       "company": "Philippine Transmarine Carriers",
+      "location": "Makati City, Philippines",
       "duration": "March 2025 – May 2025",
+      "context": "Tasks were performed under the supervision and mentorship of senior IT staff.",
       "highlights": [
-        "Administered Active Directory accounts and user access controls.",
-        "Reformatted and redeployed Windows workstations securely."
+        "Assisted with Active Directory account administration and user access controls.",
+        "Supported troubleshooting of network connectivity and VPN issues for office users.",
+        "Performed secure reformatting and redeployment of Windows workstations following enterprise data privacy and asset management procedures.",
+        "Tracked IT asset inventory in Excel and assisted with RAM and SSD hardware upgrades."
       ]
     }
   ],
+  "projects": [
+    {
+      "name": "Cloud-Backed Portfolio",
+      "repository": "https://github.com/Jeysibn/portfolio",
+      "live_site": "https://jeysibn.github.io/portfolio",
+      "type": "Cloud / DevOps / Serverless Portfolio",
+      "status": "Active personal project",
+      "purpose": "Demonstrate practical Cloud and DevOps engineering skills through an end-to-end system that is intentionally small enough to understand while applying production-oriented practices.",
+      "summary": "A serverless portfolio hosted on GitHub Pages with a Python Azure Functions backend, Azure Cosmos DB persistence, Terraform-managed Azure infrastructure, an AI portfolio assistant, and GitHub Actions CI/CD using OIDC federation to Azure.",
+      "architecture": {
+        "frontend": "HTML, JavaScript, Tailwind CSS, and GitHub Pages.",
+        "backend": "Python 3.11 Azure Functions using the Python v2 decorator model.",
+        "database": "Azure Cosmos DB for NoSQL with a PortfolioDB database, Counter container, and VisitorIPs container.",
+        "ai": "An OpenAI-compatible AI provider accessed from the Azure Function App. The frontend is intentionally model/provider-neutral.",
+        "infrastructure": "Terraform using the AzureRM provider.",
+        "state": "Terraform remote state stored in Azure Blob Storage.",
+        "deployment": "GitHub Actions with separate development validation, pull-request production-readiness validation, and path-specific production deployment workflows."
+      },
+      "technologies": [
+        "Azure Functions",
+        "Azure Cosmos DB for NoSQL",
+        "Azure Storage",
+        "Microsoft Entra ID",
+        "Terraform",
+        "GitHub Actions",
+        "GitHub OIDC",
+        "Python 3.11",
+        "JavaScript",
+        "Tailwind CSS",
+        "GitHub Pages"
+      ],
+      "engineering_practices": [
+        "Two-branch dev-to-main workflow with main representing production.",
+        "Automated frontend, backend, and Terraform validation on the development branch.",
+        "Pull-request production-readiness checks before merging to main.",
+        "Backend tests with pytest and linting with Ruff.",
+        "Dependency compatibility checks and dependency security auditing.",
+        "Authenticated Terraform production plans against the real remote backend.",
+        "Path-specific production deployment so frontend, backend, and infrastructure deploy independently.",
+        "Remote Terraform state.",
+        "Short-lived GitHub OIDC authentication to Azure instead of a stored Azure client secret.",
+        "Operational documentation including architecture, CI/CD, OIDC, runbook, security, contributing guidance, and changelog."
+      ],
+      "security_and_privacy": [
+        "Client IP addresses are SHA-256 hashed before storage.",
+        "Visitor-related records use a 24-hour TTL in the VisitorIPs Cosmos DB container.",
+        "AI chat requests are rate-limited per hashed client IP.",
+        "The AI provider API key is stored as a GitHub Actions secret and passed to Terraform as a sensitive variable for Azure Function App configuration.",
+        "Azure deployment authentication uses GitHub OIDC and Microsoft Entra ID rather than reusable Azure client secrets.",
+        "The production main branch is protected by pull-request validation."
+      ],
+      "reliability_lessons": [
+        "A successful package deployment is not the same as runtime readiness.",
+        "An import-time AI client initialization failure once prevented Azure Functions from indexing all routes, including unrelated routes.",
+        "The backend was changed so optional AI provider initialization happens lazily at request time, allowing Function App route discovery even if AI configuration is unavailable.",
+        "The incident reinforced the value of post-deployment health checks and observability as future improvements."
+      ],
+      "cost_design": [
+        "Uses an Azure Functions Linux Consumption plan.",
+        "Uses Azure Cosmos DB free-tier configuration.",
+        "Uses a Standard LRS storage account.",
+        "Uses GitHub Pages for the static frontend.",
+        "Designed to remain low-cost for an Azure for Students subscription."
+      ]
+    },
+    {
+      "name": "Homelab GitOps Environment",
+      "repository": "https://github.com/Jeysibn/homelab-gitops",
+      "type": "DevOps / Kubernetes Home Lab",
+      "status": "Personal home-lab project",
+      "purpose": "Build a fully automated, self-healing, and observable Kubernetes environment using Infrastructure as Code and GitOps practices.",
+      "summary": "A production-style Kubernetes home lab using Proxmox, Terraform, k3s, Argo CD, GitHub Actions, Helm, automated TLS, ingress, and Prometheus/Grafana observability.",
+      "technologies": [
+        "Proxmox",
+        "Terraform",
+        "k3s",
+        "Kubernetes",
+        "Argo CD",
+        "GitHub Actions",
+        "Helm",
+        "Traefik",
+        "cert-manager",
+        "Prometheus",
+        "Grafana"
+      ],
+      "engineering_practices": [
+        "Terraform-based virtual machine provisioning on Proxmox.",
+        "GitOps deployment model using Argo CD.",
+        "Argo CD app-of-apps architecture with hierarchical deployment waves.",
+        "GitHub Actions quality gates that render Helm templates, validate Kubernetes schemas, and scan for security misconfigurations.",
+        "Repository structure separating Kubernetes manifests from Helm value overrides.",
+        "Automated reconciliation to reduce configuration drift and manual deployments."
+      ],
+      "problems_addressed": [
+        "Configuration drift between declared and running Kubernetes state.",
+        "Manual deployment processes.",
+        "Deployment errors such as syntax problems, invalid schemas, and security misconfigurations.",
+        "Local service availability needs including DNS, TLS, ingress, and observability."
+      ],
+      "experience_boundary": "This is a personal production-style home lab and should not be represented as professional production Kubernetes administration."
+    }
+  ],
+  "education": {
+    "degree": "Bachelor of Science in Computer Engineering",
+    "institution": "National University Baliwag",
+    "period": "August 2021 – August 2025"
+  },
   "certifications": [
     "Oracle Cloud Infrastructure (OCI) Foundations Associate",
     "Trend Vision One Server and Workload Protection Professional",
     "GitHub Foundations"
   ],
-  "education": {
-    "degree": "B.S. in Computer Engineering",
-    "institution": "National University Baliwag",
-    "period": "August 2021 – August 2025"
+  "current_learning": [
+    "Advanced cloud networking and hybrid-cloud topologies",
+    "Kubernetes deployment optimization",
+    "GitOps workflows with Helm and Argo CD",
+    "AI-assisted and AI-agent workflows for CI/CD and infrastructure operations",
+    "Cloud observability and operational reliability"
+  ],
+  "working_style_and_strengths": [
+    "Troubleshooting complex technical issues by reproducing environments and narrowing root causes.",
+    "Automation-first mindset: repetitive manual work is treated as a candidate for automation.",
+    "Hands-on learning through implementation rather than theory alone.",
+    "Documentation-oriented approach shaped by enterprise support experience.",
+    "Interest in understanding why an engineering decision is appropriate, not only how to implement it."
+  ],
+  "portfolio_ai_assistant": {
+    "purpose": "Answer questions about Jerome's experience, skills, projects, education, certifications, career goals, and technical background using verified portfolio knowledge.",
+    "backend": "Azure Functions Python API route AiChatAssistant.",
+    "frontend": "JavaScript chat widget embedded across the portfolio pages.",
+    "conversation_memory": "Chat history is stored in browser sessionStorage for the current browser session.",
+    "rate_limit": "10 AI messages per hashed client IP per hour.",
+    "provider_label_policy": "The UI should remain model-agnostic so changing the backend AI model or provider does not require editing the frontend branding."
   },
   "frequently_asked_questions": [
     {
-      "question": "Is Jerome open to remote or hybrid work?",
-      "answer": "Yes, Jerome is open to remote, hybrid, or on-site roles for Cloud Support, Junior DevOps, or Junior Site Reliability Engineering positions."
+      "question": "What roles is Jerome looking for?",
+      "answer": "Jerome is targeting entry-level Cloud Support, Junior DevOps, Junior Site Reliability Engineering, and Cloud Engineering opportunities."
     },
     {
-      "question": "What is Jerome's primary cloud focus?",
-      "answer": "Jerome works across both AWS and Azure, with a heavy emphasis on Infrastructure as Code (Terraform) and Kubernetes orchestration."
+      "question": "Is Jerome open to remote, hybrid, or on-site work?",
+      "answer": "Yes. Jerome is open to remote, hybrid, and on-site opportunities."
+    },
+    {
+      "question": "What is Jerome's primary technical focus?",
+      "answer": "His main focus is Cloud and DevOps engineering, especially Infrastructure as Code with Terraform, CI/CD with GitHub Actions, Kubernetes and GitOps, cloud infrastructure, and operational reliability."
+    },
+    {
+      "question": "Does Jerome have professional DevOps experience?",
+      "answer": "Jerome's professional experience is enterprise SaaS technical support and IT helpdesk support. His DevOps, Kubernetes, GitOps, Terraform, and CI/CD experience comes primarily from hands-on personal projects and home labs designed around production-oriented engineering practices."
+    },
+    {
+      "question": "What professional cloud experience does Jerome have?",
+      "answer": "At TrendAI, Jerome provisioned AWS environments such as EC2 instances, VPCs, security groups, subnets, and routing to reproduce customer setups and troubleshoot reported issues. He also completed training covering Azure and AWS fundamentals."
+    },
+    {
+      "question": "What did Jerome do at TrendAI?",
+      "answer": "He worked as a Technical Support Engineer for endpoint security SaaS, troubleshooting agent deployment, policy, connectivity, networking, system, and cloud-related issues. He resolved more than 80 enterprise technical cases and reproduced customer environments in AWS for troubleshooting."
+    },
+    {
+      "question": "What is Jerome's main Cloud and DevOps portfolio project?",
+      "answer": "His Cloud-Backed Portfolio is an end-to-end serverless DevOps project using GitHub Pages, Azure Functions, Azure Cosmos DB, Terraform, GitHub Actions, GitHub OIDC with Microsoft Entra ID, automated testing, remote Terraform state, and an AI assistant."
+    },
+    {
+      "question": "How does Jerome use Terraform?",
+      "answer": "He uses Terraform to provision and manage Azure infrastructure for his cloud portfolio and to provision virtual machines for his Proxmox Kubernetes home lab. His portfolio also uses remote Terraform state in Azure Blob Storage and automated Terraform validation, planning, and deployment in GitHub Actions."
+    },
+    {
+      "question": "How does Jerome use GitHub Actions?",
+      "answer": "He uses GitHub Actions for development CI, pull-request production-readiness validation, backend packaging, dependency auditing, Terraform validation and planning, and path-specific production deployments to GitHub Pages, Azure Functions, and Azure infrastructure."
+    },
+    {
+      "question": "How does Jerome authenticate GitHub Actions to Azure?",
+      "answer": "His production workflows use GitHub OpenID Connect federation with Microsoft Entra ID, providing short-lived Azure authentication without storing a reusable Azure service principal client secret in GitHub."
+    },
+    {
+      "question": "What Kubernetes experience does Jerome have?",
+      "answer": "Jerome runs a personal production-style Kubernetes home lab using k3s, Argo CD, Helm, GitHub Actions, Traefik, cert-manager, Prometheus, and Grafana. The environment uses Terraform for Proxmox VM provisioning and GitOps reconciliation through Argo CD."
+    },
+    {
+      "question": "What is GitOps in Jerome's home lab?",
+      "answer": "Git is treated as the desired source of truth and Argo CD reconciles the Kubernetes cluster toward that declared state. This reduces configuration drift and replaces manual deployment steps with automated synchronization."
+    },
+    {
+      "question": "What observability tools has Jerome used?",
+      "answer": "Jerome has hands-on experience with Prometheus and Grafana in his Kubernetes home lab. He is also working toward stronger Azure observability and operational monitoring in his cloud portfolio."
+    },
+    {
+      "question": "What certifications does Jerome hold?",
+      "answer": "Jerome holds Oracle Cloud Infrastructure Foundations Associate, Trend Vision One Server and Workload Protection Professional, and GitHub Foundations certifications."
+    },
+    {
+      "question": "What is Jerome's education?",
+      "answer": "He earned a Bachelor of Science in Computer Engineering from National University Baliwag, attending from August 2021 to August 2025."
+    },
+    {
+      "question": "What troubleshooting experience does Jerome have?",
+      "answer": "His troubleshooting background includes enterprise endpoint security SaaS, hybrid Windows/Linux environments, networking and connectivity problems, cloud configuration issues, AWS environment reproduction, Active Directory support, VPN troubleshooting, and root-cause analysis in his own cloud and Kubernetes projects."
+    },
+    {
+      "question": "Why did Jerome move toward DevOps and Cloud engineering?",
+      "answer": "His support experience showed him that reliable systems need more than reactive fixes. That pushed him toward automation, Infrastructure as Code, CI/CD, cloud architecture, and Kubernetes so he could focus on making systems repeatable and resilient from deployment onward."
+    },
+    {
+      "question": "How can I contact Jerome?",
+      "answer": "You can contact Jerome at jeysibn@gmail.com or connect through LinkedIn at linkedin.com/in/jeromeibon and GitHub at github.com/Jeysibn."
     }
+  ],
+  "response_guardrails": [
+    "Use this knowledge base as the authoritative source for claims about Jerome.",
+    "Do not invent employers, roles, certifications, project outcomes, dates, metrics, or technologies.",
+    "Clearly distinguish professional experience from personal project and home-lab experience.",
+    "Do not claim that production-style personal projects are professional production experience.",
+    "If the requested detail is not present in the knowledge base, say that the available portfolio information does not specify it.",
+    "Avoid exposing secrets, API keys, connection strings, Terraform state contents, or private infrastructure credentials.",
+    "Prefer concise recruiter-friendly answers, while providing deeper technical detail when specifically asked."
   ]
 }
