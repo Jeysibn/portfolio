@@ -6,6 +6,8 @@ GitHub Actions authenticates to Microsoft Azure using OpenID Connect (OIDC) work
 
 This removes the need to keep a reusable service principal password in GitHub Secrets.
 
+OIDC secures Azure workload authentication, but it does not eliminate unrelated application secrets. The portfolio still stores the AI provider API key as a GitHub Actions secret and injects it separately into Terraform.
+
 ## Trust Flow
 
 ```text
@@ -29,13 +31,21 @@ Azure RBAC
 
 ## GitHub Secrets
 
-The workflows use identifiers rather than an Azure client secret:
+The Azure login workflows use identifiers rather than an Azure client secret:
 
 ```text
 AZURE_CLIENT_ID
 AZURE_TENANT_ID
 AZURE_SUBSCRIPTION_ID
 ```
+
+The application also uses:
+
+```text
+OPENCODE_API_KEY
+```
+
+`OPENCODE_API_KEY` is not used for Azure authentication. It is an application secret passed to Terraform as `TF_VAR_opencode_api_key` and then configured as an Azure Function App application setting.
 
 The workflow requires:
 
@@ -49,7 +59,7 @@ and authenticates with:
 
 ```yaml
 - name: Login to Azure using OIDC
-  uses: azure/login@v2
+  uses: azure/login@v3
   with:
     client-id: ${{ secrets.AZURE_CLIENT_ID }}
     tenant-id: ${{ secrets.AZURE_TENANT_ID }}
@@ -80,6 +90,8 @@ repo:Jeysibn@184398348/portfolio@1312957789:pull_request
 
 This allows the PR workflow to authenticate and inspect real infrastructure state while keeping `terraform apply` out of the PR pipeline.
 
+Dependabot pull requests do not use this Azure-authenticated path because repository secrets are not provided to Dependabot. They perform local Terraform validation with the backend disabled instead.
+
 ## Audience and Issuer
 
 The federated credentials use:
@@ -97,7 +109,26 @@ The service principal must have enough Azure RBAC permissions for the operation 
 
 Terraform needs management-plane access for resources it manages and access to the Azure Blob container used for remote state. Production backend deployment also needs permission to deploy to the Azure Function App.
 
-Permissions should be narrowed as the project matures rather than expanded to Owner unnecessarily.
+Permissions should be narrowed as the project matures rather than expanded to Owner unnecessarily. The current PR planning identity shares the production service principal, so a future hardening step is to separate or further restrict PR planning permissions.
+
+## Application Secret Flow
+
+The AI provider key is separate from OIDC and follows this path:
+
+```text
+GitHub Actions Secret: OPENCODE_API_KEY
+        |
+        v
+TF_VAR_opencode_api_key
+        |
+        v
+Terraform sensitive variable
+        |
+        v
+Azure Function App application setting
+```
+
+Because Terraform manages this application setting, the secret value is present in Terraform state. The remote state backend must therefore be protected as sensitive infrastructure data.
 
 ## Troubleshooting
 
@@ -115,9 +146,15 @@ OIDC authentication and authorization are separate concerns. Successful login pr
 
 Check the service principal's role assignments at the target subscription, resource group, or resource scope.
 
+### Terraform reports a missing AI API key
+
+Verify that `OPENCODE_API_KEY` exists as a GitHub Actions repository secret and that the workflow passes it as `TF_VAR_opencode_api_key`. Do not print the secret value into logs while troubleshooting.
+
 ## Security Notes
 
-- Do not create a client secret merely to make CI easier; OIDC is the intended authentication method.
-- Do not commit Azure access tokens or local Azure CLI caches.
+- Do not create a client secret merely to make CI easier; OIDC is the intended Azure authentication method.
+- Do not confuse OIDC with application-secret management; third-party API keys still require a secure lifecycle.
+- Do not commit Azure access tokens, API keys, local Azure CLI caches, or secret-bearing `.tfvars` files.
 - Keep production GitHub Environment protections enabled.
+- Treat Terraform remote state as sensitive because it can contain managed secret values.
 - Review Azure role assignments when adding new Terraform-managed services.
