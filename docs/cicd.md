@@ -9,7 +9,7 @@ dev  -> development / integration
 main -> protected production
 ```
 
-This model is intentionally simple for a single-maintainer project while still separating integration from production release. Explicitly scoped feature branches may be used for larger milestones before merging into `dev`.
+Scoped feature branches are used for larger changes before integration into `dev`. Production changes reach `main` only through a pull request.
 
 ## Development CI
 
@@ -17,13 +17,11 @@ Workflow: `.github/workflows/dev-ci.yml`
 
 Triggers:
 
-- push to `dev`
-- pull requests targeting `dev`
-- manual workflow dispatch
+- push to `dev`;
+- pull requests targeting `dev`;
+- manual workflow dispatch.
 
-The development pipeline validates all major project layers.
-
-### Frontend
+### Frontend validation
 
 Working directory: `frontend/app`
 
@@ -36,20 +34,21 @@ npm install
 
 The generated build must contain `dist/index.html` plus JavaScript and CSS assets before frontend validation passes.
 
-### Backend
+The current frontend toolchain requires a modern Node runtime. Local development should use Node.js 22.12+; CI uses Node 22.
 
-- Python 3.11 setup
-- dependency installation
-- dependency compatibility check
-- Python compilation
-- Ruff linting
-- pytest
+### Backend validation
 
-### Terraform
+- Python 3.11 setup;
+- dependency installation and compatibility check;
+- Python compilation;
+- Ruff linting;
+- pytest.
 
-- formatting check
-- initialization without the remote backend
-- Terraform validation
+### Terraform validation
+
+- formatting check;
+- initialization without the remote backend;
+- Terraform validation.
 
 The final `Development CI Passed` job depends on all validation jobs.
 
@@ -59,69 +58,54 @@ Workflow: `.github/workflows/pr-main.yml`
 
 Trigger:
 
-- pull requests targeting `main`
+- pull requests targeting `main`.
 
 The pull request pipeline is the production-readiness gate.
 
-### Frontend Production Readiness
+### Frontend production readiness
 
 The frontend job:
 
-1. installs the React application dependencies;
+1. installs React application dependencies;
 2. runs strict TypeScript validation;
 3. creates a Vite production build;
-4. verifies the generated `dist` artifact;
-5. packages only the static production output;
-6. uploads the artifact for review/debugging.
+4. verifies the generated `dist` output;
+5. packages only the static production artifact;
+6. uploads that artifact for review/debugging.
 
 Source files and development dependencies are not part of the deployable frontend artifact.
 
-### Backend Production Readiness
+The Vite configuration also injects a build timestamp used by the deployed UI to calculate **Release age**. This timestamp is release metadata, not infrastructure uptime.
+
+### Backend production readiness
 
 Runs:
 
-- dependency compatibility checks
-- Python compilation
-- Ruff linting
-- dependency security audit with `pip-audit`
-- backend tests
+- dependency compatibility checks;
+- Python compilation;
+- Ruff linting;
+- dependency security audit with `pip-audit`;
+- backend tests.
 
-### Backend Production Build
+### Backend production build
 
 Builds the Azure Function deployment package using the same project dependencies required in production.
 
-### Terraform Production Plan
+### Terraform production plan
 
 For normal pull requests, the Terraform job:
 
 1. requests a GitHub OIDC token;
 2. authenticates to Azure through Microsoft Entra ID;
 3. initializes the real Azure Blob remote backend;
-4. validates the Terraform configuration;
+4. validates Terraform configuration;
 5. injects the AI provider key as `TF_VAR_opencode_api_key` from the GitHub Actions `OPENCODE_API_KEY` secret;
 6. generates a real plan against current production state;
 7. writes the plan to the GitHub Actions step summary.
 
 The PR workflow never runs `terraform apply`.
 
-The application-secret flow is:
-
-```text
-GitHub Actions Secret: OPENCODE_API_KEY
-        |
-        v
-TF_VAR_opencode_api_key
-        |
-        v
-Terraform sensitive variable
-        |
-        v
-Azure Function App OPENCODE_API_KEY setting
-```
-
-Because Terraform manages the Function App setting, the secret value is also present in Terraform state. Access to the remote backend must therefore be treated as sensitive.
-
-### Dependabot Terraform Validation
+### Dependabot Terraform validation
 
 Dependabot pull requests intentionally do not receive repository secrets. For Dependabot, the PR workflow:
 
@@ -130,15 +114,13 @@ Dependabot pull requests intentionally do not receive repository secrets. For De
 - runs formatting and validation checks;
 - skips authenticated remote-state planning.
 
-This keeps dependency-update PRs safe without weakening secret isolation.
-
-### Final Gate
+### Final gate
 
 `Production Ready` depends on frontend readiness, backend validation/build, and Terraform validation/plan. It is the final merge gate for protected `main`.
 
 ## Production Deployment
 
-Production occurs only after changes are merged to `main`.
+Production occurs only after merge into `main`.
 
 ### Frontend
 
@@ -167,7 +149,9 @@ checkout
 
 Deployment target: GitHub Pages.
 
-The live-page verification means a successful artifact upload alone is not considered enough evidence of a successful frontend release.
+Every new frontend build receives a fresh build timestamp, so the visible Release age counter resets with each release.
+
+The live-page verification means successful artifact upload alone is not considered enough evidence of a successful frontend release.
 
 ### Backend
 
@@ -190,7 +174,7 @@ After package deployment, the workflow:
 2. validates the health JSON contract;
 3. calls `GetVisitorCount`;
 4. verifies that the response contains an integer count;
-5. fails the deployment when runtime verification fails.
+5. fails the deployment if runtime verification fails.
 
 ### Terraform
 
@@ -203,7 +187,7 @@ terraform/**
 .github/workflows/terraform-deploy.yml
 ```
 
-The production Terraform workflow performs:
+Production flow:
 
 ```text
 Azure OIDC login
@@ -214,7 +198,13 @@ Azure OIDC login
 -> terraform apply saved plan
 ```
 
-A fresh plan is generated on `main` even when the PR previously generated a plan, because remote infrastructure state may have changed between review and merge.
+A fresh plan is generated on `main` even when PR validation previously generated one because remote state may change between review and merge.
+
+## Documentation-Only Releases
+
+Markdown-only changes do not match the frontend, backend, or Terraform deployment path filters, so synchronizing documentation after a successful release does not redeploy the application or mutate Azure infrastructure.
+
+Documentation still follows the normal branch model so `dev` and `main` remain aligned with the deployed system description.
 
 ## Concurrency
 
@@ -230,7 +220,7 @@ Production Terraform deployments do not cancel in-progress applies. Infrastructu
 Feature / developer change
    |
    v
-PR or push -> dev
+PR -> dev
    |
    v
 Development CI
@@ -252,4 +242,4 @@ Merge to protected main
    +--> Terraform plan -> apply
 ```
 
-The key rule is simple: validation can happen before merge, but production mutation happens only after merge to `main`, and deployment success is followed by runtime verification where practical.
+The core rule is simple: validation happens before merge, production mutation happens only after merge to `main`, and deployment success is followed by runtime verification where practical.
