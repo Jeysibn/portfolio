@@ -15,7 +15,12 @@ function formatReleaseAge(now = new Date()) {
   return `${minutes}m`;
 }
 
-function updateHeroContactAction() {
+function updateHeroCopy() {
+  const title = document.getElementById("hero-title");
+  if (title) {
+    title.textContent = "Aspiring Cloud & DevOps Engineer building reliable, automated systems.";
+  }
+
   const action = document.querySelector<HTMLAnchorElement>(".hero-actions .button-primary");
   if (!action) return;
   action.href = "#contact";
@@ -34,7 +39,7 @@ function bindProjectCards() {
     card.tabIndex = 0;
     card.setAttribute("role", "button");
     card.setAttribute("aria-haspopup", "dialog");
-    card.setAttribute("aria-label", `View ${title} case study`);
+    card.setAttribute("aria-label", `View ${title} project details`);
 
     const open = () => action.click();
     card.addEventListener("click", (event) => {
@@ -72,27 +77,19 @@ function updateReleaseAge() {
 }
 
 function installComfort(attempt = 0) {
-  const ready = document.querySelector(".hero-actions") && document.querySelector(".monitor-summary") && document.querySelector(".project-row");
+  const ready = document.getElementById("hero-title") && document.querySelector(".hero-actions") && document.querySelector(".monitor-summary") && document.querySelector(".project-row");
   if (!ready && attempt < 30) {
     window.setTimeout(() => installComfort(attempt + 1), 50);
     return;
   }
 
   cleanupComfort?.();
-  updateHeroContactAction();
+  updateHeroCopy();
   bindProjectCards();
   updateReleaseAge();
 
   const runtimeTimer = window.setInterval(updateReleaseAge, 1_000);
-  const rebinder = window.setInterval(() => {
-    updateHeroContactAction();
-    bindProjectCards();
-  }, 2_000);
-
-  cleanupComfort = () => {
-    window.clearInterval(runtimeTimer);
-    window.clearInterval(rebinder);
-  };
+  cleanupComfort = () => window.clearInterval(runtimeTimer);
 }
 
 window.requestAnimationFrame(() => installComfort());
