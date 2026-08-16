@@ -98,9 +98,9 @@ resource "azurerm_linux_function_app" "function" {
   }
 
   app_settings = {
-    "CosmosDbConnectionString"             = azurerm_cosmosdb_account.db.primary_sql_connection_string
-    "AzureWebJobsFeatureFlags"             = "EnableWorkerIndexing"
-    "OPENCODE_API_KEY"                     = var.opencode_api_key
+    "CosmosDbConnectionString"              = azurerm_cosmosdb_account.db.primary_sql_connection_string
+    "AzureWebJobsFeatureFlags"              = "EnableWorkerIndexing"
+    "OPENCODE_API_KEY"                      = var.opencode_api_key
     "APPLICATIONINSIGHTS_CONNECTION_STRING" = azurerm_application_insights.portfolio.connection_string
   }
 }
