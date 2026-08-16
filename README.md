@@ -5,9 +5,9 @@
 [![Terraform](https://img.shields.io/badge/IaC-Terraform-7B42BC?logo=terraform)](https://developer.hashicorp.com/terraform)
 [![Azure](https://img.shields.io/badge/Cloud-Microsoft%20Azure-0078D4?logo=microsoftazure)](https://azure.microsoft.com/)
 
-A production-oriented cloud portfolio built as a hands-on DevOps project. The site combines a static frontend, a Python serverless API, Azure Cosmos DB, Terraform-managed infrastructure, an AI portfolio assistant, and GitHub Actions CI/CD with OpenID Connect (OIDC) authentication to Azure.
+A production-oriented cloud portfolio built as a hands-on DevOps project. The site combines a static frontend, a Python serverless API, Azure Cosmos DB, Terraform-managed infrastructure, a model-neutral AI portfolio assistant, and GitHub Actions CI/CD with OpenID Connect (OIDC) authentication to Azure.
 
-The project is intentionally small enough to understand end-to-end, while applying real engineering practices around infrastructure as code, automated validation, protected production releases, remote state, short-lived cloud credentials, and operational documentation.
+The project is intentionally small enough to understand end-to-end, while applying real engineering practices around infrastructure as code, automated validation, protected production releases, remote state, short-lived cloud credentials, application-secret management, and operational documentation.
 
 ## Live Project
 
@@ -26,7 +26,7 @@ The project is intentionally small enough to understand end-to-end, while applyi
 | Frontend | HTML, JavaScript, Tailwind CSS, GitHub Pages | Static portfolio UI, visitor counter, AI chat interface |
 | Backend | Azure Functions, Python 3.11 | Visitor counter API and AI assistant API |
 | Database | Azure Cosmos DB for NoSQL | Persistent visitor count, hashed visitor records, chat rate-limit records |
-| AI | OpenCode Zen OpenAI-compatible API | Portfolio-specific conversational assistant |
+| AI | OpenAI-compatible external API | Portfolio-specific conversational assistant with model-neutral frontend branding |
 | Infrastructure | Terraform + AzureRM | Azure resource provisioning and lifecycle management |
 | CI/CD | GitHub Actions | Validation, security checks, build packaging, Terraform planning, production deployment |
 | Cloud authentication | GitHub OIDC + Microsoft Entra ID | Short-lived Azure authentication without stored client secrets |
@@ -77,7 +77,7 @@ main → protected production
 
 ### Development
 
-A push to `dev` runs automated validation for the frontend, backend, and Terraform configuration.
+A push to `dev` or pull request targeting `dev` runs automated validation for the frontend, backend, and Terraform configuration.
 
 ### Pull Request to `main`
 
@@ -89,10 +89,12 @@ A `dev → main` pull request runs production-readiness checks including:
 - dependency security auditing
 - backend tests
 - Azure Function deployment package build
-- Azure OIDC authentication
+- Azure OIDC authentication for normal contributor PRs
 - Terraform initialization against the real remote backend
 - authenticated Terraform production plan
 - final `Production Ready` merge gate
+
+Dependabot PRs use a safe Terraform validation path with the backend disabled and no Azure authentication because repository secrets are intentionally unavailable to Dependabot.
 
 No infrastructure or application deployment occurs from a pull request.
 
@@ -119,9 +121,26 @@ Key security decisions include:
 - protected `main` branch with required PR validation
 - separate OIDC trust subjects for pull-request planning and production environment deployment
 - hashed client IP addresses before storage in Cosmos DB
-- Terraform state stored remotely in Azure Blob Storage
+- AI provider API key stored in GitHub Actions Secrets and passed to Terraform as a sensitive `TF_VAR` input
+- Terraform state stored remotely in Azure Blob Storage and treated as sensitive because managed secret values can be represented in state
 - backend dependency auditing in PR validation
 - environment and local-secret files excluded from Git
+- lazy AI client initialization so optional AI configuration failures cannot prevent unrelated Function routes from being indexed
+
+The application-secret flow is:
+
+```text
+GitHub Actions Secret: OPENCODE_API_KEY
+        |
+        v
+TF_VAR_opencode_api_key
+        |
+        v
+Terraform sensitive variable
+        |
+        v
+Azure Function App application setting
+```
 
 See [`docs/azure-oidc.md`](docs/azure-oidc.md) and [`SECURITY.md`](SECURITY.md).
 
@@ -218,7 +237,7 @@ Container:       tfstate
 State key:       portfolio.terraform.tfstate
 ```
 
-The CI/CD identity also requires permission to access the remote state blob.
+The CI/CD identity also requires permission to access the remote state blob. Because Terraform manages application settings containing sensitive values, state access should be restricted and state contents should not be exposed in logs or public troubleshooting output.
 
 ## Azure Resources Managed by Terraform
 
@@ -237,6 +256,8 @@ Terraform currently provisions:
 ## Operational Notes
 
 The portfolio is designed to remain low-cost and suitable for a personal cloud project. The architecture uses serverless/consumption-oriented services and Cosmos DB free-tier configuration where applicable.
+
+A successful deployment job is not considered equivalent to runtime readiness. The Azure Functions incident that motivated lazy AI initialization is documented in the runbook and informs the roadmap for post-deploy health checks and observability.
 
 For troubleshooting and deployment operations, see [`docs/runbook.md`](docs/runbook.md).
 
@@ -258,6 +279,7 @@ This repository is both a live portfolio and a learning project focused on demon
 - managing infrastructure with Terraform
 - building CI/CD pipelines
 - implementing secure workload identity
+- managing application secrets without committing credentials
 - managing remote state
 - enforcing production release gates
 - testing and validating application changes
