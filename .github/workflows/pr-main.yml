@@ -210,6 +210,8 @@ jobs:
 
       - name: Terraform production plan
         if: github.actor != 'dependabot[bot]'
+        env:
+          TF_VAR_opencode_api_key: ${{ secrets.OPENCODE_API_KEY }}
         run: |
           terraform plan \
             -input=false \
