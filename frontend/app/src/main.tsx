@@ -5,7 +5,9 @@ import "./index.css";
 import "./redesign.css";
 import "./impeccable.css";
 import "./refine.css";
+import "./comfort.css";
 import "./ui-refinements";
+import "./comfort-refinements";
 
 const root = document.getElementById("root");
 
