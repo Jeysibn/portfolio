@@ -62,9 +62,11 @@ AI_HEADERS = {
 # ---------------------------------------------------------
 # GLOBAL CLIENTS
 # ---------------------------------------------------------
-# Reusing clients between Azure Function invocations reduces
-# unnecessary connection creation on warm serverless instances.
+# Clients are created lazily. This is important for Azure Functions because
+# module-level configuration errors can prevent the Python worker from indexing
+# every route in the Function App.
 cosmos_client = None
+ai_client = None
 
 
 def get_cosmos_client() -> CosmosClient:
@@ -78,11 +80,22 @@ def get_cosmos_client() -> CosmosClient:
     return cosmos_client
 
 
-# OpenCode Zen exposes an OpenAI-compatible API.
-ai_client = OpenAI(
-    api_key=os.environ.get("OPENCODE_API_KEY"),
-    base_url=AI_BASE_URL,
-)
+def get_ai_client() -> OpenAI:
+    """Create and reuse the OpenCode Zen OpenAI-compatible client."""
+    global ai_client
+
+    if ai_client is None:
+        api_key = os.environ.get("OPENCODE_API_KEY")
+
+        if not api_key:
+            raise RuntimeError("OPENCODE_API_KEY is not configured.")
+
+        ai_client = OpenAI(
+            api_key=api_key,
+            base_url=AI_BASE_URL,
+        )
+
+    return ai_client
 
 
 # ---------------------------------------------------------
@@ -129,9 +142,7 @@ def load_knowledge_base() -> dict:
             return json.load(file)
 
     except (OSError, json.JSONDecodeError):
-        logger.exception(
-            "Unable to load the portfolio knowledge base: %s",
-        )
+        logger.exception("Unable to load the portfolio knowledge base.")
         return {}
 
 
@@ -255,9 +266,7 @@ def GetVisitorCount(req: func.HttpRequest) -> func.HttpResponse:
         KeyError,
         ValueError,
     ):
-        logger.exception(
-            "Visitor counter request failed: %s",
-        )
+        logger.exception("Visitor counter request failed.")
 
         return func.HttpResponse(
             body="Error connecting to the database.",
@@ -428,7 +437,9 @@ def AiChatAssistant(req: func.HttpRequest) -> func.HttpResponse:
         # -------------------------------------------------
         # OpenCode Zen AI request
         # -------------------------------------------------
-        response = ai_client.chat.completions.create(
+        client = get_ai_client()
+
+        response = client.chat.completions.create(
             model=AI_MODEL,
             messages=messages,
             temperature=0.7,
@@ -438,9 +449,7 @@ def AiChatAssistant(req: func.HttpRequest) -> func.HttpResponse:
         response_content = response.choices[0].message.content
 
         if not response_content:
-            logger.error(
-                "AI provider returned an empty response."
-            )
+            logger.error("AI provider returned an empty response.")
 
             return func.HttpResponse(
                 body=json.dumps(
@@ -466,10 +475,24 @@ def AiChatAssistant(req: func.HttpRequest) -> func.HttpResponse:
             headers=AI_HEADERS,
         )
 
-    except exceptions.CosmosHttpResponseError:
-        logger.exception(
-            "Cosmos DB error while processing AI request: %s",
+    except RuntimeError:
+        logger.exception("AI service configuration is missing or invalid.")
+
+        return func.HttpResponse(
+            body=json.dumps(
+                {
+                    "error": (
+                        "The AI assistant is temporarily unavailable."
+                    )
+                }
+            ),
+            mimetype="application/json",
+            status_code=503,
+            headers=AI_HEADERS,
         )
+
+    except exceptions.CosmosHttpResponseError:
+        logger.exception("Cosmos DB error while processing AI request.")
 
         return func.HttpResponse(
             body=json.dumps(
@@ -485,9 +508,7 @@ def AiChatAssistant(req: func.HttpRequest) -> func.HttpResponse:
         )
 
     except OpenAIError:
-        logger.exception(
-            "AI provider request failed: %s",
-        )
+        logger.exception("AI provider request failed.")
 
         return func.HttpResponse(
             body=json.dumps(
@@ -504,9 +525,7 @@ def AiChatAssistant(req: func.HttpRequest) -> func.HttpResponse:
         )
 
     except (KeyError, TypeError, AttributeError, ValueError):
-        logger.exception(
-            "Invalid data encountered while processing AI request: %s",
-        )
+        logger.exception("Invalid data encountered while processing AI request.")
 
         return func.HttpResponse(
             body=json.dumps(
