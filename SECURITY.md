@@ -32,11 +32,33 @@ Examples that must remain outside Git include:
 
 Production GitHub Actions authenticate to Azure using OIDC workload identity federation rather than a stored Azure client secret.
 
+Application secrets are handled separately from Azure workload identity. The AI provider key follows this runtime path:
+
+```text
+GitHub Actions Secret: OPENCODE_API_KEY
+        |
+        v
+TF_VAR_opencode_api_key
+        |
+        v
+Terraform sensitive variable
+        |
+        v
+Azure Function App application setting
+```
+
+The API key must never be committed to Terraform source, workflow YAML, documentation, or committed `.tfvars` files.
+
+Because Terraform manages the Function App application setting, the secret value is also represented in Terraform state. The remote Terraform backend must therefore be treated as sensitive infrastructure data and access should be restricted accordingly.
+
+Terraform's `sensitive = true` marking reduces accidental CLI/output disclosure but does not remove the value from state.
+
 ## Production Controls
 
 - `main` is protected and accepts changes through pull requests.
 - Production-readiness checks must pass before merge.
 - Pull requests may authenticate to Azure for Terraform planning but do not apply infrastructure.
+- Dependabot pull requests perform Terraform validation without Azure authentication or remote-state planning because repository secrets are intentionally unavailable to Dependabot.
 - Production infrastructure mutation occurs only from the post-merge `main` workflow.
 - GitHub Environment and Entra federated identity subjects restrict eligible production workflows.
 
