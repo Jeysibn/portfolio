@@ -4,6 +4,8 @@ import App from "./App";
 import "./index.css";
 import "./redesign.css";
 import "./impeccable.css";
+import "./refine.css";
+import "./ui-refinements";
 
 const root = document.getElementById("root");
 
