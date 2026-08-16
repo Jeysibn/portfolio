@@ -1,0 +1,215 @@
+/* Third design pass: simplify labels, rebalance credentials, center case studies, and remove unwanted chrome. */
+
+/* Remove the scroll progress indicator entirely. */
+.scroll-progress-track {
+  display: none !important;
+}
+
+/* Keep short section titles visually direct. */
+.section-heading h2,
+.credentials-layout h2 {
+  max-width: 14ch;
+}
+
+/* Projects: remove the decorative Git -> Automation -> Runtime artwork and let the work stand on its own. */
+.project-row,
+.project-row-reverse {
+  display: block;
+  width: min(980px, 100%);
+  margin-inline: auto;
+}
+
+.project-visual {
+  display: none !important;
+}
+
+.project-copy,
+.project-row-reverse .project-copy {
+  max-width: none;
+  order: initial;
+  padding: clamp(28px, 4vw, 42px);
+}
+
+.project-copy > p:not(.project-category) {
+  max-width: 74ch;
+}
+
+.project-row::before {
+  inset: 12% 5% -12%;
+}
+
+/* Credentials: use the full content width instead of squeezing education and certificates side-by-side. */
+.credentials-layout {
+  display: block;
+}
+
+.credentials-layout > div:first-child {
+  max-width: 760px;
+  margin-bottom: clamp(34px, 5vw, 54px);
+}
+
+.credentials-content {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+}
+
+.education-block {
+  width: min(820px, 100%);
+}
+
+.certification-block {
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.credential-subheading {
+  margin-bottom: 18px;
+}
+
+.certification-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.cert-card {
+  min-height: 280px;
+  padding: 24px;
+}
+
+.cert-card-topline {
+  min-height: 40px;
+  margin-bottom: 30px;
+}
+
+.cert-provider-mark {
+  font-size: 0.82rem;
+}
+
+.cert-card h3 {
+  max-width: 28ch;
+  font-size: 0.98rem;
+  line-height: 1.5;
+}
+
+.cert-description {
+  padding: 24px;
+  font-size: 0.79rem;
+  line-height: 1.7;
+}
+
+.cert-hover-hint {
+  left: 24px;
+  bottom: 22px;
+}
+
+/* Project details are a centered modal now, not a right-side drawer. */
+.case-dialog {
+  width: min(920px, calc(100vw - 32px));
+  max-width: 920px;
+  height: auto;
+  max-height: min(88dvh, 900px);
+  margin: auto;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--cyan) 28%, var(--line-strong));
+  border-radius: 16px;
+  background: transparent;
+  box-shadow: 0 34px 110px rgb(0 0 0 / 0.46);
+}
+
+.case-dialog::backdrop {
+  background: rgb(0 4 10 / 0.76);
+  backdrop-filter: blur(10px);
+}
+
+.case-panel {
+  width: 100%;
+  height: auto;
+  max-height: min(88dvh, 900px);
+  margin: 0;
+  padding: clamp(28px, 5vw, 52px);
+  overflow-y: auto;
+  background: var(--surface);
+  box-shadow: none;
+}
+
+.case-dialog[open] .case-panel {
+  animation: case-modal-pop 320ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.case-header h2 {
+  max-width: 16ch;
+  font-size: clamp(2rem, 4vw, 3.45rem);
+  line-height: 1.02;
+}
+
+/* Local Manila time lives inside the monitor summary. */
+.monitor-summary {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.monitor-local-time strong {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+@keyframes case-modal-pop {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.955);
+    filter: blur(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@media (max-width: 1080px) {
+  .certification-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .certification-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cert-card {
+    min-height: 250px;
+  }
+
+  .monitor-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .monitor-summary > div:nth-child(3),
+  .monitor-summary > div:nth-child(4) {
+    border-top: 1px solid var(--line);
+  }
+
+  .monitor-summary > div:nth-child(3) {
+    border-left: 0;
+  }
+
+  .case-dialog {
+    width: calc(100vw - 20px);
+    max-height: 92dvh;
+    border-radius: 13px;
+  }
+
+  .case-panel {
+    max-height: 92dvh;
+    padding: 24px 20px 30px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .case-dialog[open] .case-panel {
+    animation: none;
+  }
+}
