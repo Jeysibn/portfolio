@@ -41,6 +41,10 @@ function bindProjectCards() {
     card.setAttribute("aria-haspopup", "dialog");
     card.setAttribute("aria-label", `View ${title} project details`);
 
+    action.tabIndex = -1;
+    action.setAttribute("aria-hidden", "true");
+    action.replaceChildren();
+
     const open = () => action.click();
     card.addEventListener("click", (event) => {
       const target = event.target;
