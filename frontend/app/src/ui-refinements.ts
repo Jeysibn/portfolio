@@ -137,28 +137,23 @@ function ensureManilaClock() {
   clock = document.createElement("div");
   clock.className = "monitor-local-time";
   clock.setAttribute("aria-label", "Current time in Manila, Philippines");
-
   const label = document.createElement("span");
   label.textContent = "Manila";
-
   const value = document.createElement("strong");
   value.className = "monitor-local-time-value";
-
   clock.append(label, value);
   monitorSummary.append(clock);
   return clock;
 }
 
 function updateManilaClock() {
-  const clock = ensureManilaClock();
-  const value = clock?.querySelector<HTMLElement>(".monitor-local-time-value");
+  const value = ensureManilaClock()?.querySelector<HTMLElement>(".monitor-local-time-value");
   if (value) value.textContent = manilaTimeFormatter.format(new Date());
 }
 
 function ensureScrollPatternLayer() {
   const shell = document.querySelector<HTMLElement>(".site-shell");
   if (!shell || shell.querySelector(".scroll-pattern-layer")) return;
-
   const layer = document.createElement("div");
   layer.className = "scroll-pattern-layer";
   layer.setAttribute("aria-hidden", "true");
@@ -177,10 +172,8 @@ function createCloseButton(label: string) {
 function ensureImageZoomDialog() {
   let dialog = document.querySelector<HTMLDialogElement>(".image-zoom-dialog");
   if (dialog) return dialog;
-
   dialog = document.createElement("dialog");
   dialog.className = "image-zoom-dialog";
-
   const frame = document.createElement("div");
   frame.className = "image-zoom-frame";
   const close = createCloseButton("Close architecture diagram");
@@ -188,11 +181,9 @@ function ensureImageZoomDialog() {
   image.className = "image-zoom-content";
   const caption = document.createElement("p");
   caption.className = "image-zoom-caption";
-
   frame.append(close, image, caption);
   dialog.append(frame);
   document.body.append(dialog);
-
   close.addEventListener("click", () => dialog?.close());
   dialog.addEventListener("click", (event) => {
     if (event.target === dialog) dialog?.close();
@@ -205,7 +196,6 @@ function openImageZoom(source: HTMLImageElement) {
   const image = dialog.querySelector<HTMLImageElement>(".image-zoom-content");
   const caption = dialog.querySelector<HTMLElement>(".image-zoom-caption");
   if (!image || !caption) return;
-
   image.src = source.currentSrc || source.src;
   image.alt = source.alt;
   caption.textContent = source.alt || "Architecture diagram";
@@ -218,14 +208,11 @@ function installArchitectureZoomDelegation() {
     if (!(target instanceof Element)) return;
     const link = target.closest<HTMLAnchorElement>(".architecture-link");
     if (!link) return;
-
     const image = link.querySelector<HTMLImageElement>("img");
     if (!image) return;
-
     event.preventDefault();
     openImageZoom(image);
   };
-
   document.addEventListener("click", handleArchitectureClick);
   return () => document.removeEventListener("click", handleArchitectureClick);
 }
@@ -233,7 +220,6 @@ function installArchitectureZoomDelegation() {
 function ensureSkillDialog() {
   let dialog = document.querySelector<HTMLDialogElement>(".skill-detail-dialog");
   if (dialog) return dialog;
-
   dialog = document.createElement("dialog");
   dialog.className = "skill-detail-dialog";
   document.body.append(dialog);
@@ -247,14 +233,12 @@ function openSkillDialog(groupLabel: string) {
   const group = skillGroups.find((item) => item.label === groupLabel);
   const detail = skillDetails[groupLabel];
   if (!group || !detail) return;
-
   const dialog = ensureSkillDialog();
   dialog.replaceChildren();
   const panel = document.createElement("article");
   panel.className = "skill-detail-panel";
   const close = createCloseButton("Close skill details");
   close.addEventListener("click", () => dialog.close());
-
   const eyebrow = document.createElement("p");
   eyebrow.className = "skill-detail-eyebrow";
   eyebrow.textContent = "CAPABILITY DETAIL";
@@ -268,7 +252,6 @@ function openSkillDialog(groupLabel: string) {
   practice.textContent = detail.practice;
   const list = document.createElement("div");
   list.className = "skill-detail-list";
-
   group.items.forEach((item) => {
     const entry = document.createElement("div");
     const name = document.createElement("h3");
@@ -278,7 +261,6 @@ function openSkillDialog(groupLabel: string) {
     entry.append(name, description);
     list.append(entry);
   });
-
   panel.append(close, eyebrow, title, summary, practice, list);
   dialog.append(panel);
   if (!dialog.open) dialog.showModal();
@@ -289,7 +271,6 @@ function bindSkillCards() {
     if (card.dataset.detailBound === "true") return;
     const label = card.querySelector<HTMLElement>("h3")?.textContent?.trim();
     if (!label) return;
-
     card.dataset.detailBound = "true";
     card.tabIndex = 0;
     card.setAttribute("role", "button");
@@ -305,9 +286,7 @@ function bindSkillCards() {
 }
 
 function installContinuousScrollMotion() {
-  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (reduceMotion) return () => undefined;
-
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return () => undefined;
   const reactiveSelector = [
     ".section-heading",
     ".timeline-item",
@@ -318,51 +297,36 @@ function installContinuousScrollMotion() {
     ".resume-preview",
     ".contact-panel",
   ].join(",");
-
   const elements = Array.from(document.querySelectorAll<HTMLElement>(reactiveSelector));
   elements.forEach((element) => element.classList.add("scroll-reactive"));
-
   const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => entry.target.classList.toggle("is-in-view", entry.isIntersecting));
-    },
+    (entries) => entries.forEach((entry) => entry.target.classList.toggle("is-in-view", entry.isIntersecting)),
     { threshold: 0.08, rootMargin: "8% 0px 8% 0px" },
   );
   elements.forEach((element) => observer.observe(element));
-
   let frame = 0;
   const update = () => {
     const viewportHeight = Math.max(window.innerHeight, 1);
     const scrollable = Math.max(document.documentElement.scrollHeight - viewportHeight, 1);
     const progress = Math.min(1, Math.max(0, window.scrollY / scrollable));
-
-    document.documentElement.style.setProperty("--page-scroll", `${window.scrollY}`);
-    document.documentElement.style.setProperty("--page-progress", progress.toFixed(4));
     document.documentElement.style.setProperty("--pattern-y", `${(-window.scrollY * 0.18).toFixed(2)}px`);
     document.documentElement.style.setProperty("--pattern-x", `${(window.scrollY * 0.07).toFixed(2)}px`);
     document.documentElement.style.setProperty("--pattern-rotate", `${(progress * 7 - 3.5).toFixed(2)}deg`);
-
     elements.forEach((element) => {
       const rect = element.getBoundingClientRect();
       const center = rect.top + rect.height / 2;
       const phase = Math.max(-1.25, Math.min(1.25, (center - viewportHeight / 2) / viewportHeight));
-      const motionY = phase * -12;
-      const motionRotate = phase * 0.22;
-      element.style.setProperty("--viewport-phase", phase.toFixed(4));
-      element.style.setProperty("--motion-y", `${motionY.toFixed(2)}px`);
-      element.style.setProperty("--motion-rotate", `${motionRotate.toFixed(3)}deg`);
+      element.style.setProperty("--motion-y", `${(phase * -12).toFixed(2)}px`);
+      element.style.setProperty("--motion-rotate", `${(phase * 0.22).toFixed(3)}deg`);
     });
   };
-
   const requestUpdate = () => {
     cancelAnimationFrame(frame);
     frame = requestAnimationFrame(update);
   };
-
   update();
   window.addEventListener("scroll", requestUpdate, { passive: true });
   window.addEventListener("resize", requestUpdate);
-
   return () => {
     cancelAnimationFrame(frame);
     observer.disconnect();
@@ -373,12 +337,10 @@ function installContinuousScrollMotion() {
 
 function installRefinements(attempt = 0) {
   const appReady = document.getElementById("about-title") && document.querySelector(".monitor-summary");
-
   if (!appReady && attempt < 30) {
     window.setTimeout(() => installRefinements(attempt + 1), 50);
     return;
   }
-
   cleanupInstalledRefinements?.();
   applyShortSectionTitles();
   removeRedundantSectionIntros();
@@ -386,11 +348,9 @@ function installRefinements(attempt = 0) {
   ensureScrollPatternLayer();
   updateManilaClock();
   bindSkillCards();
-
   const stopArchitectureZoom = installArchitectureZoomDelegation();
   const stopScrollMotion = installContinuousScrollMotion();
   const clockTimer = window.setInterval(updateManilaClock, 1_000);
-
   cleanupInstalledRefinements = () => {
     window.clearInterval(clockTimer);
     stopArchitectureZoom();
