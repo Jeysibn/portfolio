@@ -2,7 +2,7 @@
   "metadata": {
     "last_updated": "2026-08-16",
     "purpose": "Authoritative knowledge source for Jerome Ibon's portfolio AI assistant.",
-    "scope": "Professional background, education, certifications, technical skills, projects, career interests, and current learning.",
+    "scope": "Professional background, education, certifications, technical skills, projects, career interests, availability, and current learning.",
     "accuracy_note": "Professional employment and personal/home-lab project experience are intentionally distinguished to avoid overstating production experience."
   },
   "profile": {
@@ -15,14 +15,34 @@
     "portfolio": "https://jeysibn.dev",
     "github_pages_portfolio": "https://jeysibn.github.io/portfolio",
     "linkedin": "https://linkedin.com/in/jeromeibon",
-    "github": "https://github.com/Jeysibn"
+    "github": "https://github.com/Jeysibn",
+    "languages": [
+      {
+        "language": "English",
+        "proficiency": "Professional working proficiency"
+      },
+      {
+        "language": "Filipino",
+        "proficiency": "Professional working proficiency"
+      }
+    ]
   },
   "career": {
+    "current_status": "Actively job hunting while continuously upskilling through hands-on projects, especially the Enterprise GitOps Homelab and Cloud-Backed Portfolio.",
+    "availability": "Available to start immediately.",
     "target_roles": [
       "Cloud Support Engineer",
       "Junior DevOps Engineer",
-      "Junior Site Reliability Engineer"
+      "Junior Site Reliability Engineer",
+      "Entry-Level Cloud Engineer"
     ],
+    "target_geography": [
+      "Philippines-based opportunities",
+      "International remote opportunities",
+      "Local relocation opportunities",
+      "International relocation opportunities"
+    ],
+    "relocation": "Willing to relocate locally or internationally.",
     "work_arrangement": [
       "Remote",
       "Hybrid",
@@ -39,7 +59,9 @@
   "education": {
     "degree": "B.S. in Computer Engineering",
     "institution": "National University Baliwag",
-    "period": "August 2021 – August 2025"
+    "period": "August 2021 – August 2025",
+    "achievement": "Jerome and his team received the Best Capstone award for their graduating year.",
+    "capstone_title": "Not yet added to the knowledge base."
   },
   "certifications": [
     "Oracle Cloud Infrastructure (OCI) Foundations Associate",
@@ -169,7 +191,7 @@
         "database": "Azure Cosmos DB for NoSQL with PortfolioDB, Counter, and VisitorIPs containers.",
         "infrastructure": "Terraform with the AzureRM provider in Azure Korea Central.",
         "terraform_state": "Remote Terraform state stored in Azure Blob Storage.",
-        "ai": "An OpenAI-compatible API integration through OpenCode Zen powers a portfolio-specific AI assistant.",
+        "ai": "An OpenAI-compatible API integration powers a portfolio-specific AI assistant. The frontend intentionally uses model-neutral branding so backend model changes do not require a frontend branding change.",
         "authentication": "GitHub Actions authenticates to Azure using GitHub OIDC federation with Microsoft Entra ID instead of a reusable Azure client secret.",
         "branching": "Two-branch model: dev for development/integration and main for protected production."
       },
@@ -196,7 +218,7 @@
         "Backend dependencies are audited during PR validation.",
         "Application and infrastructure changes are tested before production merge.",
         "The AI client is lazily initialized so a missing AI API key cannot prevent Azure Functions from indexing unrelated routes.",
-        "The OpenCode API key is stored as a GitHub Actions secret and passed to Terraform as a sensitive variable to configure the Azure Function App environment."
+        "The AI provider API key is stored as a GitHub Actions secret and passed to Terraform as a sensitive variable to configure the Azure Function App environment."
       ],
       "features": [
         "Unique visitor counter backed by Cosmos DB.",
@@ -224,17 +246,26 @@
       "alternate_name": "Homelab GitOps Environment",
       "repository": "https://github.com/Jeysibn/homelab-gitops",
       "type": "DevOps / Kubernetes / GitOps Home Lab",
+      "status": "Active personal upskilling project",
       "experience_context": "Personal home-lab project designed to apply production-style infrastructure and operational practices.",
       "purpose": "Build a fully automated, self-healing, observable local Kubernetes environment using Infrastructure as Code and GitOps, with the Git repository acting as the source of truth.",
+      "current_physical_environment": {
+        "location": "The homelab hardware is located at Jerome's parents' house.",
+        "proxmox_host": "One refurbished/repurposed laptop runs Proxmox VE.",
+        "kubernetes_scale": "The current K3s environment runs one Kubernetes master/server node.",
+        "remote_access_device": "A Raspberry Pi 4B provides remote network access to the homelab using Tailscale VPN; it is not currently a Kubernetes node.",
+        "runtime_observation": "The Proxmox host has been running for roughly one month, and Jerome has not experienced hardware errors or observed downtime during that period.",
+        "uptime_guardrail": "Treat the roughly one-month observation as personal observation, not a formal availability SLA or independently measured uptime percentage."
+      },
       "architecture": {
         "virtualization": "Proxmox virtual machines provisioned with Terraform.",
-        "cluster": "K3s lightweight Kubernetes.",
+        "cluster": "K3s lightweight Kubernetes. The current environment is a single-node K3s server/master deployment.",
         "gitops": "Argo CD using the App-of-Apps pattern and sync waves.",
         "networking": "Calico CNI, MetalLB LoadBalancer IP address management, Traefik ingress, and Cert-Manager for TLS.",
         "dns": "Pi-hole, Unbound, and ExternalDNS.",
-        "storage": "Longhorn highly available CSI storage.",
+        "storage": "Longhorn CSI storage is part of the repository architecture; claims of high availability should be qualified because the current Kubernetes environment is single-node.",
         "observability": "Prometheus for metrics, Loki for logs, and Grafana for visualization.",
-        "remote_access": "Tailscale subnet routing."
+        "remote_access": "Tailscale provides remote connectivity through a Raspberry Pi 4B."
       },
       "gitops_workflow": [
         "Develop Terraform or Kubernetes YAML changes in Git.",
@@ -249,16 +280,23 @@
         "Sync waves for ordered application deployment.",
         "CI quality gates for Helm/Kubernetes validation and security misconfiguration checks.",
         "Separation between raw Kubernetes manifests and Helm value overrides.",
-        "Automated TLS, local DNS, distributed storage, and observability."
+        "Automated TLS, local DNS, storage, and observability services."
       ],
-      "disaster_recovery": "The repository documents a bootstrap process intended to rebuild the cluster from bare metal in under 15 minutes by provisioning VMs, installing K3s/CNI, installing Argo CD, and applying the root App-of-Apps manifest.",
+      "earlier_cluster_experiment": {
+        "topology": "Jerome's first homelab testing used an old laptop running Ubuntu Server together with a Raspberry Pi as two K3s nodes.",
+        "challenge": "The biggest challenge was operating a cluster across different CPU architectures on the two hardware platforms.",
+        "lesson": "The mixed-architecture setup exposed compatibility and deployment considerations that do not appear when all cluster nodes use the same architecture."
+      },
+      "disaster_recovery": "The repository documents a bootstrap process intended to rebuild the cluster from bare metal in under 15 minutes by provisioning VMs, installing K3s/CNI, installing Argo CD, and applying the root App-of-Apps manifest. Do not state that Jerome has personally benchmarked a sub-15-minute rebuild unless the knowledge base is later updated with a measured test result.",
       "problems_addressed": [
         "Configuration drift",
         "Manual deployments",
         "Invalid Kubernetes manifests and configuration errors",
         "Local service availability",
         "Repeatable disaster recovery",
-        "Centralized metrics, logs, and visualization"
+        "Centralized metrics, logs, and visualization",
+        "Remote administration of a homelab located at another residence",
+        "Mixed CPU architecture compatibility during early K3s experimentation"
       ]
     }
   ],
@@ -266,7 +304,8 @@
     "Advanced cloud networking and hybrid-cloud topologies.",
     "Optimizing Kubernetes deployments and GitOps workflows using Helm and Argo CD.",
     "Integrating AI agents into CI/CD workflows for operational automation.",
-    "Cloud operations and observability practices for the portfolio, including health checks, monitoring, alerts, and post-deploy verification."
+    "Cloud operations and observability practices for the portfolio, including health checks, monitoring, alerts, and post-deploy verification.",
+    "Continuing to improve the Enterprise GitOps Homelab and Cloud-Backed Portfolio while actively job hunting."
   ],
   "student_resources": {
     "azure": "Uses an Azure for Students subscription and is intentionally cost-conscious when selecting Azure services and SKUs.",
@@ -281,12 +320,28 @@
   ],
   "frequently_asked_questions": [
     {
+      "question": "What is Jerome doing currently?",
+      "answer": "Jerome is actively job hunting while upskilling through hands-on Cloud and DevOps projects, primarily his Enterprise GitOps Homelab and Cloud-Backed Portfolio."
+    },
+    {
+      "question": "When can Jerome start?",
+      "answer": "Jerome is available to start immediately."
+    },
+    {
       "question": "What roles is Jerome looking for?",
-      "answer": "Jerome is targeting entry-level Cloud Support Engineer, Junior DevOps Engineer, and Junior Site Reliability Engineer roles."
+      "answer": "Jerome is targeting entry-level Cloud Support Engineer, Junior DevOps Engineer, Junior Site Reliability Engineer, and Cloud Engineer roles."
     },
     {
       "question": "Is Jerome open to remote, hybrid, or on-site work?",
       "answer": "Yes. Jerome is open to remote, hybrid, or on-site opportunities."
+    },
+    {
+      "question": "Is Jerome willing to relocate?",
+      "answer": "Yes. Jerome is willing to relocate locally within the Philippines or internationally, and he is also open to international remote roles."
+    },
+    {
+      "question": "What languages does Jerome speak?",
+      "answer": "Jerome speaks English and Filipino with professional working proficiency and is comfortable handling professional conversations in both languages."
     },
     {
       "question": "Where is Jerome based?",
@@ -295,6 +350,10 @@
     {
       "question": "What is Jerome's professional background?",
       "answer": "Jerome is a Computer Engineering graduate with 6 months of enterprise SaaS technical support experience at TrendAI and prior IT helpdesk internship experience. His Cloud and DevOps engineering experience is demonstrated mainly through personal portfolio and home-lab projects."
+    },
+    {
+      "question": "Did Jerome receive any academic awards?",
+      "answer": "Yes. Jerome and his team received the Best Capstone award for their graduating year at National University Baliwag."
     },
     {
       "question": "What cloud platforms does Jerome know?",
@@ -306,7 +365,19 @@
     },
     {
       "question": "What is Jerome's strongest DevOps project?",
-      "answer": "Two major projects demonstrate his DevOps skills: a cloud-backed Azure portfolio with Terraform and GitHub Actions CI/CD, and an Enterprise GitOps Homelab using Proxmox, Terraform, K3s, Argo CD, Helm, networking, distributed storage, and observability tooling."
+      "answer": "Two major projects demonstrate his DevOps skills: a cloud-backed Azure portfolio with Terraform and GitHub Actions CI/CD, and an Enterprise GitOps Homelab using Proxmox, Terraform, K3s, Argo CD, Helm, networking, storage, and observability tooling."
+    },
+    {
+      "question": "How large is Jerome's current Kubernetes homelab?",
+      "answer": "The current homelab runs one K3s server/master node on virtualized infrastructure hosted by a refurbished laptop running Proxmox VE. A Raspberry Pi 4B is used for remote network access through Tailscale rather than as a current Kubernetes node."
+    },
+    {
+      "question": "Has Jerome's homelab been stable?",
+      "answer": "Jerome reports that the Proxmox homelab host has been running for roughly one month without observed downtime or hardware errors. This is a personal observation rather than a formal uptime SLA."
+    },
+    {
+      "question": "What was a difficult problem Jerome encountered with Kubernetes?",
+      "answer": "During early K3s testing, Jerome built a two-node setup using an Ubuntu Server laptop and a Raspberry Pi. The different CPU architectures created compatibility challenges and became one of his most significant homelab learning experiences."
     },
     {
       "question": "What has Jerome built with Terraform?",
@@ -314,7 +385,7 @@
     },
     {
       "question": "What has Jerome done with Kubernetes?",
-      "answer": "In his personal GitOps home lab, Jerome operates a K3s cluster managed declaratively with Argo CD. The environment includes Calico, MetalLB, Traefik, Cert-Manager, Longhorn, Prometheus, Loki, Grafana, DNS services, and Tailscale."
+      "answer": "In his personal GitOps home lab, Jerome operates K3s managed declaratively with Argo CD. The environment includes Calico, MetalLB, Traefik, Cert-Manager, Longhorn, Prometheus, Loki, Grafana, DNS services, and Tailscale."
     },
     {
       "question": "Does Jerome have CI/CD experience?",
@@ -353,6 +424,9 @@
     "Answer only from facts present in this knowledge base.",
     "Do not invent employment, certifications, project results, production responsibilities, or years of experience.",
     "Clearly distinguish professional employment from personal portfolio and home-lab project experience.",
+    "Do not convert personal observations such as approximately one month without observed downtime into an uptime percentage or SLA.",
+    "Do not describe the current Raspberry Pi 4B as a Kubernetes node; it currently provides remote connectivity through Tailscale.",
+    "Do not claim that the documented under-15-minute homelab rebuild has been personally benchmarked unless the knowledge base is later updated with a measured result.",
     "Do not expose secrets, credentials, API keys, cloud subscription identifiers, Terraform state contents, or private infrastructure details.",
     "For contact requests, prefer email or LinkedIn; do not provide a phone number unless the knowledge base is explicitly updated to allow it."
   ]
