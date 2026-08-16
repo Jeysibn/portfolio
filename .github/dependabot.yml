@@ -12,6 +12,26 @@ updates:
         update-types:
           - "version-update:semver-major"
 
+  - package-ecosystem: "npm"
+    directory: "/frontend/app"
+    target-branch: "dev"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    groups:
+      frontend-runtime:
+        patterns:
+          - "react"
+          - "react-dom"
+      frontend-tooling:
+        patterns:
+          - "vite"
+          - "@vitejs/*"
+          - "typescript"
+          - "tailwindcss"
+          - "@tailwindcss/*"
+          - "@types/*"
+
   - package-ecosystem: "github-actions"
     directory: "/"
     target-branch: "dev"

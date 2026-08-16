@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   deploy:
-    name: Deploy Frontend
+    name: Build and Deploy Frontend
     runs-on: ubuntu-latest
 
     environment:
@@ -30,14 +30,66 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+
+      - name: Install frontend dependencies
+        working-directory: frontend/app
+        run: npm install --no-audit --no-fund
+
+      - name: Typecheck frontend
+        working-directory: frontend/app
+        run: npm run typecheck
+
+      - name: Build frontend
+        working-directory: frontend/app
+        run: npm run build
+
+      - name: Verify frontend artifact
+        run: |
+          test -f frontend/app/dist/index.html
+          test -d frontend/app/dist/assets
+
       - name: Setup GitHub Pages
         uses: actions/configure-pages@v6
 
       - name: Upload frontend artifact
         uses: actions/upload-pages-artifact@v5
         with:
-          path: "./frontend"
+          path: "./frontend/app/dist"
 
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
+
+      - name: Verify deployed frontend
+        env:
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          set -euo pipefail
+
+          for attempt in {1..6}; do
+            if page=$(curl --silent --show-error --fail --max-time 15 "$PAGE_URL"); then
+              if grep -q "Jerome Ibon" <<< "$page"; then
+                echo "GitHub Pages smoke test passed."
+                exit 0
+              fi
+            fi
+
+            echo "Frontend verification attempt $attempt/6 failed; retrying in 10 seconds..."
+            sleep 10
+          done
+
+          echo "GitHub Pages deployment could not be verified."
+          exit 1
+
+      - name: Deployment summary
+        if: success()
+        run: |
+          echo "## React Frontend Deployment ✅" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Vite production build deployed and verified on GitHub Pages." >> "$GITHUB_STEP_SUMMARY"
+          echo "**Commit:** ${{ github.sha }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "**URL:** ${{ steps.deployment.outputs.page_url }}" >> "$GITHUB_STEP_SUMMARY"

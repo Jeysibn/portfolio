@@ -27,6 +27,10 @@ jobs:
     name: Frontend Production Readiness
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: frontend/app
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -36,29 +40,24 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Validate HTML
-        run: |
-          npx --yes htmlhint "frontend/**/*.html"
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
 
-      - name: Validate JavaScript syntax
-        run: |
-          node --check frontend/js/chat.js
-          node --check frontend/js/counter.js
+      - name: Typecheck React frontend
+        run: npm run typecheck
 
-      - name: Verify production files
+      - name: Build React frontend
+        run: npm run build
+
+      - name: Verify production artifact
         run: |
-          test -f frontend/index.html
-          test -f frontend/projects.html
-          test -f frontend/resume.html
-          test -f frontend/js/chat.js
-          test -f frontend/js/counter.js
+          test -f dist/index.html
+          test -d dist/assets
+          test -n "$(find dist/assets -maxdepth 1 -type f -name '*.js' -print -quit)"
+          test -n "$(find dist/assets -maxdepth 1 -type f -name '*.css' -print -quit)"
 
       - name: Create frontend artifact
-        run: |
-          tar \
-            --exclude='*.tar.gz' \
-            -czf frontend-build.tar.gz \
-            frontend/
+        run: tar -czf ../../frontend-build.tar.gz -C dist .
 
       - name: Upload frontend build
         uses: actions/upload-artifact@v7
@@ -256,15 +255,16 @@ jobs:
           echo " Production Readiness Checks Passed"
           echo "======================================"
           echo ""
-          echo "Frontend validation:      PASSED"
-          echo "Backend validation:       PASSED"
-          echo "Backend tests:            PASSED"
-          echo "Dependency audit:         PASSED"
-          echo "Backend build:            PASSED"
+          echo "React frontend build:       PASSED"
+          echo "TypeScript validation:      PASSED"
+          echo "Backend validation:         PASSED"
+          echo "Backend tests:              PASSED"
+          echo "Dependency audit:           PASSED"
+          echo "Backend build:              PASSED"
           if [ "${{ github.actor }}" = "dependabot[bot]" ]; then
-            echo "Terraform validation:     PASSED (no Azure plan for Dependabot)"
+            echo "Terraform validation:       PASSED (no Azure plan for Dependabot)"
           else
-            echo "Terraform plan:           PASSED"
+            echo "Terraform plan:             PASSED"
           fi
           echo ""
           echo "Pull Request is ready for merge into main."

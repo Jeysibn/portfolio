@@ -30,6 +30,10 @@ jobs:
     name: Frontend Validation
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: frontend/app
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -39,22 +43,21 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Validate HTML
-        run: |
-          npx --yes htmlhint "frontend/**/*.html"
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
 
-      - name: Validate JavaScript syntax
-        run: |
-          node --check frontend/js/chat.js
-          node --check frontend/js/counter.js
+      - name: Typecheck React frontend
+        run: npm run typecheck
 
-      - name: Verify required frontend files
+      - name: Build React frontend
+        run: npm run build
+
+      - name: Verify production artifact
         run: |
-          test -f frontend/index.html
-          test -f frontend/projects.html
-          test -f frontend/resume.html
-          test -f frontend/js/chat.js
-          test -f frontend/js/counter.js
+          test -f dist/index.html
+          test -d dist/assets
+          test -n "$(find dist/assets -maxdepth 1 -type f -name '*.js' -print -quit)"
+          test -n "$(find dist/assets -maxdepth 1 -type f -name '*.css' -print -quit)"
 
   # =========================================================
   # BACKEND
@@ -139,7 +142,7 @@ jobs:
     steps:
       - name: CI Summary
         run: |
-          echo "Frontend checks passed."
+          echo "React + TypeScript frontend checks passed."
           echo "Backend checks and tests passed."
           echo "Terraform checks passed."
           echo "Development validation passed."

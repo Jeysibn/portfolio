@@ -9,7 +9,7 @@ dev  -> development / integration
 main -> protected production
 ```
 
-This model is intentionally simple because the project is maintained by one developer, but it still separates integration from production release.
+This model is intentionally simple for a single-maintainer project while still separating integration from production release. Explicitly scoped feature branches may be used for larger milestones before merging into `dev`.
 
 ## Development CI
 
@@ -25,9 +25,16 @@ The development pipeline validates all major project layers.
 
 ### Frontend
 
-- HTML validation
-- JavaScript syntax validation
-- required-file checks
+Working directory: `frontend/app`
+
+```text
+npm install
+-> strict TypeScript typecheck
+-> Vite production build
+-> dist artifact verification
+```
+
+The generated build must contain `dist/index.html` plus JavaScript and CSS assets before frontend validation passes.
 
 ### Backend
 
@@ -58,7 +65,16 @@ The pull request pipeline is the production-readiness gate.
 
 ### Frontend Production Readiness
 
-Validates frontend source files and creates a build artifact.
+The frontend job:
+
+1. installs the React application dependencies;
+2. runs strict TypeScript validation;
+3. creates a Vite production build;
+4. verifies the generated `dist` artifact;
+5. packages only the static production output;
+6. uploads the artifact for review/debugging.
+
+Source files and development dependencies are not part of the deployable frontend artifact.
 
 ### Backend Production Readiness
 
@@ -118,7 +134,7 @@ This keeps dependency-update PRs safe without weakening secret isolation.
 
 ### Final Gate
 
-`Production Ready` depends on all production-readiness jobs and is configured as the required status check for the protected `main` branch.
+`Production Ready` depends on frontend readiness, backend validation/build, and Terraform validation/plan. It is the final merge gate for protected `main`.
 
 ## Production Deployment
 
@@ -132,9 +148,26 @@ Path trigger:
 
 ```text
 frontend/**
+.github/workflows/frontend-deploy.yml
+```
+
+Deployment flow:
+
+```text
+checkout
+-> Node.js 22
+-> npm install
+-> TypeScript typecheck
+-> Vite build
+-> verify dist/
+-> upload dist/ to GitHub Pages
+-> deploy
+-> curl live Pages URL and verify expected document title
 ```
 
 Deployment target: GitHub Pages.
+
+The live-page verification means a successful artifact upload alone is not considered enough evidence of a successful frontend release.
 
 ### Backend
 
@@ -144,11 +177,20 @@ Path trigger:
 
 ```text
 backend/**
+.github/workflows/backend-deploy.yml
 ```
 
 Deployment target: Azure Functions.
 
 Azure authentication uses GitHub OIDC.
+
+After package deployment, the workflow:
+
+1. retries `GET /api/health` while the Function host starts;
+2. validates the health JSON contract;
+3. calls `GetVisitorCount`;
+4. verifies that the response contains an integer count;
+5. fails the deployment when runtime verification fails.
 
 ### Terraform
 
@@ -176,17 +218,19 @@ A fresh plan is generated on `main` even when the PR previously generated a plan
 
 ## Concurrency
 
-Development and PR validation can cancel obsolete runs when newer commits arrive.
+Development and PR validation cancel obsolete runs when newer commits arrive.
 
-Production Terraform deployments should not be cancelled mid-apply. Infrastructure deployment uses a dedicated concurrency group with cancellation disabled.
+Frontend production deployment also cancels an obsolete frontend run when a newer frontend commit supersedes it.
+
+Production Terraform deployments do not cancel in-progress applies. Infrastructure deployment uses a dedicated concurrency group with cancellation disabled.
 
 ## Release Safety Model
 
 ```text
-Developer change
+Feature / developer change
    |
    v
-push to dev
+PR or push -> dev
    |
    v
 Development CI
@@ -198,14 +242,14 @@ PR dev -> main
 Production readiness + real Terraform plan
    |
    v
-Required Production Ready check
+Production Ready gate
    |
    v
 Merge to protected main
    |
-   +--> frontend deployment
-   +--> backend deployment
-   +--> Terraform plan + apply
+   +--> React build -> GitHub Pages -> live smoke check
+   +--> Azure Functions deploy -> health/API smoke checks
+   +--> Terraform plan -> apply
 ```
 
-The key rule is simple: validation can happen before merge, but production mutation happens only after merge to `main`.
+The key rule is simple: validation can happen before merge, but production mutation happens only after merge to `main`, and deployment success is followed by runtime verification where practical.

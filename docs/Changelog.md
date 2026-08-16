@@ -10,22 +10,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-* **Expanded AI Knowledge Base**: Added richer career, project, homelab, technical-skill, availability, relocation, language, and recruiter FAQ context with guardrails that distinguish professional experience from personal project experience.
-* **Terraform-Managed AI Configuration**: Added the AI provider API key as a sensitive Terraform input populated from the GitHub Actions `OPENCODE_API_KEY` secret through `TF_VAR_opencode_api_key`.
+* **React + TypeScript Single-Page Frontend**: Rebuilt the portfolio as a Vite-powered React application with strict TypeScript, responsive anchor navigation, typed content models, project case studies, and a consolidated single-page information architecture.
+* **React API Integration Layer**: Added typed clients for `/api/health`, `GetVisitorCount`, and `AiChatAssistant`, including loading, validation, and recovery states.
+* **Responsive Theme System**: Added explicit System, Light, and Dark preferences while preserving the existing `color-theme` browser preference key.
+* **Live Production Status**: The portfolio hero now checks the real Azure Function health endpoint instead of displaying a hardcoded service state.
+* **Accessible Project Case Studies**: Added native dialog-based project details with architecture diagrams, repository links, technology metadata, and keyboard/Escape behavior.
+* **Print-Optimized React Resume**: Added a dedicated print representation generated from the same typed experience, skill, education, certification, and project data used by the site.
+* **Application Insights + Log Analytics**: Added workspace-based Application Insights and a dedicated Log Analytics workspace through Terraform.
+* **Health Endpoint**: Added `GET /api/health` as a dependency-independent Function App liveness endpoint.
+* **Operational Documentation**: Added `docs/observability.md` with telemetry coverage, cost guardrails, initial SLOs/SLIs, KQL queries, and operational response guidance.
+* **Post-Deployment Verification**: Backend deployment now validates the health contract and visitor API after Azure Functions deployment; frontend deployment verifies the live GitHub Pages document after release.
 
 ### Changed
+* **Frontend Production Build**: GitHub Pages now deploys only the Vite-generated `frontend/app/dist/` artifact instead of publishing the source frontend directory.
+* **Frontend CI/CD**: Development and production-readiness workflows now install frontend dependencies, run strict TypeScript checks, build with Vite, and verify the generated JavaScript/CSS artifact.
+* **AI Assistant UI**: Migrated session history, request state, rate-limit responses, and errors from manual DOM manipulation to React state while keeping provider-neutral branding.
+* **Visitor Counter UI**: Migrated the counter to React with explicit checking and unavailable states.
+* **Frontend Design System**: Reworked hierarchy, spacing, typography, focus states, browser surfaces, responsive behavior, and motion using the Impeccable design quality floor while keeping the engineering work visually dominant.
+* **Expanded AI Knowledge Base**: Added richer career, project, homelab, technical-skill, availability, relocation, language, and recruiter FAQ context with guardrails that distinguish professional experience from personal project experience.
+* **Terraform-Managed AI Configuration**: Added the AI provider API key as a sensitive Terraform input populated from the GitHub Actions `OPENCODE_API_KEY` secret through `TF_VAR_opencode_api_key`.
 * **Model-Neutral AI Branding**: Removed model-specific branding from the portfolio chat interface so backend AI model/provider changes do not require frontend branding changes.
 * **Runtime-Safe AI Initialization**: Changed the AI client from import-time initialization to lazy request-time initialization so optional AI configuration failures cannot prevent unrelated Azure Function routes from being indexed.
 * **Function App Secret Ownership**: Terraform now manages the `OPENCODE_API_KEY` Function App setting instead of relying on an out-of-band application setting protected by `ignore_changes`.
 
+### Removed
+* **Legacy Multi-Page Frontend**: Removed `frontend/index.html`, `frontend/projects.html`, `frontend/resume.html`, standalone `chat.js` and `counter.js`, and the legacy stylesheet after React reached functional/content parity.
+
 ### Fixed
 * **Azure Function Route Discovery**: Restored Function App route indexing after an import-time AI configuration failure caused the Function App to expose no indexed routes.
 * **AI Assistant Configuration Recovery**: Restored the AI assistant after the `OPENCODE_API_KEY` application setting was missing, while keeping the visitor counter operational.
-* **Frontend Counter Error Handling**: Improved visitor-counter response handling so HTTP failures are reported as HTTP errors instead of misleading JSON parsing failures.
+* **Frontend Counter Error Handling**: Improved visitor-counter response handling so HTTP failures are reported as service failures instead of misleading JSON parsing failures.
 
 ### Security
 * **GitHub-Managed Application Secret**: `OPENCODE_API_KEY` is stored in GitHub Actions Secrets and injected into Terraform at workflow runtime rather than committed to the repository.
 * **Sensitive Terraform Input**: The API key Terraform variable is marked sensitive. Because Terraform manages the Function App setting, the value is also present in the protected remote Terraform state and access to that backend must be treated as sensitive.
+* **Secret-Free Frontend Bundle**: The React frontend contains only public API endpoints/configuration; AI provider keys and Azure connection strings remain server-side.
+
+### Operations
+* **Telemetry Cost Guardrails**: Log Analytics uses 30-day retention and a `0.1 GB/day` daily ingestion cap, with Application Insights sampling configured to control telemetry volume.
+* **Structured Runtime Events**: Added correlation IDs and structured operational logging for health, visitor, AI, rate-limit, and failure events without logging sensitive request content.
 
 ---
 
