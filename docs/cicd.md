@@ -15,9 +15,10 @@ This model is intentionally simple because the project is maintained by one deve
 
 Workflow: `.github/workflows/dev-ci.yml`
 
-Trigger:
+Triggers:
 
 - push to `dev`
+- pull requests targeting `dev`
 - manual workflow dispatch
 
 The development pipeline validates all major project layers.
@@ -75,16 +76,45 @@ Builds the Azure Function deployment package using the same project dependencies
 
 ### Terraform Production Plan
 
-The Terraform PR job:
+For normal pull requests, the Terraform job:
 
 1. requests a GitHub OIDC token;
 2. authenticates to Azure through Microsoft Entra ID;
 3. initializes the real Azure Blob remote backend;
 4. validates the Terraform configuration;
-5. generates a real plan against current production state;
-6. writes the plan to the GitHub Actions step summary.
+5. injects the AI provider key as `TF_VAR_opencode_api_key` from the GitHub Actions `OPENCODE_API_KEY` secret;
+6. generates a real plan against current production state;
+7. writes the plan to the GitHub Actions step summary.
 
 The PR workflow never runs `terraform apply`.
+
+The application-secret flow is:
+
+```text
+GitHub Actions Secret: OPENCODE_API_KEY
+        |
+        v
+TF_VAR_opencode_api_key
+        |
+        v
+Terraform sensitive variable
+        |
+        v
+Azure Function App OPENCODE_API_KEY setting
+```
+
+Because Terraform manages the Function App setting, the secret value is also present in Terraform state. Access to the remote backend must therefore be treated as sensitive.
+
+### Dependabot Terraform Validation
+
+Dependabot pull requests intentionally do not receive repository secrets. For Dependabot, the PR workflow:
+
+- skips Azure OIDC login;
+- initializes Terraform with `-backend=false`;
+- runs formatting and validation checks;
+- skips authenticated remote-state planning.
+
+This keeps dependency-update PRs safe without weakening secret isolation.
 
 ### Final Gate
 
@@ -128,16 +158,18 @@ Path trigger:
 
 ```text
 terraform/**
+.github/workflows/terraform-deploy.yml
 ```
 
 The production Terraform workflow performs:
 
 ```text
 Azure OIDC login
+-> terraform fmt check
 -> terraform init
 -> terraform validate
--> terraform plan
--> terraform apply
+-> terraform plan with TF_VAR_opencode_api_key
+-> terraform apply saved plan
 ```
 
 A fresh plan is generated on `main` even when the PR previously generated a plan, because remote infrastructure state may have changed between review and merge.
