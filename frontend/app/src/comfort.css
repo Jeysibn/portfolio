@@ -1,4 +1,4 @@
-/* Comfort pass: keep the page alive without moving visible content under the reader. */
+/* Comfort pass: keep the page readable, accessible, and calm. */
 
 /* Hide the browser scrollbar while preserving normal wheel/touch/keyboard scrolling. */
 html {
@@ -33,6 +33,28 @@ body::-webkit-scrollbar {
   transform: translate3d(0, 0, 0) !important;
 }
 
+/* Native select menus need explicit foreground/background colors in dark mode. */
+.theme-control select {
+  color: var(--text);
+  background: transparent;
+  color-scheme: dark;
+}
+
+.theme-control select option {
+  color: #f4f7fb;
+  background: #081424;
+}
+
+:root[data-theme="light"] .theme-control select {
+  color: var(--text);
+  color-scheme: light;
+}
+
+:root[data-theme="light"] .theme-control select option {
+  color: #091827;
+  background: #ffffff;
+}
+
 /* A closed chat must never create an invisible click shield. */
 .chat-widget {
   pointer-events: none;
@@ -48,7 +70,7 @@ body::-webkit-scrollbar {
   visibility: hidden !important;
 }
 
-/* Project cards themselves are now the case-study action. */
+/* Project cards themselves are the project-details action. */
 .project-row {
   cursor: pointer;
 }
@@ -60,22 +82,6 @@ body::-webkit-scrollbar {
 
 .project-row .text-action {
   display: none !important;
-}
-
-.project-row::after {
-  content: "Open case study ↗";
-  display: inline-block;
-  margin: 0 clamp(28px, 4vw, 42px) clamp(24px, 3vw, 34px);
-  color: var(--accent);
-  font-family: var(--mono);
-  font-size: 0.66rem;
-  letter-spacing: 0.02em;
-  opacity: 0.82;
-}
-
-.project-row:hover::after,
-.project-row:focus-visible::after {
-  opacity: 1;
 }
 
 /* Release age is a compact operational metric. */
