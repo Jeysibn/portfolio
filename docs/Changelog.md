@@ -1,129 +1,151 @@
 # Changelog
 
-All notable changes to the **Cloud-Backed Portfolio** project will be documented in this file.
+All notable changes to the **Cloud-Backed Portfolio** project are documented here.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and the project uses semantic versioning for release history.
 
 ---
 
 ## [Unreleased]
 
+_No unreleased changes documented._
+
+---
+
+## [1.5.0] - 2026-08-17
+
 ### Added
-* **React + TypeScript Single-Page Frontend**: Rebuilt the portfolio as a Vite-powered React application with strict TypeScript, responsive anchor navigation, typed content models, project case studies, and a consolidated single-page information architecture.
-* **React API Integration Layer**: Added typed clients for `/api/health`, `GetVisitorCount`, and `AiChatAssistant`, including loading, validation, and recovery states.
-* **Responsive Theme System**: Added explicit System, Light, and Dark preferences while preserving the existing `color-theme` browser preference key.
-* **Live Production Status**: The portfolio hero now checks the real Azure Function health endpoint instead of displaying a hardcoded service state.
-* **Accessible Project Case Studies**: Added native dialog-based project details with architecture diagrams, repository links, technology metadata, and keyboard/Escape behavior.
-* **Print-Optimized React Resume**: Added a dedicated print representation generated from the same typed experience, skill, education, certification, and project data used by the site.
-* **Application Insights + Log Analytics**: Added workspace-based Application Insights and a dedicated Log Analytics workspace through Terraform.
-* **Health Endpoint**: Added `GET /api/health` as a dependency-independent Function App liveness endpoint.
-* **Operational Documentation**: Added `docs/observability.md` with telemetry coverage, cost guardrails, initial SLOs/SLIs, KQL queries, and operational response guidance.
-* **Post-Deployment Verification**: Backend deployment now validates the health contract and visitor API after Azure Functions deployment; frontend deployment verifies the live GitHub Pages document after release.
+
+- **React + TypeScript single-page frontend**: Completed the Vite-powered React migration with strict TypeScript, typed content models, anchor navigation, and production-only `dist/` deployment to GitHub Pages.
+- **Live production monitoring card**: Added a hero status panel backed by the real Azure Functions `/api/health` endpoint.
+- **Release age metadata**: Added a Vite build timestamp used by the frontend to show release age. The value resets on every frontend release and is explicitly not presented as server uptime.
+- **Live Manila time**: Added current Manila time to the monitoring panel as client-side context.
+- **Interactive project details**: Entire project cards now open centered project-detail dialogs; architecture images zoom in-page instead of navigating to raw image URLs.
+- **Detailed skill inspection**: Skill capability cards now open keyboard-accessible dialogs with category context and per-tool descriptions.
+- **Certification cards**: Added individual provider-styled credential cards with hover/focus descriptions.
+- **Full on-page resume**: The resume is visible directly in the portfolio while retaining print/save output.
+- **Opportunity-focused contact experience**: Added an explicit Open to opportunities state and a direct hero Contact CTA.
+- **Application Insights + Log Analytics**: Added workspace-based Application Insights and a dedicated Log Analytics workspace through Terraform.
+- **Health endpoint**: Added `GET /api/health` as a dependency-independent Function App liveness endpoint.
+- **Post-deployment verification**: Backend deployment validates health and visitor APIs after Azure Functions deployment; frontend deployment verifies the live GitHub Pages document.
 
 ### Changed
-* **Frontend Production Build**: GitHub Pages now deploys only the Vite-generated `frontend/app/dist/` artifact instead of publishing the source frontend directory.
-* **Frontend CI/CD**: Development and production-readiness workflows now install frontend dependencies, run strict TypeScript checks, build with Vite, and verify the generated JavaScript/CSS artifact.
-* **AI Assistant UI**: Migrated session history, request state, rate-limit responses, and errors from manual DOM manipulation to React state while keeping provider-neutral branding.
-* **Visitor Counter UI**: Migrated the counter to React with explicit checking and unavailable states.
-* **Frontend Design System**: Reworked hierarchy, spacing, typography, focus states, browser surfaces, responsive behavior, and motion using the Impeccable design quality floor while keeping the engineering work visually dominant.
-* **Expanded AI Knowledge Base**: Added richer career, project, homelab, technical-skill, availability, relocation, language, and recruiter FAQ context with guardrails that distinguish professional experience from personal project experience.
-* **Terraform-Managed AI Configuration**: Added the AI provider API key as a sensitive Terraform input populated from the GitHub Actions `OPENCODE_API_KEY` secret through `TF_VAR_opencode_api_key`.
-* **Model-Neutral AI Branding**: Removed model-specific branding from the portfolio chat interface so backend AI model/provider changes do not require frontend branding changes.
-* **Runtime-Safe AI Initialization**: Changed the AI client from import-time initialization to lazy request-time initialization so optional AI configuration failures cannot prevent unrelated Azure Function routes from being indexed.
-* **Function App Secret Ownership**: Terraform now manages the `OPENCODE_API_KEY` Function App setting instead of relying on an out-of-band application setting protected by `ignore_changes`.
 
-### Removed
-* **Legacy Multi-Page Frontend**: Removed `frontend/index.html`, `frontend/projects.html`, `frontend/resume.html`, standalone `chat.js` and `counter.js`, and the legacy stylesheet after React reached functional/content parity.
+- **Frontend design system**: Reworked the deployed experience into a terminal-inspired Cloud/DevOps visual system while keeping content readable and portfolio-first.
+- **Hero positioning**: Updated the headline to position Jerome as an aspiring Cloud & DevOps Engineer rather than implying senior-level production ownership.
+- **Motion behavior**: Reduced persistent scroll-linked movement after usability review. Content uses restrained one-time reveals while the subtle background remains responsive to scrolling.
+- **Theme accessibility**: Strengthened Light mode contrast and corrected native theme-selector option colors in Dark mode.
+- **Project interaction**: Removed case-study wording and separate project CTA text; the whole project card is now the direct project-detail trigger.
+- **AI assistant UI**: Migrated session history, request state, rate-limit responses, and errors to React while retaining provider-neutral branding.
+- **Visitor counter UI**: Migrated the counter to React with explicit checking and unavailable states.
+- **Frontend production build**: GitHub Pages now deploys only `frontend/app/dist/` rather than source frontend files.
+- **Frontend CI/CD**: Development and production-readiness workflows install dependencies, run strict TypeScript checks, build with Vite, and verify the generated artifact.
+- **Expanded AI knowledge base**: Added richer project, homelab, career, technical-skill, availability, and recruiter FAQ context.
+- **Terraform-managed AI configuration**: Added the AI provider API key as a sensitive Terraform input populated from GitHub Actions `OPENCODE_API_KEY` through `TF_VAR_opencode_api_key`.
+- **Runtime-safe AI initialization**: Changed AI client creation from import time to lazy request time so optional AI configuration failures cannot prevent unrelated Azure Function routes from indexing.
 
 ### Fixed
-* **Azure Function Route Discovery**: Restored Function App route indexing after an import-time AI configuration failure caused the Function App to expose no indexed routes.
-* **AI Assistant Configuration Recovery**: Restored the AI assistant after the `OPENCODE_API_KEY` application setting was missing, while keeping the visitor counter operational.
-* **Frontend Counter Error Handling**: Improved visitor-counter response handling so HTTP failures are reported as service failures instead of misleading JSON parsing failures.
+
+- **Closed chatbot click shield**: Fixed the hidden chat container so it no longer blocks interaction with content underneath when closed.
+- **Theme selector readability**: Fixed unreadable white-on-white native select options in Dark mode.
+- **Project architecture preview**: Removed the forced white preview surface and kept architecture viewing inside the application.
+- **Motion comfort**: Removed continuous card/text drift that could cause visual discomfort while scrolling.
+- **Azure Function route discovery**: Preserved route indexing when optional AI configuration is unavailable by avoiding import-time AI client initialization.
+- **Frontend counter error handling**: HTTP failures now surface as service failures instead of misleading JSON parsing errors.
+
+### Removed
+
+- **Legacy multi-page frontend**: Removed the old `frontend/index.html`, `frontend/projects.html`, `frontend/resume.html`, standalone chat/counter scripts, and legacy stylesheet after React reached parity.
+- **Decorative project architecture artwork**: Removed the hero/project artwork that competed with the portfolio content.
+- **Scroll progress bar**: Removed the top-of-page progress indicator after design review.
+- **Visible case-study labels**: Removed case-study wording from project cards and accessible card labels because the project content is presented as project details rather than a formal case study.
 
 ### Security
-* **GitHub-Managed Application Secret**: `OPENCODE_API_KEY` is stored in GitHub Actions Secrets and injected into Terraform at workflow runtime rather than committed to the repository.
-* **Sensitive Terraform Input**: The API key Terraform variable is marked sensitive. Because Terraform manages the Function App setting, the value is also present in the protected remote Terraform state and access to that backend must be treated as sensitive.
-* **Secret-Free Frontend Bundle**: The React frontend contains only public API endpoints/configuration; AI provider keys and Azure connection strings remain server-side.
+
+- **GitHub-managed application secret**: `OPENCODE_API_KEY` remains stored in GitHub Actions Secrets and injected into Terraform at workflow runtime rather than committed to the repository.
+- **Sensitive Terraform state**: Terraform-managed Function App settings can be represented in remote state, so backend access remains restricted.
+- **Secret-free frontend bundle**: AI provider keys and Azure connection strings remain server-side.
 
 ### Operations
-* **Telemetry Cost Guardrails**: Log Analytics uses 30-day retention and a `0.1 GB/day` daily ingestion cap, with Application Insights sampling configured to control telemetry volume.
-* **Structured Runtime Events**: Added correlation IDs and structured operational logging for health, visitor, AI, rate-limit, and failure events without logging sensitive request content.
+
+- **Telemetry cost guardrails**: Log Analytics uses 30-day retention and a `0.1 GB/day` ingestion cap with Application Insights sampling controls.
+- **Structured runtime events**: Correlation IDs and structured operational logging cover health, visitor, AI, rate-limit, and failure events without logging sensitive request content.
+- **Post-release documentation sync**: Updated README, architecture, CI/CD, observability, runbook, contribution guidance, and changelog to describe the deployed 1.5.0 state.
 
 ---
 
 ## [1.4.0] - 2026-08-16
 
 ### Added
-* **Professional Project Documentation**: Rebuilt the root README as a complete project entry point with architecture, repository structure, CI/CD flow, security model, local development, Terraform bootstrap, operational notes, and documentation links.
-* **Architecture Guide**: Added `docs/architecture.md` describing frontend, backend, Cosmos DB, AI integration, Terraform, data flows, and design principles.
-* **CI/CD Guide**: Added `docs/cicd.md` documenting the `dev`/`main` branch model, validation stages, authenticated Terraform PR planning, and production deployments.
-* **Azure OIDC Guide**: Added `docs/azure-oidc.md` documenting GitHub-to-Azure workload identity federation, immutable subject claims, RBAC considerations, and troubleshooting.
-* **Operations Runbook**: Added `docs/runbook.md` with common deployment, backend, Terraform, CI, rollback, and recovery procedures.
-* **Repository Governance**: Added `CONTRIBUTING.md`, `SECURITY.md`, and an MIT `LICENSE`.
-* **Dependency Automation**: Added Dependabot configuration for Python and GitHub Actions dependencies.
-* **Backend Test Suite**: Added unit coverage for IP hashing and extraction, AI knowledge-base prompt behavior, knowledge-base loading, and HTTP OPTIONS/preflight routes.
-* **Terraform CLI Constraint**: Added an explicit supported Terraform CLI version range.
+
+- Professional root README covering architecture, repository structure, CI/CD, security, local development, Terraform bootstrap, and operations.
+- `docs/architecture.md`, `docs/cicd.md`, `docs/azure-oidc.md`, `docs/runbook.md`, governance documents, Dependabot configuration, and backend unit tests.
+- Explicit Terraform CLI version constraints.
 
 ### Changed
-* **Mandatory Backend Testing**: Development CI and PR production-readiness validation now require pytest to pass instead of conditionally skipping an empty test suite.
-* **Reproducible Backend Dependencies**: Pinned the production versions proven by the last successful Azure Function deployment: `azure-functions==1.25.0`, `azure-cosmos==4.16.3`, and `openai==3.1.0`.
-* **Expanded Git Ignore Rules**: Added virtual environments, local secrets, Python tooling caches, coverage files, Terraform plans/state variants, build artifacts, and editor files.
+
+- Backend tests became mandatory in Development CI and production-readiness validation.
+- Production backend dependencies were pinned to the versions proven by successful Azure Function deployment.
+- Git ignore coverage was expanded for environments, secrets, caches, Terraform artifacts, editor files, and build output.
 
 ### Removed
-* **Tracked Python Virtual Environment**: Removed `backend/.venv/` and its generated packages from version control.
-* **Local Installation Artifact**: Removed the committed Microsoft package installer artifact from the backend directory.
-* **Temporary OIDC Test Workflow**: Removed the one-off Azure OIDC validation workflow after production OIDC authentication was proven.
+
+- Tracked Python virtual environment.
+- Local package-installer artifact.
+- Temporary OIDC validation workflow after production federation was proven.
 
 ---
 
 ## [1.3.0] - 2026-08-16
 
 ### Added
-* **Two-Branch CI/CD Model**: Established `dev` as the development/integration branch and `main` as the protected production branch.
-* **Development CI Pipeline**: Added automated frontend, backend, and Terraform validation for pushes to `dev`, including HTML validation, JavaScript syntax checks, Python compilation, Ruff linting, dependency validation, conditional pytest execution, Terraform formatting, initialization, and validation.
-* **Pull Request Production Readiness Pipeline**: Added a dedicated `dev` → `main` PR workflow that validates frontend and backend code, performs dependency security auditing, builds deployment artifacts, and gates merges through a final `Production Ready` check.
-* **Authenticated Terraform PR Plan**: Added Azure OIDC authentication to pull request validation so Terraform can initialize the real remote backend and generate an infrastructure plan against current production state without applying changes.
-* **Azure OIDC Federation**: Added GitHub Actions workload identity federation with Microsoft Entra ID, removing the need for long-lived Azure client secrets in deployment workflows.
-* **Production Terraform Deployment**: Added a dedicated production workflow that authenticates to Azure through OIDC, initializes remote state, validates configuration, generates a fresh Terraform plan, and applies infrastructure changes after merge to `main`.
-* **Main Branch Protection**: Added a GitHub branch ruleset requiring pull requests and successful production-readiness checks before changes can be merged into `main`.
+
+- `dev` / `main` two-branch CI/CD model.
+- Development CI for frontend, backend, and Terraform validation.
+- Production-readiness pull request workflow.
+- Authenticated Terraform planning against remote state using Azure OIDC.
+- Protected `main` branch release gate.
 
 ### Changed
-* **Deployment Workflow Separation**: Split production delivery into dedicated frontend, backend, and Terraform workflows with path-specific triggers on `main`.
-* **Backend Deployment Authentication**: Migrated Azure deployment authentication from a Function App publish profile to short-lived OIDC-based Azure authentication.
-* **Terraform Validation Strategy**: PR validation now checks planned infrastructure changes against the remote backend, while Terraform apply remains restricted to the post-merge production workflow.
-* **Backend Code Quality**: Improved Python lint compliance and exception logging behavior to support stricter automated CI validation.
+
+- Split frontend, backend, and Terraform production deployment into path-specific workflows.
+- Migrated Azure deployment authentication from reusable credentials to short-lived GitHub OIDC federation.
 
 ### Security
-* **Secretless Azure Authentication**: Production and pull request workflows now exchange GitHub-issued OIDC tokens for short-lived Azure credentials instead of storing a reusable Azure service principal secret.
-* **Protected Production Branch**: Direct production changes are constrained through PR-based validation and required status checks.
+
+- Removed the need for a reusable Azure service-principal client secret in deployment workflows.
+- Constrained production changes through protected pull requests and required checks.
 
 ---
 
 ## [1.2.0] - 2026-08-14
 
 ### Added
-* **Expanded Portfolio Showcase**: Added a second project card to the Projects page (`projects.html`) featuring modal details and architecture breakdowns.
+
+- Expanded portfolio project showcase with a second project and architecture details.
 
 ---
 
 ## [1.1.0] - 2026-08-10
 
 ### Changed
-* **Visitor Counter Logic**: Upgraded the `GetResumeCounter` Azure Function to log unique visitors by IP address.
+
+- Upgraded visitor counting to track unique visitors by hashed IP-derived identity.
 
 ### Added
-* **IP Deduplication & 24-Hour TTL**: Implemented rate-limiting logic so each unique IP address is counted only once every 24 hours to prevent counter inflation and spam requests.
+
+- 24-hour TTL-based visitor deduplication to reduce counter inflation and spam requests.
 
 ---
 
 ## [1.0.0] - 2026-08-01
 
 ### Added
-* **Initial Release**: Launched the initial version of the Cloud-Backed Portfolio site.
-* **Frontend UI**: Responsive static site built using HTML5, JavaScript, and Tailwind CSS hosted on GitHub Pages.
-* **Dark / Light Mode**: Added a persistent theme toggle with `localStorage` memory and OS theme preference auto-detection across `index.html`, `projects.html`, and `resume.html`.
-* **Serverless Backend**: Built an asynchronous HTTP trigger API in Python 3.11 (Azure Functions v2 programming model).
-* **Database Integration**: Integrated Azure Cosmos DB (NoSQL API) for persistent visitor counts.
-* **Infrastructure as Code (IaC)**: Provisioned cloud resources using HashiCorp Terraform.
-* **CI/CD Automation**: Configured GitHub Actions workflows for automated build, test, and deployment of both frontend and backend code.
+
+- Initial Cloud-Backed Portfolio release.
+- Static responsive frontend hosted on GitHub Pages.
+- Dark/Light theme support.
+- Python Azure Functions backend.
+- Azure Cosmos DB visitor counter.
+- Terraform infrastructure as code.
+- GitHub Actions build and deployment automation.

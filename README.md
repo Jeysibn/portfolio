@@ -5,9 +5,9 @@
 [![Terraform](https://img.shields.io/badge/IaC-Terraform-7B42BC?logo=terraform)](https://developer.hashicorp.com/terraform)
 [![Azure](https://img.shields.io/badge/Cloud-Microsoft%20Azure-0078D4?logo=microsoftazure)](https://azure.microsoft.com/)
 
-A production-oriented cloud portfolio built as a hands-on DevOps project. The system combines a React + TypeScript single-page frontend, a Python Azure Functions API, Azure Cosmos DB, Terraform-managed infrastructure, Azure-native observability, a model-neutral AI portfolio assistant, and GitHub Actions CI/CD with OpenID Connect (OIDC) authentication to Azure.
+A production-oriented Cloud and DevOps portfolio built as an end-to-end engineering project. The deployed system combines a React + TypeScript single-page frontend, Python Azure Functions APIs, Azure Cosmos DB, Terraform-managed infrastructure, Azure-native observability, a provider-neutral AI portfolio assistant, and GitHub Actions CI/CD using OpenID Connect (OIDC) authentication to Azure.
 
-The project is intentionally small enough to understand end-to-end while applying production-style engineering practices around infrastructure as code, automated validation, protected releases, remote state, short-lived cloud credentials, application-secret management, deployment verification, telemetry, and operational documentation.
+The current frontend uses a terminal-inspired engineering visual system while keeping the site portfolio-first rather than dashboard-first. It includes live production health, release metadata, interactive project details, detailed skill inspection, certification cards, a fully visible resume, and an opportunity-focused contact experience.
 
 ## Live Project
 
@@ -19,11 +19,9 @@ The project is intentionally small enough to understand end-to-end while applyin
 
 ![System Architecture Diagram](frontend/assets/architectural-diagram-cloudbacked-portfolio.png)
 
-### Components
-
 | Layer | Technology | Responsibility |
 |---|---|---|
-| Frontend | React, TypeScript, Vite, Tailwind CSS, GitHub Pages | Single-page portfolio UI, live API status, visitor counter, AI chat, project case studies, printable resume |
+| Frontend | React, TypeScript, Vite, Tailwind CSS, GitHub Pages | Single-page portfolio UI, health monitor, visitor counter, AI chat, project details, skills, credentials, resume |
 | Backend | Azure Functions, Python 3.11 | Health, visitor-counter, and AI-assistant APIs |
 | Database | Azure Cosmos DB for NoSQL | Persistent visitor count, hashed visitor records, chat rate-limit records |
 | AI | OpenAI-compatible external API | Portfolio-specific conversational assistant with provider-neutral frontend branding |
@@ -32,7 +30,7 @@ The project is intentionally small enough to understand end-to-end while applyin
 | CI/CD | GitHub Actions | Typechecking, builds, tests, security checks, Terraform planning, production deployment, smoke verification |
 | Cloud authentication | GitHub OIDC + Microsoft Entra ID | Short-lived Azure authentication without stored client secrets |
 
-For a deeper system walkthrough, see [`docs/architecture.md`](docs/architecture.md).
+For the full system walkthrough, see [`docs/architecture.md`](docs/architecture.md).
 
 ## Repository Structure
 
@@ -67,6 +65,12 @@ portfolio/
 │   │   │   ├── hooks.ts
 │   │   │   ├── portfolio.ts
 │   │   │   ├── index.css
+│   │   │   ├── redesign.css
+│   │   │   ├── impeccable.css
+│   │   │   ├── refine.css
+│   │   │   ├── comfort.css
+│   │   │   ├── ui-refinements.ts
+│   │   │   ├── comfort-refinements.ts
 │   │   │   └── main.tsx
 │   │   ├── index.html
 │   │   ├── package.json
@@ -74,32 +78,44 @@ portfolio/
 │   │   └── vite.config.ts
 │   └── assets/
 ├── terraform/
-├── .gitignore
 ├── CONTRIBUTING.md
-├── LICENSE
 ├── SECURITY.md
 └── README.md
 ```
 
 ## Frontend
 
-The portfolio is a single React page rather than a multi-page static site. Navigation uses document anchors such as `#projects` and `#experience`, so GitHub Pages does not need client-side routing fallbacks.
+The portfolio is a single React page hosted on GitHub Pages. Navigation uses document anchors such as `#projects`, `#skills`, and `#contact`, so the application does not require a client-side router or static-hosting fallback rules.
 
-The frontend includes:
+Current frontend features include:
 
-- responsive desktop and mobile navigation with active-section tracking
-- system, light, and dark theme preferences
-- typed portfolio content models
-- live production `/api/health` status
-- visitor counter with explicit loading and failure states
-- AI assistant with session history and error handling
-- project case-study dialogs with architecture diagrams
-- print-optimized full resume output
-- reduced-motion support, keyboard focus states, and responsive layouts
+- responsive desktop and mobile navigation with active-section tracking;
+- System, Light, and Dark theme preferences;
+- an **Aspiring Cloud & DevOps Engineer** hero with an explicit **Open to opportunities** state;
+- live production `/api/health` status from Azure Functions;
+- a build-derived **Release age** value that resets with every frontend release;
+- live Manila time in the monitoring panel;
+- visitor counter with loading and unavailable states;
+- AI assistant with session history, rate-limit/error handling, and a closed state that does not block page interaction;
+- whole-card project interaction with centered project-detail dialogs;
+- in-page architecture-diagram zoom instead of raw-image navigation;
+- clickable skill capability cards with detailed modal explanations;
+- provider-styled certification cards with hover/focus descriptions;
+- a fully visible on-page resume plus print/save output;
+- restrained one-time reveal motion and `prefers-reduced-motion` support.
+
+### Health and release-age semantics
+
+The hero monitor deliberately separates liveness from release metadata:
+
+- `/api/health` confirms that the Azure Function worker loaded and can serve HTTP;
+- it does **not** prove Cosmos DB or the external AI provider is healthy;
+- **Release age** is calculated from a Vite build timestamp and is not server uptime;
+- the release-age counter is only shown as active while the production health check is Operational.
 
 ### Local frontend development
 
-Prerequisite: Node.js 22+.
+Use Node.js **22.12+**. Node 18 is unsupported by the current Vite toolchain.
 
 ```bash
 cd frontend/app
@@ -107,7 +123,9 @@ npm install
 npm run dev
 ```
 
-The production Azure Functions API is used by default. To use a local Function host, create a local `.env` from `.env.example`:
+If `nvm` is available, a Node 22 runtime can be selected before installing dependencies.
+
+The production Azure Functions API is used by default. To target a local Function host, create a local `.env` from `.env.example`:
 
 ```text
 VITE_API_BASE_URL=http://localhost:7071/api
@@ -120,51 +138,39 @@ npm run typecheck
 npm run build
 ```
 
-Vite writes the static GitHub Pages artifact to `frontend/app/dist/`.
+Vite writes the deployable GitHub Pages artifact to `frontend/app/dist/`.
 
 ## CI/CD Model
 
-The repository uses a deliberately simple two-branch model:
+The repository uses two long-lived branches:
 
 ```text
 dev  → development and integration
 main → protected production
 ```
 
+Scoped feature branches are used for larger work before integration into `dev`.
+
 ### Development
 
-A push to `dev` or pull request targeting `dev` validates all three engineering surfaces:
+A push to `dev` or pull request targeting `dev` validates:
 
-- React/TypeScript dependency installation
-- strict TypeScript typecheck
-- Vite production build and artifact verification
-- Python dependency compatibility, syntax, Ruff, and backend tests
-- Terraform formatting, initialization without the production backend, and validation
-- final `Development CI Passed` gate
+- React dependency installation;
+- strict TypeScript typecheck;
+- Vite production build and artifact verification;
+- Python dependency compatibility, syntax, Ruff, and backend tests;
+- Terraform formatting, backend-disabled initialization, and validation;
+- final `Development CI Passed` gate.
 
 ### Pull Request to `main`
 
-A `dev → main` pull request runs production-readiness checks including:
+A `dev → main` pull request runs production-readiness checks including frontend build packaging, backend validation/security auditing, Azure Function deployment-package creation, Azure OIDC authentication, Terraform remote-backend initialization, a real authenticated Terraform plan, and the final `Production Ready` gate.
 
-- React dependency installation, TypeScript validation, and Vite production build
-- production frontend artifact packaging
-- Python dependency compatibility checks
-- Ruff linting
-- dependency security auditing
-- backend tests
-- Azure Function deployment-package build
-- Azure OIDC authentication for normal contributor PRs
-- Terraform initialization against the real remote backend
-- authenticated Terraform production plan
-- final `Production Ready` merge gate
-
-Dependabot PRs use a safe Terraform validation path with the backend disabled and no Azure authentication because repository secrets are intentionally unavailable to Dependabot.
-
-No infrastructure or application deployment occurs from a pull request.
+No application or infrastructure mutation occurs from the pull request itself.
 
 ### Production
 
-After a successful PR is merged into `main`, path-specific workflows deploy only the affected part of the system:
+After merge into `main`, path-specific workflows deploy only the affected layer:
 
 ```text
 frontend/**  → Vite build → GitHub Pages → live-page smoke check
@@ -172,29 +178,29 @@ backend/**   → Azure Functions → health + visitor API smoke tests
 terraform/** → Terraform plan + apply
 ```
 
-The frontend workflow uploads only `frontend/app/dist/`; source files and development dependencies are not published to GitHub Pages.
+The frontend workflow uploads only `frontend/app/dist/`. Source files and development dependencies are not published to GitHub Pages.
 
 Production Azure workflows authenticate using GitHub-issued OIDC tokens rather than stored Azure client secrets.
 
-See [`docs/cicd.md`](docs/cicd.md) for the complete pipeline design.
+See [`docs/cicd.md`](docs/cicd.md).
 
 ## Security Design
 
 Key security decisions include:
 
-- GitHub OIDC federation with Microsoft Entra ID for Azure Actions authentication
-- no reusable Azure service principal client secret in GitHub
-- protected `main` branch with required PR validation
-- separate OIDC trust subjects for pull-request planning and production environment deployment
-- hashed client IP addresses before storage in Cosmos DB
-- AI provider API key stored in GitHub Actions Secrets and passed to Terraform as a sensitive `TF_VAR` input
-- Terraform state stored remotely in Azure Blob Storage and treated as sensitive because managed secret values can be represented in state
-- backend dependency auditing in PR validation
-- environment and local-secret files excluded from Git
-- lazy AI client initialization so optional AI configuration failures cannot prevent unrelated Function routes from being indexed
-- no provider API keys or Azure connection strings embedded in the React bundle
+- GitHub OIDC federation with Microsoft Entra ID for Azure Actions authentication;
+- no reusable Azure service-principal client secret in GitHub;
+- protected `main` branch with required PR validation;
+- separate OIDC trust subjects for pull-request planning and production environment deployment;
+- hashed client IP addresses before persistence in Cosmos DB;
+- AI provider API key stored in GitHub Actions Secrets and passed to Terraform as a sensitive `TF_VAR` input;
+- Terraform state stored remotely in Azure Blob Storage and treated as sensitive;
+- backend dependency auditing in PR validation;
+- local environment and secret files excluded from Git;
+- lazy AI-client initialization so optional AI failures cannot prevent unrelated Function routes from being indexed;
+- no provider API keys or Azure connection strings embedded in the React bundle.
 
-The application-secret flow is:
+Application-secret flow:
 
 ```text
 GitHub Actions Secret: OPENCODE_API_KEY
@@ -213,13 +219,13 @@ See [`docs/azure-oidc.md`](docs/azure-oidc.md) and [`SECURITY.md`](SECURITY.md).
 
 ## Backend Local Development
 
-### Prerequisites
+Prerequisites:
 
 - Python 3.11+
 - Azure Functions Core Tools
 - Terraform
 - Azure CLI
-- Node.js 22+
+- Node.js 22.12+
 
 ```bash
 cd backend
@@ -229,9 +235,7 @@ python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-Create `backend/local.settings.json` locally with the required application settings. This file is intentionally ignored by Git.
-
-Typical settings include:
+Create `backend/local.settings.json` locally with the required application settings. The file is ignored by Git.
 
 ```json
 {
@@ -245,21 +249,17 @@ Typical settings include:
 }
 ```
 
-Run the Function App locally:
+Run and validate:
 
 ```bash
 func start
-```
 
-Backend validation:
-
-```bash
 cd backend
 ruff check .
 pytest -v
 ```
 
-### Terraform validation
+Terraform validation without touching shared remote state:
 
 ```bash
 cd terraform
@@ -268,32 +268,9 @@ terraform init -backend=false
 terraform validate
 ```
 
-Use the real backend only when intentionally working with the shared Azure state.
+## Terraform Remote State
 
-## Terraform Remote State Bootstrap
-
-The application infrastructure uses an Azure Blob Storage backend. The state storage must exist before Terraform can initialize the remote backend.
-
-```bash
-az login
-
-az group create \
-  --name rg-terraform-state \
-  --location koreacentral
-
-az storage account create \
-  --name sttfstatejeysibn \
-  --resource-group rg-terraform-state \
-  --location koreacentral \
-  --sku Standard_LRS \
-  --encryption-services blob
-
-az storage container create \
-  --name tfstate \
-  --account-name sttfstatejeysibn
-```
-
-Terraform backend configuration:
+Remote state is stored in Azure Blob Storage:
 
 ```text
 Resource group:  rg-terraform-state
@@ -302,35 +279,36 @@ Container:       tfstate
 State key:       portfolio.terraform.tfstate
 ```
 
-The CI/CD identity also requires permission to access the remote-state blob. Because Terraform manages application settings containing sensitive values, state access should be restricted and state contents should not be exposed in logs or public troubleshooting output.
+Because Terraform manages sensitive Function App settings, access to the remote backend is restricted and state contents must not be exposed in logs or public troubleshooting output.
 
 ## Azure Resources Managed by Terraform
 
 Terraform currently provisions:
 
-- Azure Resource Group
-- Azure Storage Account for the Function App
-- Azure Cosmos DB account
-- Cosmos DB SQL database (`PortfolioDB`)
-- `Counter` container
-- `VisitorIPs` container with TTL
-- Linux Consumption App Service Plan
-- Python 3.11 Azure Function App
-- Log Analytics workspace with telemetry cost guardrails
-- workspace-based Application Insights
-- application configuration, Application Insights connection, and CORS settings
+- Azure Resource Group;
+- Function App Storage Account;
+- Azure Cosmos DB account;
+- Cosmos DB SQL database (`PortfolioDB`);
+- `Counter` container;
+- `VisitorIPs` container with TTL;
+- Linux Consumption App Service Plan;
+- Python 3.11 Azure Function App;
+- Log Analytics workspace with cost guardrails;
+- workspace-based Application Insights;
+- Function App configuration, telemetry connection, and CORS settings.
 
 ## Observability and Operations
 
-Milestone 5 added production visibility and deployment verification:
+Production visibility includes:
 
-- `GET /api/health` liveness endpoint
-- Application Insights request, failure, exception, and latency telemetry
-- structured application events and correlation IDs
-- Log Analytics with 30-day retention and a `0.1 GB/day` ingestion cap
-- backend deployment health and visitor-counter smoke checks
-- frontend GitHub Pages post-deployment verification
-- initial SLI/SLO targets and KQL troubleshooting queries
+- `GET /api/health` liveness endpoint;
+- Application Insights request, failure, exception, and latency telemetry;
+- structured application events and correlation IDs;
+- Log Analytics with 30-day retention and a `0.1 GB/day` ingestion cap;
+- backend health and visitor-counter post-deployment smoke checks;
+- frontend GitHub Pages post-deployment verification;
+- frontend health monitor with explicit liveness and release-age semantics;
+- initial SLI/SLO targets and KQL troubleshooting queries.
 
 See [`docs/observability.md`](docs/observability.md) and [`docs/runbook.md`](docs/runbook.md).
 
@@ -338,28 +316,27 @@ See [`docs/observability.md`](docs/observability.md) and [`docs/runbook.md`](doc
 
 - [`docs/architecture.md`](docs/architecture.md) — system design and data flows
 - [`docs/cicd.md`](docs/cicd.md) — branch model and GitHub Actions pipelines
-- [`docs/observability.md`](docs/observability.md) — telemetry, health checks, cost guardrails, SLOs, and KQL
+- [`docs/observability.md`](docs/observability.md) — telemetry, health semantics, cost guardrails, SLOs, and KQL
 - [`docs/azure-oidc.md`](docs/azure-oidc.md) — Azure federation design and trust subjects
-- [`docs/runbook.md`](docs/runbook.md) — common operational and recovery procedures
-- [`docs/Changelog.md`](docs/Changelog.md) — project release history
-- [`CONTRIBUTING.md`](CONTRIBUTING.md) — development workflow and contribution standards
+- [`docs/runbook.md`](docs/runbook.md) — deployment, troubleshooting, rollback, and recovery procedures
+- [`docs/Changelog.md`](docs/Changelog.md) — release history
+- [`CONTRIBUTING.md`](CONTRIBUTING.md) — development workflow and validation commands
 - [`SECURITY.md`](SECURITY.md) — security model and reporting guidance
 
 ## Project Goals
 
-This repository is both a live portfolio and a learning project focused on demonstrating practical Cloud and DevOps engineering skills:
+This repository is both a live portfolio and a learning project focused on practical Cloud and DevOps engineering:
 
-- designing cloud architecture
-- managing infrastructure with Terraform
-- building CI/CD pipelines
-- implementing secure workload identity
-- building typed frontend applications against serverless APIs
-- managing application secrets without committing credentials
-- managing remote state
-- enforcing production release gates
-- instrumenting and verifying production services
-- testing and validating application changes
-- documenting engineering decisions and operational procedures
+- cloud architecture;
+- infrastructure as code;
+- CI/CD and protected releases;
+- workload identity and secret management;
+- typed frontend applications against serverless APIs;
+- remote state management;
+- observability and post-deployment verification;
+- accessible frontend interaction design;
+- testing and validation;
+- operational documentation.
 
 ## License
 
