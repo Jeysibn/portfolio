@@ -17,7 +17,7 @@ Azure Functions (Python)
   |                \
   |                 \ OpenAI-compatible API
   v                  v
-Azure Cosmos DB     OpenCode Zen
+Azure Cosmos DB     AI Provider
 ```
 
 Infrastructure is managed with Terraform and deployed through GitHub Actions.
@@ -25,6 +25,8 @@ Infrastructure is managed with Terraform and deployed through GitHub Actions.
 ## Frontend
 
 The frontend is a static site hosted on GitHub Pages. It contains the portfolio content, visitor-counter client logic, and AI assistant interface.
+
+The AI interface is intentionally model/provider-neutral so backend model changes do not require frontend branding changes.
 
 The frontend calls anonymous Azure Function HTTP endpoints. Anonymous Function authorization is intentional because the APIs are consumed directly by the public website; abuse controls are therefore implemented at the application layer where appropriate.
 
@@ -52,8 +54,30 @@ The raw IP address is not intentionally persisted.
 2. applies a per-visitor rate limit using Cosmos DB records;
 3. loads the portfolio knowledge base from `backend/data/knowledge_base.json`;
 4. builds a constrained system prompt;
-5. sends the request to OpenCode Zen through its OpenAI-compatible API;
-6. returns a concise portfolio-specific response.
+5. lazily creates the OpenAI-compatible AI client at request time;
+6. sends the request to the configured AI provider;
+7. returns a concise portfolio-specific response.
+
+Lazy AI-client initialization is a reliability boundary: missing optional AI configuration can produce a controlled AI-route error without preventing Azure Functions from indexing unrelated routes such as the visitor counter.
+
+## Application Secret Flow
+
+The AI provider key is not stored in source control. It follows this deployment path:
+
+```text
+GitHub Actions Secret: OPENCODE_API_KEY
+        |
+        v
+TF_VAR_opencode_api_key
+        |
+        v
+Terraform sensitive variable
+        |
+        v
+Azure Function App OPENCODE_API_KEY setting
+```
+
+Because Terraform manages the Function App setting, the secret value is represented in Terraform state. The remote backend must therefore be treated as sensitive infrastructure data.
 
 ## Data Layer
 
@@ -83,7 +107,7 @@ Container:       tfstate
 Key:             portfolio.terraform.tfstate
 ```
 
-Keeping state outside the application resource group separates Terraform's control data from the infrastructure being managed.
+Keeping state outside the application resource group separates Terraform's control data from the infrastructure being managed. State access is restricted because it can contain sensitive managed values.
 
 ## Delivery Architecture
 
@@ -94,6 +118,8 @@ The repository uses two long-lived branches:
 
 Pull requests from `dev` to `main` run an authenticated Terraform plan against the current remote state. Terraform apply is never performed from a pull request.
 
+Dependabot pull requests use a safe validation path with the Terraform backend disabled and no Azure authentication because repository secrets are intentionally unavailable to Dependabot.
+
 After merge, path-specific production workflows deploy frontend, backend, or infrastructure changes.
 
 ## Authentication
@@ -101,6 +127,8 @@ After merge, path-specific production workflows deploy frontend, backend, or inf
 GitHub Actions authenticates to Azure using OpenID Connect workload identity federation with Microsoft Entra ID.
 
 There is no reusable Azure client secret required by the deployment workflows. GitHub receives a short-lived OIDC token for each eligible workflow job and exchanges it for Azure credentials.
+
+Application secrets such as the external AI provider key are managed separately from Azure workload identity.
 
 See [azure-oidc.md](azure-oidc.md) for the trust model.
 
@@ -110,8 +138,10 @@ The project favors:
 
 - simple serverless components;
 - infrastructure as code;
-- short-lived credentials;
+- short-lived cloud credentials;
+- explicit application-secret handling;
 - automated validation before production;
+- runtime isolation for optional integrations;
 - low operational cost;
 - explicit documentation;
 - enough separation to remain maintainable without introducing unnecessary enterprise complexity.

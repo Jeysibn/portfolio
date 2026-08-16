@@ -79,8 +79,14 @@ Never commit:
 - Terraform state files;
 - downloaded cloud credential files.
 
-Use documented GitHub Secrets, GitHub Environments, Azure application settings, or local ignored configuration instead.
+Application secrets managed by Terraform must originate from a secure external source such as GitHub Actions Secrets. For example, `OPENCODE_API_KEY` is exposed to Terraform at workflow runtime through `TF_VAR_opencode_api_key` and then configured as a Function App application setting.
+
+Do not place real secret values in `.tf` files, workflow YAML, committed `.tfvars` files, documentation, or CI logs.
+
+Because Terraform-managed secrets can be represented in state, treat the remote Terraform backend as sensitive and do not expose state contents during troubleshooting.
+
+Manual Azure Portal changes should not become the normal source of truth for application settings that Terraform owns. Prefer correcting the GitHub Secret, workflow input, or Terraform configuration and then allowing the normal pipeline to converge production.
 
 ## Documentation
 
-Changes that materially alter architecture, deployment, authentication, or operations should update the relevant document under `docs/` and the changelog when appropriate.
+Changes that materially alter architecture, deployment, authentication, application-secret handling, or operations should update the relevant document under `docs/` and the changelog when appropriate.
