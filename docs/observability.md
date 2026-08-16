@@ -2,21 +2,21 @@
 
 ## Purpose
 
-The portfolio uses Azure-native observability to make production health visible without introducing a high-cost monitoring stack. Application Insights is workspace-based and sends telemetry to a dedicated Log Analytics workspace provisioned by Terraform.
+The portfolio uses Azure-native observability to make production behavior visible without introducing a high-cost monitoring stack. Application Insights is workspace-based and sends telemetry to a dedicated Log Analytics workspace provisioned by Terraform.
 
 ## Telemetry
 
 The Azure Function records:
 
-- HTTP request and exception telemetry through Application Insights
-- structured operational events for health checks, visitor-counter requests, AI requests, successful operations, and rate limiting
-- correlation IDs that are returned to callers in `X-Correlation-ID`
+- HTTP request and exception telemetry through Application Insights;
+- structured operational events for health checks, visitor-counter requests, AI requests, successful operations, and rate limiting;
+- correlation IDs returned to callers in `X-Correlation-ID`.
 
 Application request bodies, AI prompts/responses, raw client IP addresses, API keys, connection strings, and other secrets must not be written to logs.
 
-## Health endpoint
+## Health Endpoint
 
-`GET /api/health` is intentionally a lightweight liveness endpoint. It confirms that the Function worker loaded the application and can serve HTTP traffic without making calls to Cosmos DB or the external AI provider.
+`GET /api/health` is intentionally a lightweight liveness endpoint. It confirms that the Function worker loaded the application and can serve HTTP traffic without calling Cosmos DB or the external AI provider.
 
 Example response:
 
@@ -28,20 +28,51 @@ Example response:
 }
 ```
 
-Dependency failures remain visible through request failures, exceptions, and the production visitor-counter smoke test. Keeping liveness independent from dependencies avoids declaring the whole Function host unhealthy because an external service is temporarily degraded.
+Dependency failures remain visible through request failures, exceptions, and the production visitor-counter smoke test. Keeping liveness independent from dependencies avoids declaring the Function host unhealthy solely because an external service is temporarily degraded.
 
-## Deployment verification
+## Frontend Monitoring Panel
 
-The backend production workflow no longer treats package upload as sufficient proof of a healthy deployment. After Azure Functions deployment it:
+The deployed React hero surfaces the production health check together with release metadata.
 
-1. retries `/api/health` for up to two minutes while the Function host starts;
+### Operational state
+
+The `Operational`, `Checking`, and `Unavailable` states are driven by the real `/api/health` request made from the browser.
+
+An Operational result means the Function application is live enough to answer the health route. It does **not** mean Cosmos DB, the AI provider, or every backend route has been dependency-checked.
+
+### Release age
+
+The frontend build injects a timestamp through Vite and calculates **Release age** from that value.
+
+Release age:
+
+- resets whenever a new frontend build is deployed;
+- is displayed only as active while the production health check is Operational;
+- is **not** Azure Function uptime;
+- does not imply that a serverless Function instance has been continuously running since deployment.
+
+This distinction is important because Azure Functions can scale and recycle independently of the frontend release lifecycle.
+
+The monitoring card also displays current Manila time as presentation context. That clock is client-side and is not an infrastructure health signal.
+
+## Deployment Verification
+
+### Backend
+
+The backend production workflow does not treat package upload as sufficient proof of a healthy deployment. After Azure Functions deployment it:
+
+1. retries `/api/health` while the Function host starts;
 2. validates the JSON health contract;
-3. calls `GetVisitorCount` and validates that the API returns an integer count;
-4. fails the deployment workflow if verification does not succeed.
+3. calls `GetVisitorCount` and confirms an integer count;
+4. fails the deployment workflow when verification does not succeed.
 
-This provides a simple post-deployment gate without continuously generating synthetic traffic.
+### Frontend
 
-## Cost guardrails
+The GitHub Pages production workflow builds the Vite application, deploys the generated `dist/` artifact, and verifies the live Pages document after release.
+
+This provides deployment evidence without continuously generating synthetic traffic.
+
+## Cost Guardrails
 
 The Log Analytics workspace is configured with:
 
@@ -52,9 +83,9 @@ The Log Analytics workspace is configured with:
 
 Request and exception telemetry are excluded from sampling so failures and request-level reliability signals remain available. Application code should continue to log only operational metadata at `Information` level and avoid verbose payload logging.
 
-At the configured daily cap, telemetry ingestion cannot exceed roughly 3.1 GB in a 31-day month. The cap is a safety mechanism, not a target: normal portfolio traffic should be far below it.
+At the configured daily cap, telemetry ingestion cannot exceed roughly 3.1 GB in a 31-day month. The cap is a safety mechanism, not a target; normal portfolio traffic should remain far below it.
 
-## Initial service indicators and objectives
+## Initial Service Indicators and Objectives
 
 | Signal | Initial objective | Measurement |
 |---|---|---|
@@ -65,9 +96,11 @@ At the configured daily cap, telemetry ingestion cannot exceed roughly 3.1 GB in
 
 The AI endpoint is excluded from the one-second latency objective because it depends on an external model provider and has materially different latency characteristics.
 
-These are initial engineering objectives for a personal portfolio, not contractual SLAs. They should be revisited after enough production telemetry exists to establish realistic baselines.
+These are engineering objectives for a personal portfolio, not contractual SLAs. They should be revisited after enough telemetry exists to establish realistic baselines.
 
-## Useful Application Insights queries
+The frontend Release age display is intentionally excluded from these SLOs because it is release metadata, not an availability measurement.
+
+## Useful Application Insights Queries
 
 ### Recent failed requests
 
@@ -107,12 +140,12 @@ traces
 | order by timestamp desc
 ```
 
-## Operational response
+## Operational Response
 
 When a production workflow smoke test fails:
 
 1. inspect the failed GitHub Actions step and HTTP status;
-2. check Application Insights failed requests and exceptions using the deployment timestamp;
-3. use the correlation ID when one is available to connect application events to a request;
+2. check Application Insights failed requests and exceptions around the deployment timestamp;
+3. use the correlation ID when available to connect application events to a request;
 4. verify Function App configuration and Cosmos DB availability;
 5. follow `docs/runbook.md` for service-specific troubleshooting and rollback decisions.
