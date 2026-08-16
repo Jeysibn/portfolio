@@ -59,6 +59,26 @@ resource "azurerm_service_plan" "asp" {
   sku_name            = "Y1"
 }
 
+# Centralized telemetry store for Application Insights.
+# The 0.1 GB/day cap keeps this personal portfolio below roughly 3.1 GB/month
+# even if an unexpected logging spike occurs.
+resource "azurerm_log_analytics_workspace" "portfolio" {
+  name                = "law-${var.project_prefix}-portfolio"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  sku                 = "PerGB2018"
+  retention_in_days   = 30
+  daily_quota_gb      = 0.1
+}
+
+resource "azurerm_application_insights" "portfolio" {
+  name                = "appi-${var.project_prefix}-portfolio"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  workspace_id        = azurerm_log_analytics_workspace.portfolio.id
+  application_type    = "web"
+}
+
 # Python Azure Function App
 resource "azurerm_linux_function_app" "function" {
   name                       = "func-${var.project_prefix}-portfolio"
@@ -78,9 +98,10 @@ resource "azurerm_linux_function_app" "function" {
   }
 
   app_settings = {
-    "CosmosDbConnectionString" = azurerm_cosmosdb_account.db.primary_sql_connection_string
-    "AzureWebJobsFeatureFlags" = "EnableWorkerIndexing"
-    "OPENCODE_API_KEY"         = var.opencode_api_key
+    "CosmosDbConnectionString"             = azurerm_cosmosdb_account.db.primary_sql_connection_string
+    "AzureWebJobsFeatureFlags"             = "EnableWorkerIndexing"
+    "OPENCODE_API_KEY"                     = var.opencode_api_key
+    "APPLICATIONINSIGHTS_CONNECTION_STRING" = azurerm_application_insights.portfolio.connection_string
   }
 }
 
