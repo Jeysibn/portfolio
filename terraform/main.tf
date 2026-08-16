@@ -80,15 +80,7 @@ resource "azurerm_linux_function_app" "function" {
   app_settings = {
     "CosmosDbConnectionString" = azurerm_cosmosdb_account.db.primary_sql_connection_string
     "AzureWebJobsFeatureFlags" = "EnableWorkerIndexing"
-  }
-
-  # OPENCODE_API_KEY is managed as a runtime secret outside Terraform.
-  # Ignore only that map entry so Terraform continues managing the rest
-  # of the Function App settings without deleting the secret on apply.
-  lifecycle {
-    ignore_changes = [
-      app_settings["OPENCODE_API_KEY"],
-    ]
+    "OPENCODE_API_KEY"          = var.opencode_api_key
   }
 }
 
