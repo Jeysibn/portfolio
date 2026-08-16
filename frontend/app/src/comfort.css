@@ -1,0 +1,90 @@
+/* Comfort pass: keep the page alive without moving visible content under the reader. */
+
+/* Hide the browser scrollbar while preserving normal wheel/touch/keyboard scrolling. */
+html {
+  scrollbar-width: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/* Keep the scroll-linked background pattern, but stop persistent card/text drift. */
+.scroll-reactive,
+.scroll-reactive.is-in-view,
+.motion-ready .scroll-reactive[data-reveal].is-visible,
+.motion-ready .project-row[data-reveal].is-visible,
+.motion-ready .skill-card[data-reveal].is-visible,
+.motion-ready .cert-card[data-reveal].is-visible,
+.motion-ready .timeline-item[data-reveal].is-visible,
+.motion-ready .section-heading[data-reveal].is-visible,
+.motion-ready .education-block[data-reveal].is-visible,
+.motion-ready .resume-preview[data-reveal].is-visible,
+.motion-ready .contact-panel[data-reveal].is-visible {
+  transform: none !important;
+}
+
+/* Background movement remains subtle and synchronous with scroll only. */
+.scroll-pattern-layer {
+  opacity: 0.48;
+  transform: translate3d(0, 0, 0) !important;
+}
+
+/* A closed chat must never create an invisible click shield. */
+.chat-widget {
+  pointer-events: none;
+}
+
+.chat-trigger,
+.chat-panel-open {
+  pointer-events: auto;
+}
+
+.chat-panel:not(.chat-panel-open) {
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
+/* Project cards themselves are now the case-study action. */
+.project-row {
+  cursor: pointer;
+}
+
+.project-row:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 5px;
+}
+
+.project-row .text-action {
+  display: none !important;
+}
+
+.project-row::after {
+  content: "Open case study ↗";
+  display: inline-block;
+  margin: 0 clamp(28px, 4vw, 42px) clamp(24px, 3vw, 34px);
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.02em;
+  opacity: 0.82;
+}
+
+.project-row:hover::after,
+.project-row:focus-visible::after {
+  opacity: 1;
+}
+
+/* Release age is a compact operational metric. */
+.monitor-summary > div:first-child strong {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-pattern-layer {
+    background-position: 0 0 !important;
+  }
+}
