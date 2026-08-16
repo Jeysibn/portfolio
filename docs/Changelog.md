@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased]
+
+### Added
+* **Expanded AI Knowledge Base**: Added richer career, project, homelab, technical-skill, availability, relocation, language, and recruiter FAQ context with guardrails that distinguish professional experience from personal project experience.
+* **Terraform-Managed AI Configuration**: Added the AI provider API key as a sensitive Terraform input populated from the GitHub Actions `OPENCODE_API_KEY` secret through `TF_VAR_opencode_api_key`.
+
+### Changed
+* **Model-Neutral AI Branding**: Removed model-specific branding from the portfolio chat interface so backend AI model/provider changes do not require frontend branding changes.
+* **Runtime-Safe AI Initialization**: Changed the AI client from import-time initialization to lazy request-time initialization so optional AI configuration failures cannot prevent unrelated Azure Function routes from being indexed.
+* **Function App Secret Ownership**: Terraform now manages the `OPENCODE_API_KEY` Function App setting instead of relying on an out-of-band application setting protected by `ignore_changes`.
+
+### Fixed
+* **Azure Function Route Discovery**: Restored Function App route indexing after an import-time AI configuration failure caused the Function App to expose no indexed routes.
+* **AI Assistant Configuration Recovery**: Restored the AI assistant after the `OPENCODE_API_KEY` application setting was missing, while keeping the visitor counter operational.
+* **Frontend Counter Error Handling**: Improved visitor-counter response handling so HTTP failures are reported as HTTP errors instead of misleading JSON parsing failures.
+
+### Security
+* **GitHub-Managed Application Secret**: `OPENCODE_API_KEY` is stored in GitHub Actions Secrets and injected into Terraform at workflow runtime rather than committed to the repository.
+* **Sensitive Terraform Input**: The API key Terraform variable is marked sensitive. Because Terraform manages the Function App setting, the value is also present in the protected remote Terraform state and access to that backend must be treated as sensitive.
+
+---
+
 ## [1.4.0] - 2026-08-16
 
 ### Added
