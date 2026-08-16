@@ -81,6 +81,8 @@ jobs:
       # PRODUCTION PLAN
       # =====================================================
       - name: Terraform Plan
+        env:
+          TF_VAR_opencode_api_key: ${{ secrets.OPENCODE_API_KEY }}
         run: |
           terraform plan \
             -input=false \
