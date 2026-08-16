@@ -7,7 +7,22 @@
       name="description"
       content="Jerome Ibon — Cloud and DevOps engineering portfolio focused on automation, infrastructure, reliability, and observability."
     />
-    <meta name="theme-color" content="#08111f" />
+    <meta name="theme-color" content="#07111d" />
+    <script>
+      (() => {
+        const stored = localStorage.getItem("color-theme");
+        const systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        const theme = stored === "light" || stored === "dark" ? stored : systemDark ? "dark" : "light";
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.style.colorScheme = theme;
+      })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=Manrope:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
     <title>Jerome Ibon | Cloud & DevOps Engineer</title>
   </head>
   <body>
