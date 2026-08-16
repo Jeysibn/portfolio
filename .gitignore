@@ -4,6 +4,10 @@
 !.env.example
 local.settings.json
 
+# Node / frontend
+node_modules/
+frontend/app/dist/
+
 # Python virtual environments
 .venv/
 venv/

@@ -39,22 +39,28 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Validate HTML
+      - name: Validate legacy frontend during migration
         run: |
-          npx --yes htmlhint "frontend/**/*.html"
-
-      - name: Validate JavaScript syntax
-        run: |
+          npx --yes htmlhint "frontend/*.html"
           node --check frontend/js/chat.js
           node --check frontend/js/counter.js
 
-      - name: Verify required frontend files
+      - name: Install React frontend dependencies
+        working-directory: frontend/app
+        run: npm install --no-audit --no-fund
+
+      - name: Typecheck React frontend
+        working-directory: frontend/app
+        run: npm run typecheck
+
+      - name: Build React frontend
+        working-directory: frontend/app
+        run: npm run build
+
+      - name: Verify migration build artifact
         run: |
-          test -f frontend/index.html
-          test -f frontend/projects.html
-          test -f frontend/resume.html
-          test -f frontend/js/chat.js
-          test -f frontend/js/counter.js
+          test -f frontend/app/dist/index.html
+          test -d frontend/app/dist/assets
 
   # =========================================================
   # BACKEND
