@@ -9,3 +9,14 @@ variable "project_prefix" {
   description = "Prefix for resource names."
   default     = "jeysibn"
 }
+
+variable "opencode_api_key" {
+  type        = string
+  description = "OpenCode Zen API key injected into the Azure Function App."
+  sensitive   = true
+
+  validation {
+    condition     = length(trimspace(var.opencode_api_key)) > 0
+    error_message = "The OpenCode API key must not be empty."
+  }
+}
