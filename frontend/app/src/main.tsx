@@ -99,6 +99,31 @@ function handleNavigation(anchor: HTMLAnchorElement) {
   return true;
 }
 
+function originalArchitectureUrl(previewUrl: string) {
+  try {
+    const url = new URL(previewUrl, window.location.href);
+    if (url.hostname !== "wsrv.nl") return previewUrl;
+    return url.searchParams.get("url") || previewUrl;
+  } catch {
+    return previewUrl;
+  }
+}
+
+function loadOriginalArchitectureForZoom() {
+  window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(() => {
+      const image = document.querySelector<HTMLImageElement>(".image-zoom-content");
+      if (!image) return;
+
+      const previewUrl = image.getAttribute("src") || image.src;
+      const originalUrl = originalArchitectureUrl(previewUrl);
+      if (originalUrl !== previewUrl) {
+        image.src = originalUrl;
+      }
+    });
+  });
+}
+
 applyTheme(storedTheme());
 
 const root = document.getElementById("root");
@@ -127,6 +152,12 @@ document.addEventListener(
       event.stopPropagation();
       event.stopImmediatePropagation();
       toggleTheme();
+      return;
+    }
+
+    const architectureLink = target.closest(".architecture-link");
+    if (architectureLink) {
+      loadOriginalArchitectureForZoom();
       return;
     }
 
