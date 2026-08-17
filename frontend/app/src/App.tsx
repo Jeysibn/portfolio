@@ -12,10 +12,60 @@ import {
   projects,
   skillGroups,
 } from "./portfolio";
-import type { ChatMessage, Project, ThemePreference } from "./portfolio";
+import type { ChatMessage, Project, SkillGroup, ThemePreference } from "./portfolio";
+import { skillDetails } from "./skill-details";
+
+declare const __BUILD_TIMESTAMP__: string;
 
 const sectionIds = navigation.map((item) => item.id);
 const CHAT_STORAGE_KEY = "jeysibn_chat_history";
+const buildStartedAt = new Date(__BUILD_TIMESTAMP__);
+const hasValidBuildTimestamp = !Number.isNaN(buildStartedAt.getTime());
+const releaseFormatter = new Intl.DateTimeFormat("en-US", {
+  timeZone: "Asia/Manila",
+  month: "short",
+  day: "2-digit",
+  hour: "2-digit",
+  minute: "2-digit",
+  hour12: false,
+});
+const manilaTimeFormatter = new Intl.DateTimeFormat("en-US", {
+  timeZone: "Asia/Manila",
+  hour: "numeric",
+  minute: "2-digit",
+  second: "2-digit",
+  hour12: true,
+});
+
+function formatReleaseAge(now = new Date()) {
+  if (!hasValidBuildTimestamp) return "unknown";
+  const elapsed = Math.max(0, now.getTime() - buildStartedAt.getTime());
+  const totalMinutes = Math.floor(elapsed / 60_000);
+  const days = Math.floor(totalMinutes / 1_440);
+  const hours = Math.floor((totalMinutes % 1_440) / 60);
+  const minutes = totalMinutes % 60;
+  if (days > 0) return `${days}d ${hours}h`;
+  if (hours > 0) return `${hours}h ${minutes}m`;
+  return `${minutes}m`;
+}
+
+function useClock(formatter: Intl.DateTimeFormat, interval: number) {
+  const [value, setValue] = useState(() => formatter.format(new Date()));
+  useEffect(() => {
+    const timer = window.setInterval(() => setValue(formatter.format(new Date())), interval);
+    return () => window.clearInterval(timer);
+  }, [formatter, interval]);
+  return value;
+}
+
+function useReleaseAge() {
+  const [value, setValue] = useState(() => formatReleaseAge());
+  useEffect(() => {
+    const timer = window.setInterval(() => setValue(formatReleaseAge()), 30_000);
+    return () => window.clearInterval(timer);
+  }, []);
+  return value;
+}
 
 const certificationDetails = [
   {
@@ -120,6 +170,8 @@ function App() {
   const activeSection = useActiveSection(sectionIds);
   const { preference, setPreference } = useTheme();
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [selectedSkill, setSelectedSkill] = useState<SkillGroup | null>(null);
+  const [zoomedArchitecture, setZoomedArchitecture] = useState<Project | null>(null);
 
   useScrollReveal();
 
@@ -136,9 +188,9 @@ function App() {
         <main id="top">
           <Hero />
           <About />
-          <Experience />
           <Projects onOpenProject={setSelectedProject} />
-          <Skills />
+          <Experience />
+          <Skills onOpenSkill={setSelectedSkill} />
           <Credentials />
           <Resume />
           <Contact />
@@ -146,7 +198,13 @@ function App() {
 
         <Footer />
         <ChatWidget />
-        <ProjectDialog project={selectedProject} onClose={() => setSelectedProject(null)} />
+        <ProjectDialog
+          project={selectedProject}
+          onClose={() => setSelectedProject(null)}
+          onOpenArchitecture={setZoomedArchitecture}
+        />
+        <SkillDialog group={selectedSkill} onClose={() => setSelectedSkill(null)} />
+        <ArchitectureDialog project={zoomedArchitecture} onClose={() => setZoomedArchitecture(null)} />
       </div>
 
       <PrintResume />
@@ -308,7 +366,7 @@ function Hero() {
             <span>Open to opportunities</span>
             <span className="availability-detail">Cloud · DevOps · SRE</span>
           </div>
-          <h1 id="hero-title">I build cloud systems that are easier to ship, observe, and recover.</h1>
+          <h1 id="hero-title">Aspiring Cloud &amp; DevOps Engineer.</h1>
           <p className="hero-intro">
             I’m Jerome, a Computer Engineering graduate focused on Cloud, DevOps, and reliability engineering. I turn infrastructure, delivery, and operations into version-controlled systems instead of manual checklists.
           </p>
@@ -316,8 +374,8 @@ function Hero() {
             I’m currently open to entry-level Cloud Support, DevOps, and Junior Site Reliability opportunities.
           </p>
           <div className="hero-actions">
-            <a href="#projects" className="button button-primary">
-              Explore engineering work <ArrowDownIcon />
+            <a href="#contact" className="button button-primary">
+              Contact me <ArrowDownIcon />
             </a>
             <a href="https://github.com/Jeysibn" target="_blank" rel="noreferrer" className="button button-secondary">
               GitHub <ExternalIcon />
@@ -333,16 +391,14 @@ function Hero() {
 
 function SystemStatus() {
   const [state, setState] = useState<"checking" | "healthy" | "degraded">("checking");
-  const [version, setVersion] = useState<string>("—");
+  const releaseAge = useReleaseAge();
+  const manilaTime = useClock(manilaTimeFormatter, 1_000);
 
   useEffect(() => {
     const controller = new AbortController();
 
     fetchHealth(controller.signal)
-      .then((health) => {
-        setState("healthy");
-        setVersion(health.version);
-      })
+      .then(() => setState("healthy"))
       .catch((error: unknown) => {
         if (error instanceof DOMException && error.name === "AbortError") return;
         setState("degraded");
@@ -352,6 +408,7 @@ function SystemStatus() {
   }, []);
 
   const stateLabel = state === "checking" ? "Checking" : state === "healthy" ? "Operational" : "Unavailable";
+  const releaseStamp = hasValidBuildTimestamp ? releaseFormatter.format(buildStartedAt) : "local build";
 
   return (
     <aside className="status-console hero-status" aria-label="Live portfolio service status">
@@ -361,28 +418,24 @@ function SystemStatus() {
           <span className="state-dot" aria-hidden="true" /> {stateLabel}
         </span>
       </div>
-      <dl className="status-list">
-        <StatusRow label="API" value="Azure Functions" />
-        <StatusRow label="Health" value={stateLabel} emphasis={state === "healthy"} />
-        <StatusRow label="Release" value={version} />
-        <StatusRow label="Delivery" value="GitHub Actions" />
-        <StatusRow label="Infrastructure" value="Terraform" />
-        <StatusRow label="Telemetry" value="Application Insights" />
+      <dl className="status-list monitor-groups">
+        <div className="monitor-group" aria-label="Service health">
+          <StatusRow label="API" value="Azure Functions" />
+          <StatusRow label="Health" value={stateLabel} emphasis={state === "healthy"} />
+          <StatusRow label="Probe" value={state === "healthy" ? "Passing" : stateLabel} />
+        </div>
+        <div className="monitor-group" aria-label="Release information">
+          <StatusRow label="Release" value={releaseStamp} />
+          <StatusRow label="Release age" value={releaseAge} />
+          <StatusRow label="Delivery" value="GitHub Actions" />
+        </div>
+        <div className="monitor-group" aria-label="Runtime context">
+          <StatusRow label="Infrastructure" value="Terraform" />
+          <StatusRow label="Telemetry" value="Application Insights" />
+          <StatusRow label="Runtime" value="Serverless" />
+          <StatusRow label="Manila" value={manilaTime} />
+        </div>
       </dl>
-      <div className="monitor-summary" aria-label="Serverless monitoring summary">
-        <div>
-          <span>runtime</span>
-          <strong>serverless</strong>
-        </div>
-        <div>
-          <span>probe</span>
-          <strong>{state === "healthy" ? "passing" : stateLabel.toLowerCase()}</strong>
-        </div>
-        <div>
-          <span>telemetry</span>
-          <strong>enabled</strong>
-        </div>
-      </div>
       <p className="status-note">Health is checked against the production API when this page loads.</p>
     </aside>
   );
@@ -406,7 +459,7 @@ function About() {
   ] as const;
 
   return (
-    <Section id="about" title="Reliability started for me at the troubleshooting desk.">
+    <Section id="about" title="About">
       <div className="about-layout" data-reveal="">
         <div className="prose-column">
           <p>
@@ -432,11 +485,7 @@ function About() {
 
 function Experience() {
   return (
-    <Section
-      id="experience"
-      title="Experience shaped around diagnosis, communication, and operational ownership."
-      intro="My background combines enterprise technical support with self-directed infrastructure engineering—useful context for building systems that are both operable and understandable."
-    >
+    <Section id="experience" title="Experience">
       <div className="timeline">
         {experience.map((item) => (
           <article key={`${item.organization}-${item.role}`} className="timeline-item" data-reveal="">
@@ -463,40 +512,48 @@ function Experience() {
 
 function Projects({ onOpenProject }: { onOpenProject: (project: Project) => void }) {
   return (
-    <Section
-      id="projects"
-      title="Selected systems, explained as engineering decisions."
-      intro="The technology list matters less than the operating model: what problem the system solves, how change reaches production, what happens when it fails, and how the cost stays controlled."
-    >
+    <Section id="projects" title="Projects">
       <div className="project-list">
-        {projects.map((project, index) => (
+        {projects.map((project) => (
           <article
             key={project.id}
-            className={index % 2 ? "project-row project-row-reverse" : "project-row"}
+            className={`project-row project-${project.id}`}
             data-reveal=""
+            role="button"
+            tabIndex={0}
+            aria-haspopup="dialog"
+            aria-label={`View ${project.title} project details`}
+            onClick={() => onOpenProject(project)}
+            onKeyDown={(event) => {
+              if (event.key !== "Enter" && event.key !== " ") return;
+              event.preventDefault();
+              onOpenProject(project);
+            }}
           >
-            <div className="project-visual" aria-hidden="true">
-              <div className="project-diagram">
-                <span className="diagram-node">Git</span>
-                <span className="diagram-line" />
-                <span className="diagram-node diagram-node-accent">Automation</span>
-                <span className="diagram-line" />
-                <span className="diagram-node">Runtime</span>
-              </div>
+            <div className="project-visual">
+              {project.architectureUrl ? (
+                <img
+                  src={project.architectureUrl}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                />
+              ) : null}
+              <span className="project-visual-label" aria-hidden="true">Architecture preview</span>
             </div>
 
             <div className="project-copy">
               <p className="project-category">{project.category}</p>
-              <h3>{project.title}</h3>
+              <div className="project-title-row">
+                <h3>{project.title}</h3>
+                <span className="project-open-cue" aria-hidden="true"><ArrowRightIcon /></span>
+              </div>
               <p>{project.summary}</p>
               <div className="technology-line" aria-label="Project technologies">
                 {project.technologies.slice(0, 5).map((technology) => (
                   <span key={technology}>{technology}</span>
                 ))}
               </div>
-              <button type="button" className="text-action" onClick={() => onOpenProject(project)} aria-haspopup="dialog">
-                Read the case study <ArrowRightIcon />
-              </button>
             </div>
           </article>
         ))}
@@ -505,29 +562,36 @@ function Projects({ onOpenProject }: { onOpenProject: (project: Project) => void
   );
 }
 
-function Skills() {
+function Skills({ onOpenSkill }: { onOpenSkill: (group: SkillGroup) => void }) {
   return (
     <Section
       id="skills"
-      title="A toolkit built around delivery and operations, not badge collecting."
+      title="Skills & Tools"
       intro="These are the technologies I use across cloud projects, labs, troubleshooting, automation, and deployment workflows."
     >
       <div className="skills-grid" aria-label="Technical skill groups">
         {skillGroups.map((group, index) => (
-          <article key={group.label} className="skill-card" data-reveal="">
-            <div className="skill-card-head">
+          <button
+            key={group.label}
+            type="button"
+            className="skill-card"
+            data-reveal=""
+            aria-haspopup="dialog"
+            onClick={() => onOpenSkill(group)}
+          >
+            <span className="skill-card-head">
               <span className="skill-code" aria-hidden="true">{skillCodes[index]}</span>
-              <div>
+              <span>
                 <span className="skill-card-index">0{index + 1}</span>
                 <h3>{group.label}</h3>
-              </div>
-            </div>
-            <div className="skill-chip-list">
+              </span>
+            </span>
+            <span className="skill-chip-list">
               {group.items.map((item) => (
                 <span key={item}>{item}</span>
               ))}
-            </div>
-          </article>
+            </span>
+          </button>
         ))}
       </div>
     </Section>
@@ -539,8 +603,7 @@ function Credentials() {
     <section className="credentials-section" aria-labelledby="credentials-title">
       <div className="section-inner credentials-layout">
         <div data-reveal="">
-          <h2 id="credentials-title">Education & credentials</h2>
-          <p className="section-intro">Formal foundations paired with continuous hands-on infrastructure work.</p>
+          <h2 id="credentials-title">Education &amp; Certifications</h2>
         </div>
 
         <div className="credentials-content">
@@ -560,7 +623,6 @@ function Credentials() {
           <section className="certification-block" aria-labelledby="certifications-heading">
             <div className="credential-subheading" data-reveal="">
               <p className="detail-label">Certifications</p>
-              <p>Hover or focus a credential to see what it validates.</p>
             </div>
             <div className="certification-grid">
               {certificationDetails.map((certification) => (
@@ -576,7 +638,6 @@ function Credentials() {
                   </div>
                   <h3 id={certification.name === certifications[0] ? "certifications-heading" : undefined}>{certification.name}</h3>
                   <p className="cert-description">{certification.description}</p>
-                  <span className="cert-hover-hint" aria-hidden="true">inspect credential ↗</span>
                 </article>
               ))}
             </div>
@@ -591,7 +652,7 @@ function Resume() {
   return (
     <Section
       id="resume"
-      title="Resume, without making you download it first."
+      title="Resume"
       intro="Everything important is visible here. The print action simply gives you a clean copy when you want one."
     >
       <article className="resume-preview" data-reveal="">
@@ -607,12 +668,15 @@ function Resume() {
           </button>
         </header>
 
-        <div className="resume-preview-grid">
-          <div className="resume-main-column">
-            <ResumePreviewSection title="Professional summary">
-              <p>{professionalSummary}</p>
-            </ResumePreviewSection>
+        <div className="resume-summary">
+          <h3>Professional summary</h3>
+          <p>{professionalSummary}</p>
+        </div>
 
+        <details className="resume-details">
+          <summary>View full resume <span className="resume-disclosure-icon" aria-hidden="true" /></summary>
+          <div className="resume-preview-grid">
+          <div className="resume-main-column">
             <ResumePreviewSection title="Professional experience">
               {experience.map((item) => (
                 <article key={`${item.organization}-resume`} className="resume-entry">
@@ -675,7 +739,8 @@ function Resume() {
               </ul>
             </ResumePreviewSection>
           </aside>
-        </div>
+          </div>
+        </details>
       </article>
     </Section>
   );
@@ -692,7 +757,7 @@ function ResumePreviewSection({ title, children }: { title: string; children: Re
 
 function Contact() {
   return (
-    <Section id="contact" title="Open to the right team, the right problems, and systems worth improving.">
+    <Section id="contact" title="Contact">
       <div className="contact-panel" data-reveal="">
         <div className="contact-intro">
           <div className="contact-availability">
@@ -762,7 +827,15 @@ function Section({
   );
 }
 
-function ProjectDialog({ project, onClose }: { project: Project | null; onClose: () => void }) {
+function ProjectDialog({
+  project,
+  onClose,
+  onOpenArchitecture,
+}: {
+  project: Project | null;
+  onClose: () => void;
+  onOpenArchitecture: (project: Project) => void;
+}) {
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
@@ -803,10 +876,10 @@ function ProjectDialog({ project, onClose }: { project: Project | null; onClose:
           </div>
 
           {project.architectureUrl ? (
-            <a className="architecture-link" href={project.architectureUrl} target="_blank" rel="noreferrer">
+            <button type="button" className="architecture-link" onClick={() => onOpenArchitecture(project)}>
               <img src={project.architectureUrl} alt={project.architectureAlt || `${project.title} architecture`} loading="lazy" />
-              <span>Open architecture diagram <ExternalIcon /></span>
-            </a>
+              <span>Open architecture diagram <ExpandIcon /></span>
+            </button>
           ) : null}
 
           <div className="case-section">
@@ -845,6 +918,95 @@ function ProjectDialog({ project, onClose }: { project: Project | null; onClose:
             View repository <ExternalIcon />
           </a>
         </article>
+      ) : null}
+    </dialog>
+  );
+}
+
+function SkillDialog({ group, onClose }: { group: SkillGroup | null; onClose: () => void }) {
+  const dialogRef = useRef<HTMLDialogElement>(null);
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    if (group && !dialog.open) dialog.showModal();
+    if (!group && dialog.open) dialog.close();
+  }, [group]);
+
+  const detail = group ? skillDetails[group.label] : null;
+
+  return (
+    <dialog
+      ref={dialogRef}
+      className="skill-detail-dialog"
+      aria-labelledby="skill-dialog-title"
+      onCancel={(event) => {
+        event.preventDefault();
+        onClose();
+      }}
+      onClick={(event) => {
+        if (event.target === event.currentTarget) onClose();
+      }}
+    >
+      {group && detail ? (
+        <article className="skill-detail-panel">
+          <button type="button" className="inspection-close" aria-label="Close skill details" onClick={onClose} autoFocus>
+            <CloseIcon />
+          </button>
+          <h2 id="skill-dialog-title">{group.label}</h2>
+          <p className="skill-detail-summary">{detail.summary}</p>
+          <p className="skill-detail-practice">{detail.practice}</p>
+          <div className="skill-detail-list">
+            {group.items.map((item) => (
+              <div key={`${group.label}-${item}`}>
+                <h3>{item}</h3>
+                <p>{detail.itemDescriptions[item] || "Used as part of my cloud, DevOps, support, and infrastructure workflows."}</p>
+              </div>
+            ))}
+          </div>
+        </article>
+      ) : null}
+    </dialog>
+  );
+}
+
+function ArchitectureDialog({ project, onClose }: { project: Project | null; onClose: () => void }) {
+  const dialogRef = useRef<HTMLDialogElement>(null);
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    if (project && !dialog.open) dialog.showModal();
+    if (!project && dialog.open) dialog.close();
+  }, [project]);
+
+  return (
+    <dialog
+      ref={dialogRef}
+      className="image-zoom-dialog"
+      aria-labelledby="architecture-caption"
+      onCancel={(event) => {
+        event.preventDefault();
+        onClose();
+      }}
+      onClick={(event) => {
+        if (event.target === event.currentTarget) onClose();
+      }}
+    >
+      {project?.architectureUrl ? (
+        <div className="image-zoom-frame">
+          <button type="button" className="inspection-close" aria-label="Close architecture diagram" onClick={onClose} autoFocus>
+            <CloseIcon />
+          </button>
+          <img
+            className="image-zoom-content"
+            src={project.architectureUrl}
+            alt={project.architectureAlt || `${project.title} architecture`}
+          />
+          <p id="architecture-caption" className="image-zoom-caption">
+            {project.architectureAlt || `${project.title} architecture`}
+          </p>
+        </div>
       ) : null}
     </dialog>
   );
@@ -1127,6 +1289,10 @@ function ArrowDownIcon() {
 
 function ExternalIcon() {
   return <Icon size={16}><path d="M14 5h5v5" /><path d="M10 14 19 5" /><path d="M19 13v6H5V5h6" /></Icon>;
+}
+
+function ExpandIcon() {
+  return <Icon size={16}><path d="M8 3H3v5" /><path d="m3 3 6 6" /><path d="M16 21h5v-5" /><path d="m21 21-6-6" /></Icon>;
 }
 
 function CloseIcon() {

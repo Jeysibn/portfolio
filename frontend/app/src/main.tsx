@@ -1,13 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
-import "./index.css";
-import "./redesign.css";
-import "./impeccable.css";
-import "./refine.css";
-import "./comfort.css";
-import "./ui-refinements";
-import "./comfort-refinements";
+import "./styles.css";
 
 const root = document.getElementById("root");
 
