@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="960" viewBox="0 0 1600 960" role="img" aria-labelledby="title desc">
+  <title id="title">Cloud-backed portfolio architecture</title>
+  <desc id="desc">React frontend on GitHub Pages connects to Azure Functions APIs, Cosmos DB, provider-neutral AI, Application Insights, Log Analytics, Terraform, and GitHub Actions.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f8fafc"/><stop offset="1" stop-color="#e6eef5"/></linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#0078d4"/><stop offset="1" stop-color="#66e36f"/></linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#38546b"/></marker>
+    <style>
+      .title{font:700 34px Inter,Arial,sans-serif;fill:#10202e}.label{font:700 22px Inter,Arial,sans-serif;fill:#10202e}.body{font:500 18px Inter,Arial,sans-serif;fill:#52687a}.mono{font:600 17px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;fill:#0f4f7a}.box{fill:#fff;stroke:#bfd0dc;stroke-width:2}.group{fill:#eef6fa;stroke:#bfd0dc;stroke-width:2;stroke-dasharray:8 8}.line{stroke:#38546b;stroke-width:4;fill:none;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect width="1600" height="960" fill="url(#bg)"/>
+  <text x="80" y="82" class="title">Cloud-Backed Portfolio Architecture</text>
+  <text x="80" y="116" class="body">Static frontend, serverless API, managed persistence, telemetry, and secretless CI/CD.</text>
+  <rect x="62" y="154" width="430" height="644" rx="28" class="group"/>
+  <text x="92" y="196" class="label">Visitor path</text>
+  <rect x="112" y="248" width="280" height="104" rx="20" class="box"/><text x="142" y="292" class="label">Browser</text><text x="142" y="322" class="body">Recruiter or hiring team</text>
+  <rect x="112" y="462" width="300" height="118" rx="20" class="box"/><text x="142" y="508" class="label">GitHub Pages</text><text x="142" y="538" class="body">React + TypeScript + Vite</text><text x="142" y="566" class="mono">/portfolio</text>
+  <path d="M252 352v104" class="line"/>
+  <rect x="586" y="154" width="500" height="644" rx="28" class="group"/>
+  <text x="616" y="196" class="label">Azure runtime</text>
+  <rect x="650" y="248" width="350" height="120" rx="20" class="box"/><text x="684" y="295" class="label">Azure Functions</text><text x="684" y="326" class="body">/health · /GetVisitorCount</text><text x="684" y="354" class="body">/AiChatAssistant</text>
+  <rect x="650" y="474" width="350" height="116" rx="20" class="box"/><text x="684" y="520" class="label">Cosmos DB</text><text x="684" y="550" class="body">Visitor count, hashed visitor IDs, TTL records</text>
+  <rect x="650" y="666" width="350" height="88" rx="20" class="box"/><text x="684" y="718" class="label">External AI Provider</text>
+  <path d="M412 520h226" class="line"/><path d="M825 368v96" class="line"/><path d="M825 590v66" class="line"/>
+  <rect x="1180" y="154" width="350" height="264" rx="28" class="group"/>
+  <text x="1210" y="196" class="label">Observability</text>
+  <rect x="1232" y="248" width="240" height="70" rx="18" class="box"/><text x="1260" y="292" class="label">Application Insights</text>
+  <rect x="1232" y="334" width="240" height="58" rx="18" class="box"/><text x="1260" y="372" class="label">Log Analytics</text>
+  <path d="M1000 306h220" class="line"/>
+  <rect x="1180" y="504" width="350" height="294" rx="28" class="group"/>
+  <text x="1210" y="546" class="label">Delivery &amp; IaC</text>
+  <rect x="1232" y="594" width="240" height="70" rx="18" class="box"/><text x="1260" y="638" class="label">GitHub Actions</text>
+  <rect x="1232" y="688" width="240" height="70" rx="18" class="box"/><text x="1260" y="732" class="label">Terraform + OIDC</text>
+  <path d="M1232 630H1020" class="line"/><path d="M1232 724H1010" class="line"/>
+  <rect x="80" y="842" width="1440" height="56" rx="18" fill="url(#accent)" opacity="0.14"/>
+  <text x="112" y="877" class="body">Design goal: demonstrate practical Cloud and DevOps engineering with low-stakes, observable, reproducible infrastructure.</text>
+</svg>
