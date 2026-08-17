@@ -77,20 +77,18 @@ function updateStaticCopy() {
   renderThemeButton(currentTheme());
 }
 
-function resolveNavigationTarget(destination: HTMLElement) {
-  if (destination.tagName === "H2") return destination;
-  return destination.querySelector<HTMLElement>(".section-heading h2, h2") ?? destination;
+function resolveNavigationSection(destination: HTMLElement) {
+  return destination.closest<HTMLElement>("section") ?? destination;
 }
 
-function centerElementInViewport(element: HTMLElement) {
-  const rect = element.getBoundingClientRect();
+function scrollSectionIntoView(section: HTMLElement) {
+  const headerHeight = document.querySelector<HTMLElement>(".site-header")?.offsetHeight ?? 0;
+  const rect = section.getBoundingClientRect();
   const absoluteTop = window.scrollY + rect.top;
-  const targetTop = absoluteTop - (window.innerHeight - rect.height) / 2;
-  const maxScrollTop = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
-  const clampedTop = Math.min(maxScrollTop, Math.max(0, targetTop));
+  const targetTop = Math.max(0, absoluteTop - headerHeight - 18);
 
   window.scrollTo({
-    top: clampedTop,
+    top: targetTop,
     behavior: "smooth",
   });
 }
@@ -102,8 +100,7 @@ function handleNavigation(anchor: HTMLAnchorElement) {
   const destination = document.querySelector<HTMLElement>(href);
   if (!destination) return false;
 
-  const target = resolveNavigationTarget(destination);
-  centerElementInViewport(target);
+  scrollSectionIntoView(resolveNavigationSection(destination));
   window.history.replaceState(null, "", href);
   return true;
 }
