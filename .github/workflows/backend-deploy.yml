@@ -7,6 +7,7 @@ on:
     paths:
       - "backend/**"
       - ".github/workflows/backend-deploy.yml"
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -58,6 +59,16 @@ jobs:
         with:
           app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
           package: ./backend
+
+      - name: Verify run-from-package configuration
+        run: |
+          set -euo pipefail
+
+          az functionapp config appsettings list \
+            --resource-group rg-jeysibn-portfolio \
+            --name "$AZURE_FUNCTIONAPP_NAME" \
+            --output json \
+            | python -c 'import json,sys; settings={item["name"]: item.get("value", "") for item in json.load(sys.stdin)}; package_url=settings.get("WEBSITE_RUN_FROM_PACKAGE", ""); assert package_url.startswith("https://"), "WEBSITE_RUN_FROM_PACKAGE is missing or invalid"; print("Run-from-package configuration validated")'
 
       - name: Verify production health
         env:
