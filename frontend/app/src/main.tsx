@@ -2,7 +2,6 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./styles.css";
-import { startTierTwoEnhancements } from "./tier-two-enhancements";
 
 const root = document.getElementById("root");
 
@@ -15,7 +14,3 @@ createRoot(root).render(
     <App />
   </StrictMode>,
 );
-
-window.requestAnimationFrame(() => {
-  startTierTwoEnhancements();
-});
