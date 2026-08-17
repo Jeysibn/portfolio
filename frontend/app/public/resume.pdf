@@ -1,0 +1,102 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R /F2 5 0 R >> >> /Contents 6 0 R >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+6 0 obj
+<< /Length 3215 >>
+stream
+BT
+/F1 10 Tf
+/F2 20 Tf 54 790 Td (Jerome Christian V. Ibon) Tj
+-54 -790 Td
+/F1 11 Tf 54 765 Td (Cloud Support | DevOps | Cloud Engineering) Tj
+-54 -765 Td
+/F1 9 Tf 54 749 Td (Malolos, Bulacan, Philippines | jeysibn@gmail.com | linkedin.com/in/jeromeibon | github.com/Jeysibn) Tj
+-54 -749 Td
+/F2 13 Tf 54 723 Td (Professional Summary) Tj
+-54 -723 Td
+/F1 9 Tf 54 705 Td (Computer Engineering graduate and OCI-certified engineer building production-style cloud and Kubernetes) Tj
+-54 -705 Td
+/F1 9 Tf 54 691 Td (infrastructure from provisioning through GitOps delivery and observability. Brings enterprise SaaS) Tj
+-54 -691 Td
+/F1 9 Tf 54 677 Td (technical-support experience and is pursuing entry-level Cloud Support, DevOps, and Cloud Engineering roles.) Tj
+-54 -677 Td
+/F2 13 Tf 54 651 Td (Technical Skills) Tj
+-54 -651 Td
+/F1 9 Tf 54 633 Td (Cloud: Azure, AWS, Oracle Cloud Infrastructure, VMware vSphere, Proxmox) Tj
+-54 -633 Td
+/F1 9 Tf 54 619 Td (Delivery: Terraform, GitHub Actions, Argo CD, Git, YAML) Tj
+-54 -619 Td
+/F1 9 Tf 54 605 Td (Containers: Kubernetes/k3s, Docker, Helm) Tj
+-54 -605 Td
+/F1 9 Tf 54 591 Td (Observability: Application Insights, Log Analytics, Prometheus, Grafana) Tj
+-54 -591 Td
+/F1 9 Tf 54 577 Td (Systems: Linux, Windows Server, Active Directory, TCP/IP, DNS, VPN, SSH, RDP) Tj
+-54 -577 Td
+/F2 13 Tf 54 551 Td (Experience) Tj
+-54 -551 Td
+/F2 10 Tf 54 533 Td (Technical Support Engineer, Endpoint Security SaaS | TrendAI | Aug 2025 - Feb 2026) Tj
+-54 -533 Td
+/F1 9 Tf 54 518 Td (Resolved 80+ enterprise technical cases across network, system, and cloud infrastructure issues while working) Tj
+-54 -518 Td
+/F1 9 Tf 54 504 Td (within SLA expectations.) Tj
+-54 -504 Td
+/F1 9 Tf 54 490 Td (Provisioned AWS environments including EC2, VPCs, security groups, subnets, and routing to reproduce customer) Tj
+-54 -490 Td
+/F1 9 Tf 54 476 Td (scenarios.) Tj
+-54 -476 Td
+/F1 9 Tf 54 462 Td (Completed 640 hours of training across enterprise networking, server administration, VMware vSphere, Azure) Tj
+-54 -462 Td
+/F1 9 Tf 54 448 Td (fundamentals, and AWS fundamentals.) Tj
+-54 -448 Td
+/F2 10 Tf 54 434 Td (IT Helpdesk Intern | Philippine Transmarine Carriers | Mar 2025 - May 2025) Tj
+-54 -434 Td
+/F1 9 Tf 54 419 Td (Assisted with Active Directory accounts, user access controls, network connectivity, VPN troubleshooting,) Tj
+-54 -419 Td
+/F1 9 Tf 54 405 Td (endpoint redeployment, and IT assets.) Tj
+-54 -405 Td
+/F2 13 Tf 54 379 Td (Projects) Tj
+-54 -379 Td
+/F1 9 Tf 54 361 Td (Cloud-Backed Portfolio: React, TypeScript, Azure Functions, Cosmos DB, Terraform, GitHub Actions, Application) Tj
+-54 -361 Td
+/F1 9 Tf 54 347 Td (Insights.) Tj
+-54 -347 Td
+/F1 9 Tf 54 333 Td (Homelab GitOps Environment: k3s, Argo CD, Terraform, Proxmox, Helm, GitHub Actions, Prometheus, Grafana.) Tj
+-54 -333 Td
+/F2 13 Tf 54 307 Td (Education & Certifications) Tj
+-54 -307 Td
+/F1 9 Tf 54 289 Td (Bachelor of Science in Computer Engineering | National University Baliwag | Aug 2021 - Aug 2025) Tj
+-54 -289 Td
+/F1 9 Tf 54 275 Td (Oracle Cloud Infrastructure Foundations Associate | Trend Vision One Server and Workload Protection Professional) Tj
+-54 -275 Td
+/F1 9 Tf 54 261 Td (| GitHub Foundations) Tj
+-54 -261 Td
+ET
+endstream
+endobj
+xref
+0 7
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000251 00000 n 
+0000000321 00000 n 
+0000000396 00000 n 
+trailer
+<< /Size 7 /Root 1 0 R >>
+startxref
+3663
+%%EOF
