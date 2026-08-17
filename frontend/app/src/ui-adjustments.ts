@@ -2,24 +2,6 @@ const THEME_STORAGE_KEY = "color-theme";
 
 type ThemeMode = "light" | "dark";
 
-const SUN_ICON = `
-<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-  <circle cx="12" cy="12" r="4" />
-  <path d="M12 2v2" />
-  <path d="M12 20v2" />
-  <path d="M4.93 4.93l1.41 1.41" />
-  <path d="M17.66 17.66l1.41 1.41" />
-  <path d="M2 12h2" />
-  <path d="M20 12h2" />
-  <path d="M4.93 19.07l1.41-1.41" />
-  <path d="M17.66 6.34l1.41-1.41" />
-</svg>`;
-
-const MOON_ICON = `
-<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-  <path d="M21 12.79A8.5 8.5 0 1 1 11.21 3 6.7 6.7 0 0 0 21 12.79z" />
-</svg>`;
-
 function systemTheme(): ThemeMode {
   return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
@@ -33,7 +15,6 @@ function renderThemeButton(theme: ThemeMode) {
   const trigger = document.querySelector<HTMLButtonElement>(".theme-trigger");
   if (!trigger) return;
 
-  trigger.innerHTML = theme === "dark" ? MOON_ICON : SUN_ICON;
   trigger.setAttribute("aria-label", theme === "dark" ? "Switch to light theme" : "Switch to dark theme");
   trigger.setAttribute("title", theme === "dark" ? "Switch to light theme" : "Switch to dark theme");
   trigger.removeAttribute("aria-expanded");
@@ -68,6 +49,17 @@ function setCredentialsAnchor() {
   }
 }
 
+function improveServiceCopy() {
+  const title = document.querySelector<HTMLElement>(".status-console-topline > span:first-child");
+  if (title) title.textContent = "Production status";
+
+  const note = document.querySelector<HTMLElement>(".status-note");
+  if (note) {
+    note.textContent =
+      "Checks the deployed Azure Functions API when the page loads. Portfolio content remains available if the API cannot be reached.";
+  }
+}
+
 function updateStaticCopy() {
   setCredentialsAnchor();
 
@@ -81,7 +73,24 @@ function updateStaticCopy() {
     resumeIntro.textContent = "Everything important is visible here. Download the PDF directly, or review the on-page resume details below.";
   }
 
+  improveServiceCopy();
   renderThemeButton(currentTheme());
+}
+
+function handleNavigation(anchor: HTMLAnchorElement) {
+  const href = anchor.getAttribute("href");
+  if (!href?.startsWith("#") || href === "#") return false;
+
+  const destination = document.querySelector<HTMLElement>(href);
+  if (!destination) return false;
+
+  const scrollTarget = destination.matches("section")
+    ? destination.querySelector<HTMLElement>(".section-heading h2, h2") ?? destination
+    : destination;
+
+  scrollTarget.scrollIntoView({ behavior: "smooth", block: "center" });
+  window.history.replaceState(null, "", href);
+  return true;
 }
 
 export function normalizeThemePreference() {
@@ -96,13 +105,20 @@ export function startUiAdjustments() {
     (event) => {
       const target = event.target;
       if (!(target instanceof Element)) return;
-      const trigger = target.closest(".theme-trigger");
-      if (!trigger) return;
 
-      event.preventDefault();
-      event.stopPropagation();
-      event.stopImmediatePropagation();
-      toggleTheme();
+      const themeTrigger = target.closest(".theme-trigger");
+      if (themeTrigger) {
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        toggleTheme();
+        return;
+      }
+
+      const navigationLink = target.closest<HTMLAnchorElement>(".desktop-nav a, .mobile-nav a");
+      if (navigationLink && handleNavigation(navigationLink)) {
+        event.preventDefault();
+      }
     },
     true,
   );
