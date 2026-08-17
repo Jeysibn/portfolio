@@ -10,10 +10,12 @@ if (!root) {
   throw new Error("Root element not found.");
 }
 
-startTierTwoEnhancements();
-
 createRoot(root).render(
   <StrictMode>
     <App />
   </StrictMode>,
 );
+
+window.requestAnimationFrame(() => {
+  startTierTwoEnhancements();
+});
