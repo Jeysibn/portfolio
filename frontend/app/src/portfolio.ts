@@ -39,6 +39,7 @@ export const navigation = [
   { label: "About", id: "about" },
   { label: "Projects", id: "projects" },
   { label: "Experience", id: "experience" },
+  { label: "Education", id: "credentials" },
   { label: "Skills", id: "skills" },
   { label: "Resume", id: "resume" },
   { label: "Contact", id: "contact" },
