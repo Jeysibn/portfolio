@@ -77,6 +77,24 @@ function updateStaticCopy() {
   renderThemeButton(currentTheme());
 }
 
+function resolveNavigationTarget(destination: HTMLElement) {
+  if (destination.tagName === "H2") return destination;
+  return destination.querySelector<HTMLElement>(".section-heading h2, h2") ?? destination;
+}
+
+function centerElementInViewport(element: HTMLElement) {
+  const rect = element.getBoundingClientRect();
+  const absoluteTop = window.scrollY + rect.top;
+  const targetTop = absoluteTop - (window.innerHeight - rect.height) / 2;
+  const maxScrollTop = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+  const clampedTop = Math.min(maxScrollTop, Math.max(0, targetTop));
+
+  window.scrollTo({
+    top: clampedTop,
+    behavior: "smooth",
+  });
+}
+
 function handleNavigation(anchor: HTMLAnchorElement) {
   const href = anchor.getAttribute("href");
   if (!href?.startsWith("#") || href === "#") return false;
@@ -84,11 +102,8 @@ function handleNavigation(anchor: HTMLAnchorElement) {
   const destination = document.querySelector<HTMLElement>(href);
   if (!destination) return false;
 
-  const scrollTarget = destination.matches("section")
-    ? destination.querySelector<HTMLElement>(".section-heading h2, h2") ?? destination
-    : destination;
-
-  scrollTarget.scrollIntoView({ behavior: "smooth", block: "center" });
+  const target = resolveNavigationTarget(destination);
+  centerElementInViewport(target);
   window.history.replaceState(null, "", href);
   return true;
 }
