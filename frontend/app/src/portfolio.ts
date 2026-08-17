@@ -135,7 +135,7 @@ export const projects: Project[] = [
     ],
     repositoryUrl: "https://github.com/Jeysibn/portfolio",
     architectureUrl:
-      "https://raw.githubusercontent.com/Jeysibn/portfolio/main/frontend/assets/architectural-diagram-cloudbacked-portfolio.svg",
+      "https://raw.githubusercontent.com/Jeysibn/portfolio/main/frontend/assets/architectural-diagram-cloudbacked-portfolio.png",
     architectureAlt: "Architecture diagram for the cloud-backed portfolio",
   },
   {
