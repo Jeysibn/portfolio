@@ -1,9 +1,21 @@
 declare const __BUILD_TIMESTAMP__: string;
 
 const buildStartedAt = new Date(__BUILD_TIMESTAMP__);
+const hasValidBuildTimestamp = !Number.isNaN(buildStartedAt.getTime());
+const releaseFormatter = new Intl.DateTimeFormat("en-US", {
+  timeZone: "Asia/Manila",
+  month: "short",
+  day: "2-digit",
+  hour: "2-digit",
+  minute: "2-digit",
+  hour12: false,
+});
+
 let cleanupComfort: (() => void) | null = null;
 
 function formatReleaseAge(now = new Date()) {
+  if (!hasValidBuildTimestamp) return "unknown";
+
   const elapsed = Math.max(0, now.getTime() - buildStartedAt.getTime());
   const totalMinutes = Math.floor(elapsed / 60_000);
   const days = Math.floor(totalMinutes / 1_440);
@@ -15,10 +27,14 @@ function formatReleaseAge(now = new Date()) {
   return `${minutes}m`;
 }
 
+function formatReleaseStamp() {
+  return hasValidBuildTimestamp ? releaseFormatter.format(buildStartedAt) : "local build";
+}
+
 function updateHeroCopy() {
   const title = document.getElementById("hero-title");
-  if (title) {
-    title.textContent = "Aspiring Cloud & DevOps Engineer building reliable, automated systems.";
+  if (title && title.textContent !== "Aspiring Cloud & DevOps Engineer.") {
+    title.textContent = "Aspiring Cloud & DevOps Engineer.";
   }
 
   const action = document.querySelector<HTMLAnchorElement>(".hero-actions .button-primary");
@@ -59,6 +75,23 @@ function bindProjectCards() {
   });
 }
 
+function updateReleaseMetadata() {
+  const releaseRow = Array.from(document.querySelectorAll<HTMLElement>(".status-list > div")).find(
+    (row) => row.querySelector("dt")?.textContent?.trim().toLowerCase() === "release",
+  );
+  const value = releaseRow?.querySelector<HTMLElement>("dd");
+  if (!releaseRow || !value) return;
+
+  const releaseStamp = formatReleaseStamp();
+  if (value.textContent !== releaseStamp) value.textContent = releaseStamp;
+  releaseRow.setAttribute(
+    "aria-label",
+    hasValidBuildTimestamp
+      ? `Frontend release built ${buildStartedAt.toLocaleString("en-US", { timeZone: "Asia/Manila" })} Manila time`
+      : "Local frontend build",
+  );
+}
+
 function updateReleaseAge() {
   const runtime = document.querySelector<HTMLElement>(".monitor-summary > div:first-child");
   if (!runtime) return;
@@ -67,21 +100,24 @@ function updateReleaseAge() {
   const value = runtime.querySelector<HTMLElement>("strong");
   if (!label || !value) return;
 
-  label.textContent = "release age";
-  runtime.setAttribute("aria-label", `Release built at ${buildStartedAt.toLocaleString()}`);
+  if (label.textContent !== "release age") label.textContent = "release age";
+  runtime.setAttribute(
+    "aria-label",
+    hasValidBuildTimestamp
+      ? `Frontend release built ${buildStartedAt.toLocaleString("en-US", { timeZone: "Asia/Manila" })} Manila time`
+      : "Local frontend build age",
+  );
 
-  const serviceState = document.querySelector<HTMLElement>(".service-state")?.textContent?.trim().toLowerCase() || "";
-  if (serviceState.includes("checking")) {
-    value.textContent = "checking";
-  } else if (serviceState.includes("operational")) {
-    value.textContent = formatReleaseAge();
-  } else {
-    value.textContent = "unavailable";
-  }
+  const releaseAge = formatReleaseAge();
+  if (value.textContent !== releaseAge) value.textContent = releaseAge;
 }
 
 function installComfort(attempt = 0) {
-  const ready = document.getElementById("hero-title") && document.querySelector(".hero-actions") && document.querySelector(".monitor-summary") && document.querySelector(".project-row");
+  const ready =
+    document.getElementById("hero-title") &&
+    document.querySelector(".hero-actions") &&
+    document.querySelector(".monitor-summary") &&
+    document.querySelector(".project-row");
   if (!ready && attempt < 30) {
     window.setTimeout(() => installComfort(attempt + 1), 50);
     return;
@@ -90,10 +126,23 @@ function installComfort(attempt = 0) {
   cleanupComfort?.();
   updateHeroCopy();
   bindProjectCards();
+  updateReleaseMetadata();
   updateReleaseAge();
 
-  const runtimeTimer = window.setInterval(updateReleaseAge, 1_000);
-  cleanupComfort = () => window.clearInterval(runtimeTimer);
+  const monitor = document.querySelector<HTMLElement>(".hero-status");
+  const observer = monitor
+    ? new MutationObserver(() => {
+        updateReleaseMetadata();
+        updateReleaseAge();
+      })
+    : null;
+  observer?.observe(monitor as HTMLElement, { childList: true, subtree: true, characterData: true });
+
+  const releaseAgeTimer = window.setInterval(updateReleaseAge, 30_000);
+  cleanupComfort = () => {
+    observer?.disconnect();
+    window.clearInterval(releaseAgeTimer);
+  };
 }
 
 window.requestAnimationFrame(() => installComfort());
