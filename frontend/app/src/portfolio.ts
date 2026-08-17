@@ -134,7 +134,7 @@ export const projects: Project[] = [
     ],
     repositoryUrl: "https://github.com/Jeysibn/portfolio",
     architectureUrl:
-      "https://raw.githubusercontent.com/Jeysibn/portfolio/main/frontend/assets/architectural-diagram-cloudbacked-portfolio.png",
+      "https://raw.githubusercontent.com/Jeysibn/portfolio/main/frontend/assets/architectural-diagram-cloudbacked-portfolio.svg",
     architectureAlt: "Architecture diagram for the cloud-backed portfolio",
   },
   {
@@ -179,4 +179,4 @@ export const education = {
 } as const;
 
 export const professionalSummary =
-  "Computer Engineering graduate and OCI-certified engineer building production-style cloud and Kubernetes infrastructure from provisioning through GitOps delivery and observability. Brings enterprise SaaS technical-support experience in cloud-based security environments and is pursuing entry-level Cloud Support, DevOps, or Junior Site Reliability roles.";
+  "Computer Engineering graduate and OCI-certified engineer building production-style cloud and Kubernetes infrastructure from provisioning through GitOps delivery and observability. Brings enterprise SaaS technical-support experience in cloud-based security environments and is pursuing entry-level Cloud Support, DevOps, and Cloud Engineering roles.";
