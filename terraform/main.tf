@@ -103,6 +103,13 @@ resource "azurerm_linux_function_app" "function" {
     "OPENCODE_API_KEY"                      = var.opencode_api_key
     "APPLICATIONINSIGHTS_CONNECTION_STRING" = azurerm_application_insights.portfolio.connection_string
   }
+
+  lifecycle {
+    # The backend deployment action writes this dynamic package URL. Preserve it
+    # during infrastructure-only Terraform applies so the app cannot fall back
+    # to an older package after a restart.
+    ignore_changes = [app_settings["WEBSITE_RUN_FROM_PACKAGE"]]
+  }
 }
 
 resource "azurerm_cosmosdb_sql_container" "visitor_ips" {
