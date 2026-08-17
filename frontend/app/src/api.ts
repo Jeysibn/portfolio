@@ -44,11 +44,14 @@ async function requestJson<T>(url: string, init?: RequestInit): Promise<T> {
 export async function fetchHealth(signal?: AbortSignal): Promise<HealthResponse> {
   const payload = await requestJson<HealthResponse>(`${API_BASE_URL}/health`, { signal });
 
-  if (payload.status !== "healthy" || !payload.service || !payload.version) {
+  if (payload.status !== "healthy" || !payload.service) {
     throw new Error("Health API returned an unexpected response");
   }
 
-  return payload;
+  return {
+    ...payload,
+    version: payload.version?.trim() || "live",
+  };
 }
 
 export async function fetchVisitorCount(signal?: AbortSignal): Promise<number> {
