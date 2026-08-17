@@ -1,3 +1,4 @@
+
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 
@@ -364,14 +365,14 @@ function Hero() {
           <div className="availability-pill">
             <span className="availability-dot" aria-hidden="true" />
             <span>Open to opportunities</span>
-            <span className="availability-detail">Cloud · DevOps · SRE</span>
+            <span className="availability-detail">Cloud · DevOps · Cloud Engineering</span>
           </div>
           <h1 id="hero-title">Aspiring Cloud &amp; DevOps Engineer.</h1>
           <p className="hero-intro">
-            I’m Jerome, a Computer Engineering graduate focused on Cloud, DevOps, and reliability engineering. I turn infrastructure, delivery, and operations into version-controlled systems instead of manual checklists.
+            I’m Jerome, a Computer Engineering graduate focused on Cloud, DevOps, and Cloud Engineering. I turn infrastructure, delivery, and operations into version-controlled systems instead of manual checklists.
           </p>
           <p className="hero-opportunity">
-            I’m currently open to entry-level Cloud Support, DevOps, and Junior Site Reliability opportunities.
+            I’m currently open to entry-level Cloud Support, DevOps, and Cloud Engineering opportunities.
           </p>
           <div className="hero-actions">
             <a href="#contact" className="button button-primary">
@@ -653,19 +654,24 @@ function Resume() {
     <Section
       id="resume"
       title="Resume"
-      intro="Everything important is visible here. The print action simply gives you a clean copy when you want one."
+      intro="Everything important is visible here. Download the PDF directly, or use print when you want a browser-generated copy."
     >
       <article className="resume-preview" data-reveal="">
         <header className="resume-preview-header">
           <div>
             <p className="detail-label">Resume / CV</p>
             <h3>Jerome Christian V. Ibon</h3>
-            <p>Cloud Support · DevOps · Kubernetes · GitOps · Infrastructure Automation</p>
+            <p>Cloud Support · DevOps · Cloud Engineering · Kubernetes · GitOps · Infrastructure Automation</p>
             <p className="resume-contact-line">Malolos, Bulacan, Philippines · jeysibn@gmail.com · linkedin.com/in/jeromeibon</p>
           </div>
-          <button type="button" className="button button-secondary" onClick={() => window.print()}>
-            Print / save resume <PrintIcon />
-          </button>
+          <div className="resume-actions">
+            <a className="button button-primary" href="./resume.pdf" download="Jerome-Ibon-Resume.pdf">
+              Download resume (PDF) <DownloadIcon />
+            </a>
+            <button type="button" className="button button-secondary" onClick={() => window.print()}>
+              Print / save resume <PrintIcon />
+            </button>
+          </div>
         </header>
 
         <div className="resume-summary">
@@ -764,14 +770,14 @@ function Contact() {
             <span className="availability-dot" aria-hidden="true" />
             <span>Open to opportunities</span>
           </div>
-          <h3>Let’s talk about Cloud, DevOps, reliability, or the infrastructure problem your team is trying to untangle.</h3>
+          <h3>Let’s talk about Cloud and DevOps engineering, or the infrastructure problem your team is trying to untangle.</h3>
           <p>
-            I’m interested in entry-level Cloud Support, DevOps, and Junior Site Reliability roles where I can keep building production judgment alongside strong engineering teams.
+            I’m interested in entry-level Cloud Support, DevOps, and Cloud Engineering roles where I can keep building production judgment alongside strong engineering teams.
           </p>
           <div className="role-tags" aria-label="Roles of interest">
             <span>Cloud Support</span>
             <span>DevOps</span>
-            <span>Junior SRE</span>
+            <span>Cloud Engineering</span>
           </div>
         </div>
 
@@ -1196,7 +1202,7 @@ function PrintResume() {
     <article className="print-resume">
       <header>
         <h1>Jerome Christian V. Ibon</h1>
-        <p>Cloud Support & DevOps · Kubernetes · GitOps · Infrastructure Automation</p>
+        <p>Cloud Support · DevOps · Cloud Engineering · Kubernetes · GitOps · Infrastructure Automation</p>
         <p>Malolos, Bulacan, Philippines · jeysibn@gmail.com · +63 991 408 9619</p>
         <p>linkedin.com/in/jeromeibon · github.com/Jeysibn</p>
       </header>
@@ -1313,6 +1319,10 @@ function ThemeChevronIcon() {
 
 function PrintIcon() {
   return <Icon><path d="M6 9V3h12v6" /><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" /><path d="M6 14h12v7H6z" /></Icon>;
+}
+
+function DownloadIcon() {
+  return <Icon><path d="M12 3v12" /><path d="m7 10 5 5 5-5" /><path d="M5 21h14" /></Icon>;
 }
 
 function ChatIcon() {

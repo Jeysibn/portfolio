@@ -40,6 +40,7 @@ export const navigation = [
   { label: "Projects", id: "projects" },
   { label: "Experience", id: "experience" },
   { label: "Skills", id: "skills" },
+  { label: "Certifications", id: "credentials-title" },
   { label: "Resume", id: "resume" },
   { label: "Contact", id: "contact" },
 ] as const;
@@ -134,7 +135,7 @@ export const projects: Project[] = [
     ],
     repositoryUrl: "https://github.com/Jeysibn/portfolio",
     architectureUrl:
-      "https://raw.githubusercontent.com/Jeysibn/portfolio/main/frontend/assets/architectural-diagram-cloudbacked-portfolio.png",
+      "https://wsrv.nl/?url=https%3A%2F%2Fraw.githubusercontent.com%2FJeysibn%2Fportfolio%2Fmain%2Ffrontend%2Fassets%2Farchitectural-diagram-cloudbacked-portfolio.png&w=1600&output=webp&q=80&we",
     architectureAlt: "Architecture diagram for the cloud-backed portfolio",
   },
   {
@@ -159,7 +160,8 @@ export const projects: Project[] = [
     ],
     technologies: ["K3s", "Argo CD", "Terraform", "Proxmox", "Helm", "GitHub Actions", "Prometheus", "Grafana"],
     repositoryUrl: "https://github.com/Jeysibn/homelab-gitops",
-    architectureUrl: "https://raw.githubusercontent.com/Jeysibn/homelab-gitops/main/docs/Architecture.png",
+    architectureUrl:
+      "https://wsrv.nl/?url=https%3A%2F%2Fraw.githubusercontent.com%2FJeysibn%2Fhomelab-gitops%2Fmain%2Fdocs%2FArchitecture.png&w=1600&output=webp&q=80&we",
     architectureAlt: "Architecture diagram for the Kubernetes GitOps homelab",
   },
 ];
@@ -179,4 +181,4 @@ export const education = {
 } as const;
 
 export const professionalSummary =
-  "Computer Engineering graduate and OCI-certified engineer building production-style cloud and Kubernetes infrastructure from provisioning through GitOps delivery and observability. Brings enterprise SaaS technical-support experience in cloud-based security environments and is pursuing entry-level Cloud Support, DevOps, or Junior Site Reliability roles.";
+  "Computer Engineering graduate and OCI-certified engineer building production-style cloud and Kubernetes infrastructure from provisioning through GitOps delivery and observability. Brings enterprise SaaS technical-support experience in cloud-based security environments and is pursuing entry-level Cloud Support, DevOps, and Cloud Engineering roles.";
