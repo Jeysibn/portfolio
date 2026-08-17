@@ -10,7 +10,7 @@ function getSystemTheme(): "light" | "dark" {
 
 function getInitialTheme(): ThemePreference {
   const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
-  return stored === "light" || stored === "dark" || stored === "system" ? stored : "system";
+  return stored === "light" || stored === "dark" ? stored : getSystemTheme();
 }
 
 export function useTheme() {
@@ -30,13 +30,13 @@ export function useTheme() {
   useEffect(() => {
     document.documentElement.dataset.theme = effectiveTheme;
     document.documentElement.style.colorScheme = effectiveTheme;
-    window.localStorage.setItem(THEME_STORAGE_KEY, preference);
+    window.localStorage.setItem(THEME_STORAGE_KEY, effectiveTheme);
 
     const themeColor = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
     if (themeColor) {
       themeColor.content = effectiveTheme === "dark" ? "#07111d" : "#f4f7f9";
     }
-  }, [effectiveTheme, preference]);
+  }, [effectiveTheme]);
 
   return { preference, effectiveTheme, setPreference };
 }
