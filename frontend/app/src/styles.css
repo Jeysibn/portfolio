@@ -1,4 +1,4 @@
-/* Source layer: index.css */
+/* Foundation */
 @import "tailwindcss";
 
 :root {
@@ -68,9 +68,8 @@ body::before {
   z-index: -1;
   pointer-events: none;
   background:
-    linear-gradient(var(--line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--line) 1px, transparent 1px);
-  background-size: 72px 72px;
+    radial-gradient(circle at 18% 12%, color-mix(in srgb, var(--accent) 8%, transparent), transparent 28rem),
+    radial-gradient(circle at 82% 38%, color-mix(in srgb, var(--text) 3%, transparent), transparent 34rem);
   mask-image: linear-gradient(to bottom, rgb(0 0 0 / 0.35), transparent 42rem);
   opacity: 0.22;
 }
@@ -924,12 +923,12 @@ input {
   color: var(--text);
   font-weight: 750;
   text-decoration: none;
-  transition: color 160ms ease, padding-left 200ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: color 160ms ease, transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .contact-links a:hover {
-  padding-left: 8px;
   color: var(--accent);
+  transform: translateX(8px);
 }
 
 .site-footer {
@@ -1555,7 +1554,7 @@ input {
   .print-resume {
     display: block;
     color: #17212b;
-    font-family: Arial, sans-serif;
+    font-family: var(--sans);
     font-size: 9.5pt;
     line-height: 1.42;
   }
@@ -1640,9 +1639,7 @@ input {
   }
 }
 
-/* Source layer: redesign.css */
-/* Milestone 6 design refinement: terminal-inspired, DevOps-first visual layer.
-   Loaded after index.css so the functional React foundation remains unchanged. */
+/* Terminal systems visual system */
 
 :root {
   --bg: #030914;
@@ -1705,10 +1702,7 @@ body {
 }
 
 body::before {
-  background:
-    linear-gradient(rgb(77 143 255 / 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(77 143 255 / 0.06) 1px, transparent 1px);
-  background-size: 54px 54px;
+  background: radial-gradient(circle at 72% 12%, rgb(38 127 255 / 0.07), transparent 30rem);
   mask-image: linear-gradient(to bottom, rgb(0 0 0 / 0.65), transparent 46rem);
   opacity: 0.34;
 }
@@ -2290,10 +2284,7 @@ body::before {
   border-bottom: 1px solid var(--line);
   background:
     radial-gradient(circle at 50% 10%, rgb(77 143 255 / 0.16), transparent 56%),
-    linear-gradient(rgb(77 143 255 / 0.07) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(77 143 255 / 0.07) 1px, transparent 1px),
     color-mix(in srgb, var(--bg) 56%, var(--surface));
-  background-size: auto, 28px 28px, 28px 28px, auto;
 }
 
 .project-diagram {
@@ -2723,20 +2714,22 @@ body::before {
 
   .mobile-nav {
     display: grid;
-    max-height: 0;
+    grid-template-rows: 0fr;
     overflow: hidden;
     border-top: 1px solid transparent;
     opacity: 0;
-    transition: max-height 360ms cubic-bezier(0.16, 1, 0.3, 1), opacity 220ms ease, border-color 220ms ease;
+    transition: grid-template-rows 360ms cubic-bezier(0.16, 1, 0.3, 1), opacity 220ms ease, border-color 220ms ease;
   }
 
   .mobile-nav-open {
-    max-height: 440px;
+    grid-template-rows: 1fr;
     border-top-color: var(--line);
     opacity: 1;
   }
 
   .mobile-nav nav {
+    min-height: 0;
+    overflow: hidden;
     width: min(100% - 30px, 1240px);
     margin-inline: auto;
     padding-block: 10px 16px;
@@ -2923,9 +2916,7 @@ body::before {
   }
 }
 
-/* Source layer: impeccable.css */
-/* Impeccable pass: shape -> craft -> typography -> motion -> critique -> accessibility -> polish.
-   This layer intentionally sits after redesign.css so the original functional foundation remains intact. */
+/* Interaction and component refinement */
 
 /* ---------- System / contrast refinement ---------- */
 :root[data-theme="light"] {
@@ -4040,9 +4031,7 @@ body::before {
   50% { transform: translate3d(0, 7px, 0); }
 }
 
-/* Source layer: refine.css */
-/* Fourth design pass: cleaner labels, continuous scroll motion, richer skill inspection,
-   in-page architecture zoom, and scroll-synchronous background patterns. */
+/* Responsive and dialog refinement */
 
 .scroll-progress-track { display: none !important; }
 
@@ -4052,42 +4041,6 @@ body::before {
 
 .section-heading h2,
 .credentials-layout h2 { max-width: 14ch; }
-
-.scroll-pattern-layer {
-  position: fixed;
-  inset: -24vh -18vw;
-  z-index: -1;
-  pointer-events: none;
-  opacity: 0.42;
-  background:
-    linear-gradient(rgb(77 143 255 / 0.055) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(77 143 255 / 0.055) 1px, transparent 1px),
-    radial-gradient(circle, rgb(57 216 255 / 0.12) 1px, transparent 1.6px);
-  background-size: 64px 64px, 64px 64px, 26px 26px;
-  transform: translate3d(var(--pattern-x, 0px), var(--pattern-y, 0px), 0) rotate(var(--pattern-rotate, 0deg));
-  transform-origin: center;
-  will-change: transform;
-}
-.scroll-pattern-layer::before,
-.scroll-pattern-layer::after { content: ""; position: absolute; inset: 0; pointer-events: none; }
-.scroll-pattern-layer::before {
-  background:
-    radial-gradient(circle at 24% 18%, rgb(102 227 111 / 0.11), transparent 18rem),
-    radial-gradient(circle at 78% 42%, rgb(77 143 255 / 0.11), transparent 22rem),
-    radial-gradient(circle at 48% 82%, rgb(165 107 255 / 0.08), transparent 20rem);
-}
-.scroll-pattern-layer::after {
-  opacity: 0.4;
-  background: repeating-linear-gradient(135deg, transparent 0 62px, rgb(57 216 255 / 0.05) 63px 64px, transparent 65px 126px);
-}
-:root[data-theme="light"] .scroll-pattern-layer {
-  opacity: 0.28;
-  background:
-    linear-gradient(rgb(24 95 185 / 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(24 95 185 / 0.06) 1px, transparent 1px),
-    radial-gradient(circle, rgb(0 111 145 / 0.1) 1px, transparent 1.6px);
-  background-size: 64px 64px, 64px 64px, 26px 26px;
-}
 
 .scroll-reactive {
   transform: translate3d(0, var(--motion-y, 0px), 0) rotate(var(--motion-rotate, 0deg));
@@ -4130,7 +4083,7 @@ body::before {
 .skill-card { cursor: pointer; }
 .skill-card:focus-visible { outline: 2px solid color-mix(in srgb, var(--cyan) 72%, transparent); outline-offset: 4px; }
 .skill-card-head::after {
-  content: "DETAILS ↗";
+  content: "DETAILS";
   margin-left: auto;
   color: var(--faint);
   font-family: var(--mono);
@@ -4183,7 +4136,7 @@ body::before {
 .skill-detail-summary,
 .skill-detail-practice { max-width: 74ch; color: var(--muted); line-height: 1.75; }
 .skill-detail-summary { margin: 22px 0 0; font-size: 0.94rem; }
-.skill-detail-practice { margin: 12px 0 0; padding-left: 14px; border-left: 2px solid color-mix(in srgb, var(--accent) 55%, var(--line)); font-family: var(--mono); font-size: 0.74rem; }
+.skill-detail-practice { margin: 12px 0 0; padding-left: 14px; border-left: 1px solid color-mix(in srgb, var(--accent) 55%, var(--line)); font-family: var(--mono); font-size: 0.74rem; }
 .skill-detail-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 30px; }
 .skill-detail-list > div { min-width: 0; padding: 18px; border: 1px solid var(--line); border-radius: 10px; background: color-mix(in srgb, var(--bg-elevated) 72%, transparent); }
 .skill-detail-list h3 { margin: 0 0 8px; color: var(--text); font-family: var(--mono); font-size: 0.78rem; }
@@ -4262,11 +4215,9 @@ body::before {
   .case-panel { max-height: 92dvh; padding: 24px 20px 30px; }
   .skill-detail-panel { max-height: 92dvh; padding: 28px 20px 30px; }
   .image-zoom-frame { max-height: 92dvh; padding: 14px; }
-  .scroll-pattern-layer { opacity: 0.28; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .scroll-pattern-layer { transform: none !important; }
   .scroll-reactive,
   .motion-ready .scroll-reactive[data-reveal].is-visible,
   .project-row.scroll-reactive:hover,
@@ -4278,8 +4229,7 @@ body::before {
   .image-zoom-frame { animation: none; }
 }
 
-/* Source layer: comfort.css */
-/* Comfort pass: keep the page readable, accessible, and calm. */
+/* Accessibility and interaction safeguards */
 
 /* Hide the browser scrollbar while preserving normal wheel/touch/keyboard scrolling. */
 html {
@@ -4306,12 +4256,6 @@ body::-webkit-scrollbar {
 .motion-ready .resume-preview[data-reveal].is-visible,
 .motion-ready .contact-panel[data-reveal].is-visible {
   transform: none !important;
-}
-
-/* Background movement remains subtle and synchronous with scroll only. */
-.scroll-pattern-layer {
-  opacity: 0.48;
-  transform: translate3d(0, 0, 0) !important;
 }
 
 /* Use a button-driven theme menu so sticky-header focus never invokes the
@@ -4449,9 +4393,407 @@ body::-webkit-scrollbar {
   font-variant-numeric: tabular-nums;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .scroll-pattern-layer {
-    background-position: 0 0 !important;
+/* Approved evidence-first refinement */
+:root {
+  --sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+}
+
+body::before {
+  opacity: 0.14;
+}
+
+.hero-grid {
+  grid-template-columns: minmax(0, 1.08fr) minmax(390px, 0.72fr);
+  gap: clamp(40px, 5vw, 72px);
+}
+
+.hero-copy h1 {
+  letter-spacing: -0.04em;
+}
+
+.hero-status {
+  min-height: 0;
+}
+
+.status-console {
+  box-shadow: 0 22px 54px rgb(0 0 0 / 0.24);
+}
+
+.status-console::after {
+  opacity: 0.38;
+  animation: monitor-scan 11s linear infinite;
+}
+
+.service-state-healthy .state-dot {
+  animation: none;
+}
+
+.status-console-topline {
+  padding: 14px 18px;
+}
+
+.status-list.monitor-groups {
+  display: block;
+  padding: 6px 18px 12px;
+}
+
+.status-list.monitor-groups::before {
+  margin: 2px 0 8px;
+}
+
+.monitor-groups > .monitor-group {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  padding: 0;
+  border-bottom: 1px dashed var(--line);
+}
+
+.monitor-groups > .monitor-group:last-child {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border-bottom: 0;
+}
+
+.monitor-groups > .monitor-group::before {
+  display: none;
+}
+
+.monitor-group > div {
+  min-width: 0;
+  padding: 9px 10px;
+  border-left: 1px solid var(--line);
+}
+
+.monitor-group > div:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.monitor-group dt,
+.monitor-group dd {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.monitor-group dt {
+  margin-bottom: 4px;
+  font-size: 0.58rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.monitor-group dd {
+  margin: 0;
+  font-size: 0.68rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.status-note {
+  padding: 10px 18px 12px;
+}
+
+#projects .section-inner {
+  width: min(1180px, calc(100% - 40px));
+}
+
+.project-list {
+  gap: clamp(24px, 4vw, 40px);
+}
+
+.project-row,
+.project-row-reverse {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.86fr) minmax(0, 1.14fr);
+  width: min(1080px, 100%);
+  overflow: hidden;
+  border-color: var(--line-strong);
+  background: var(--surface);
+  box-shadow: 0 22px 56px rgb(0 0 0 / 0.18);
+}
+
+.project-row::before {
+  display: none;
+}
+
+.project-row:hover {
+  border-color: color-mix(in srgb, var(--accent) 42%, var(--line-strong));
+  box-shadow: 0 26px 64px rgb(0 0 0 / 0.22);
+  transform: translateY(-3px);
+}
+
+.project-visual {
+  position: relative;
+  display: block !important;
+  min-height: 100%;
+  overflow: hidden;
+  border-right: 1px solid var(--line);
+  background: var(--bg-elevated);
+  animation: none;
+}
+
+.project-visual img {
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
+  padding: clamp(14px, 2vw, 24px);
+  object-fit: contain;
+  filter: saturate(0.82) contrast(1.02);
+  transition: filter 220ms ease, transform 280ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.project-row:hover .project-visual img,
+.project-row:focus-visible .project-visual img {
+  filter: saturate(1) contrast(1.04);
+  transform: scale(1.015);
+}
+
+.project-visual-label {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  padding: 5px 7px;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--faint);
+  font-family: var(--mono);
+  font-size: 0.58rem;
+}
+
+.project-copy,
+.project-row-reverse .project-copy {
+  padding: clamp(28px, 4vw, 44px);
+}
+
+.project-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.project-title-row h3 {
+  margin: 0;
+}
+
+.project-open-cue {
+  display: grid;
+  flex: 0 0 38px;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 1px solid var(--line-strong);
+  border-radius: 9px;
+  color: var(--muted);
+  transition: color 180ms ease, border-color 180ms ease, transform 180ms ease;
+}
+
+.project-open-cue svg {
+  width: 16px;
+  height: 16px;
+}
+
+.project-row:hover .project-open-cue,
+.project-row:focus-visible .project-open-cue {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateX(2px);
+}
+
+.skill-card {
+  width: 100%;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+}
+
+.skill-detail-practice {
+  padding-left: 12px;
+  border-left-width: 1px;
+}
+
+.architecture-link {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 1px solid var(--line);
+  color: var(--text);
+  text-align: left;
+}
+
+.architecture-link span {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.inspection-close svg {
+  width: 18px;
+  height: 18px;
+}
+
+.resume-summary {
+  max-width: 76ch;
+  padding: clamp(24px, 3vw, 34px) clamp(24px, 4vw, 44px);
+  border-top: 1px solid var(--line);
+}
+
+.resume-summary h3 {
+  margin: 0 0 10px;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--text);
+}
+
+.resume-summary p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.75;
+}
+
+.resume-details {
+  border-top: 1px solid var(--line);
+}
+
+.resume-details > summary {
+  display: flex;
+  min-height: 52px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 12px clamp(24px, 4vw, 44px);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  font-weight: 650;
+  cursor: pointer;
+  list-style: none;
+}
+
+.resume-details > summary::-webkit-details-marker {
+  display: none;
+}
+
+.resume-details > summary:hover {
+  background: var(--surface-strong);
+}
+
+.resume-disclosure-icon {
+  position: relative;
+  width: 14px;
+  height: 14px;
+  transition: transform 180ms ease;
+}
+
+.resume-disclosure-icon::before,
+.resume-disclosure-icon::after {
+  content: "";
+  position: absolute;
+  top: 6px;
+  left: 1px;
+  width: 12px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--accent);
+}
+
+.resume-disclosure-icon::after {
+  transform: rotate(90deg);
+}
+
+.resume-details[open] .resume-disclosure-icon {
+  transform: rotate(45deg);
+}
+
+.resume-details .resume-preview-grid {
+  border-top: 1px solid var(--line);
+}
+
+.chat-trigger {
+  opacity: 0.78;
+  box-shadow: 0 12px 28px rgb(0 0 0 / 0.2);
+  transform: scale(0.94);
+}
+
+.chat-trigger:hover,
+.chat-trigger:focus-visible,
+.chat-panel-open + .chat-trigger {
+  opacity: 1;
+  transform: scale(1);
+}
+
+@media (max-width: 980px) {
+  .hero-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-status {
+    width: min(720px, 100%);
+  }
+
+  .project-row,
+  .project-row-reverse {
+    grid-template-columns: minmax(230px, 0.72fr) minmax(0, 1.28fr);
   }
 }
 
+@media (max-width: 720px) {
+  #projects .section-inner {
+    width: min(100% - 28px, 1180px);
+  }
+
+  .monitor-groups > .monitor-group,
+  .monitor-groups > .monitor-group:last-child {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .monitor-group > div:nth-child(odd) {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .project-row,
+  .project-row-reverse {
+    grid-template-columns: 1fr;
+  }
+
+  .project-visual {
+    aspect-ratio: 16 / 8;
+    min-height: 0;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .project-visual img {
+    min-height: 0;
+    padding: 12px;
+  }
+
+  .project-row:hover {
+    transform: none;
+  }
+}
+
+@media print {
+  .resume-details > summary {
+    display: none !important;
+  }
+
+  .resume-details:not([open]) > .resume-preview-grid {
+    display: grid !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .status-console::after,
+  .service-state-healthy .state-dot {
+    animation: none !important;
+  }
+
+  .project-visual img,
+  .project-open-cue,
+  .chat-trigger {
+    transition: none !important;
+    transform: none !important;
+  }
+}

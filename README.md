@@ -64,13 +64,8 @@ portfolio/
 │   │   │   ├── api.ts
 │   │   │   ├── hooks.ts
 │   │   │   ├── portfolio.ts
-│   │   │   ├── index.css
-│   │   │   ├── redesign.css
-│   │   │   ├── impeccable.css
-│   │   │   ├── refine.css
-│   │   │   ├── comfort.css
-│   │   │   ├── ui-refinements.ts
-│   │   │   ├── comfort-refinements.ts
+│   │   │   ├── skill-details.ts
+│   │   │   ├── styles.css
 │   │   │   └── main.tsx
 │   │   ├── index.html
 │   │   ├── package.json
@@ -97,11 +92,11 @@ Current frontend features include:
 - live Manila time in the monitoring panel;
 - visitor counter with loading and unavailable states;
 - AI assistant with session history, rate-limit/error handling, and a closed state that does not block page interaction;
-- whole-card project interaction with centered project-detail dialogs;
+- whole-card project interaction with project-specific architecture previews and centered detail dialogs;
 - in-page architecture-diagram zoom instead of raw-image navigation;
 - clickable skill capability cards with detailed modal explanations;
 - provider-styled certification cards with hover/focus descriptions;
-- a fully visible on-page resume plus print/save output;
+- a concise on-page resume summary with progressively disclosed details and print/save output;
 - restrained one-time reveal motion and `prefers-reduced-motion` support.
 
 ### Health and release-age semantics
