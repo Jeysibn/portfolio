@@ -37,20 +37,81 @@
   opacity: 1 !important;
 }
 
+.status-console {
+  border-color: color-mix(in srgb, var(--accent) 24%, var(--line-strong));
+}
+
+.status-console-topline {
+  padding: 16px 18px;
+  background: color-mix(in srgb, var(--accent) 4%, var(--surface));
+}
+
+.status-console-topline > span:first-child {
+  color: var(--text);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.status-list.monitor-groups {
+  display: grid;
+  gap: 0;
+  padding: 0 18px;
+}
+
+.monitor-groups > .monitor-group,
+.monitor-groups > .monitor-group:last-child {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-bottom: 1px solid var(--line);
+}
+
+.monitor-groups > .monitor-group:last-child {
+  border-bottom: 0;
+}
+
+.monitor-group > div {
+  min-width: 0;
+  padding: 14px 12px;
+  border-left: 1px solid var(--line);
+}
+
+.monitor-group > div:nth-child(odd) {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.monitor-group dt {
+  margin-bottom: 5px;
+  color: var(--faint);
+  font-size: 0.58rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.monitor-group dd {
+  margin: 0;
+  color: var(--text);
+  font-size: 0.72rem;
+  line-height: 1.35;
+  white-space: normal;
+  overflow: visible;
+  overflow-wrap: anywhere;
+  text-overflow: clip;
+}
+
+.status-note {
+  padding: 14px 18px 18px;
+  border-top: 1px solid var(--line);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+}
+
 .status-console,
 .status-list,
 .monitor-groups,
 .monitor-group,
 .status-list div {
   min-width: 0;
-}
-
-.status-list dt,
-.status-list dd {
-  white-space: normal;
-  overflow: visible;
-  overflow-wrap: anywhere;
-  text-overflow: clip;
 }
 
 .theme-control {
@@ -95,4 +156,22 @@
 
 #credentials-title {
   scroll-margin-top: 90px;
+}
+
+@media (max-width: 720px) {
+  .monitor-groups > .monitor-group,
+  .monitor-groups > .monitor-group:last-child {
+    grid-template-columns: 1fr;
+  }
+
+  .monitor-group > div,
+  .monitor-group > div:nth-child(odd) {
+    padding-inline: 0;
+    border-left: 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .monitor-group > div:first-child {
+    border-top: 0;
+  }
 }
