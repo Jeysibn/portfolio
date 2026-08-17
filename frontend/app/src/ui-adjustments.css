@@ -144,6 +144,30 @@
   scroll-margin-top: 90px;
 }
 
+/* When About becomes a single column, keep philosophy attached to the copy. */
+@media (max-width: 980px) {
+  .about-layout {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .about-layout .prose-column {
+    width: 100%;
+    max-width: none;
+  }
+
+  .about-layout .prose-column p:last-child {
+    margin-bottom: 0;
+  }
+
+  .about-layout .principles-list {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    align-self: start;
+  }
+}
+
 @media (max-width: 720px) {
   .project-row {
     border-radius: 16px;
@@ -166,6 +190,19 @@
   .project-open-cue {
     width: 38px;
     height: 38px;
+  }
+
+  .about-layout {
+    gap: 18px;
+  }
+
+  .principles-list::before {
+    padding: 13px 14px;
+    overflow-wrap: anywhere;
+  }
+
+  .principles-list article {
+    padding-inline: 14px;
   }
 
   /* Keep the main-branch status design while making its table geometry clean on phones. */
