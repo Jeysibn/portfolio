@@ -2,52 +2,126 @@
   display: none;
 }
 
-@media (min-width: 981px) {
-  .project-visual {
-    min-height: 430px;
-    padding: 12px;
-  }
+/* Project showcase cards */
+.project-list {
+  gap: clamp(48px, 6vw, 72px);
+}
 
-  .project-visual img {
-    width: 100%;
-    height: 100%;
-    min-height: 390px;
-    padding: 4px;
-    object-fit: contain;
-  }
+.project-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+  overflow: hidden;
+  border: 1px solid var(--line-strong);
+  border-radius: 20px;
+  background: var(--surface);
+  box-shadow: 0 24px 70px color-mix(in srgb, var(--bg) 70%, transparent);
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.project-row:hover,
+.project-row:focus-visible {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--accent) 42%, var(--line-strong));
+  box-shadow: 0 30px 84px color-mix(in srgb, var(--bg) 78%, transparent);
+}
+
+.project-visual,
+.project-row-reverse .project-visual {
+  order: 0;
+  min-height: 0;
+  aspect-ratio: 16 / 8.6;
+  padding: clamp(18px, 2.5vw, 34px);
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background:
+    radial-gradient(circle at 50% 35%, color-mix(in srgb, var(--accent) 8%, transparent), transparent 44%),
+    var(--bg-elevated);
+}
+
+.project-visual img {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  max-height: none;
+  padding: 0;
+  object-fit: contain;
+  filter: saturate(0.92) contrast(1.02);
+}
+
+.project-copy,
+.project-row-reverse .project-copy {
+  order: 1;
+  max-width: none;
+  padding: clamp(26px, 3.6vw, 44px);
+}
+
+.project-category {
+  margin-bottom: 12px;
 }
 
 .project-title-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 38px;
+  grid-template-columns: minmax(0, 1fr) 42px;
   align-items: start;
   gap: 20px;
 }
 
 .project-title-row h3 {
   min-width: 0;
+  max-width: 18ch;
+  font-size: clamp(2rem, 4vw, 3.25rem);
+}
+
+.project-copy > p:not(.project-category) {
+  max-width: 72ch;
+  margin-top: 18px;
 }
 
 .project-open-cue {
   display: grid !important;
-  width: 38px;
-  height: 38px;
+  width: 42px;
+  height: 42px;
   place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg-elevated);
   visibility: visible !important;
   opacity: 1 !important;
 }
 
+.project-visual-label {
+  inset: auto 18px 16px auto;
+  padding: 6px 9px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+/* Compact production-status panel */
 .status-console {
-  border-color: color-mix(in srgb, var(--accent) 24%, var(--line-strong));
+  border: 1px solid var(--line-strong);
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow: 0 24px 64px color-mix(in srgb, var(--bg) 72%, transparent);
+}
+
+.status-console::before {
+  width: 3px;
+  opacity: 0.9;
 }
 
 .status-console-topline {
-  padding: 16px 18px;
-  background: color-mix(in srgb, var(--accent) 4%, var(--surface));
+  padding: 17px 18px;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
 }
 
 .status-console-topline > span:first-child {
   color: var(--text);
+  font-family: "Manrope", sans-serif;
+  font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -63,6 +137,7 @@
 .monitor-groups > .monitor-group:last-child {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  padding: 0;
   border-bottom: 1px solid var(--line);
 }
 
@@ -70,30 +145,47 @@
   border-bottom: 0;
 }
 
-.monitor-group > div {
+/* Keep only the strongest signals: API/health, release/delivery, telemetry/time. */
+.monitor-groups > .monitor-group:nth-child(1) > div:nth-child(3),
+.monitor-groups > .monitor-group:nth-child(2) > div:nth-child(2),
+.monitor-groups > .monitor-group:nth-child(3) > div:nth-child(1),
+.monitor-groups > .monitor-group:nth-child(3) > div:nth-child(3) {
+  display: none;
+}
+
+.monitor-group > div,
+.monitor-group > div:nth-child(odd) {
   min-width: 0;
-  padding: 14px 12px;
+  padding: 15px 12px;
   border-left: 1px solid var(--line);
 }
 
-.monitor-group > div:nth-child(odd) {
+.monitor-group > div:first-child,
+.monitor-group > div:nth-child(odd):first-child {
   padding-left: 0;
   border-left: 0;
 }
 
+.monitor-group > div:nth-child(2) {
+  padding-right: 0;
+}
+
 .monitor-group dt {
-  margin-bottom: 5px;
+  margin-bottom: 6px;
   color: var(--faint);
-  font-size: 0.58rem;
-  letter-spacing: 0.07em;
+  font-family: "Manrope", sans-serif;
+  font-size: 0.62rem;
+  font-weight: 750;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .monitor-group dd {
   margin: 0;
   color: var(--text);
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
   font-size: 0.72rem;
-  line-height: 1.35;
+  line-height: 1.45;
   white-space: normal;
   overflow: visible;
   overflow-wrap: anywhere;
@@ -101,9 +193,13 @@
 }
 
 .status-note {
-  padding: 14px 18px 18px;
+  margin: 0;
+  padding: 14px 18px 17px;
   border-top: 1px solid var(--line);
-  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  color: var(--faint);
+  background: transparent;
+  font-size: 0.68rem;
+  line-height: 1.55;
 }
 
 .status-console,
@@ -114,6 +210,7 @@
   min-width: 0;
 }
 
+/* Theme toggle */
 .theme-control {
   width: 40px;
   min-width: 40px;
@@ -159,6 +256,41 @@
 }
 
 @media (max-width: 720px) {
+  .project-row {
+    border-radius: 16px;
+  }
+
+  .project-visual {
+    aspect-ratio: 4 / 3;
+    padding: 14px;
+  }
+
+  .project-copy {
+    padding: 24px 20px;
+  }
+
+  .project-title-row {
+    grid-template-columns: minmax(0, 1fr) 38px;
+    gap: 14px;
+  }
+
+  .project-open-cue {
+    width: 38px;
+    height: 38px;
+  }
+
+  .monitor-groups > .monitor-group,
+  .monitor-groups > .monitor-group:last-child {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .monitor-group > div,
+  .monitor-group > div:nth-child(odd) {
+    padding: 13px 10px;
+  }
+}
+
+@media (max-width: 480px) {
   .monitor-groups > .monitor-group,
   .monitor-groups > .monitor-group:last-child {
     grid-template-columns: 1fr;
