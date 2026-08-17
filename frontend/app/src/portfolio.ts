@@ -39,8 +39,8 @@ export const navigation = [
   { label: "About", id: "about" },
   { label: "Projects", id: "projects" },
   { label: "Experience", id: "experience" },
-  { label: "Certifications", id: "credentials-title" },
   { label: "Skills", id: "skills" },
+  { label: "Certifications", id: "credentials-title" },
   { label: "Resume", id: "resume" },
   { label: "Contact", id: "contact" },
 ] as const;
