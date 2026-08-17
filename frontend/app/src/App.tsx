@@ -225,20 +225,76 @@ function ThemeSelect({
   value: ThemePreference;
   onChange: (preference: ThemePreference) => void;
 }) {
+  const [open, setOpen] = useState(false);
+  const controlRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const options: Array<{ value: ThemePreference; label: string }> = [
+    { value: "system", label: "System" },
+    { value: "light", label: "Light" },
+    { value: "dark", label: "Dark" },
+  ];
+  const currentLabel = options.find((option) => option.value === value)?.label ?? "System";
+
+  useEffect(() => {
+    if (!open) return;
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (event.target instanceof Node && !controlRef.current?.contains(event.target)) {
+        setOpen(false);
+      }
+    };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      setOpen(false);
+      triggerRef.current?.focus({ preventScroll: true });
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [open]);
+
+  const selectTheme = (preference: ThemePreference) => {
+    onChange(preference);
+    setOpen(false);
+    window.requestAnimationFrame(() => triggerRef.current?.focus({ preventScroll: true }));
+  };
+
   return (
-    <label className="theme-control">
-      <SunMoonIcon />
-      <span className="sr-only">Color theme</span>
-      <select
-        value={value}
-        aria-label="Color theme"
-        onChange={(event) => onChange(event.target.value as ThemePreference)}
+    <div ref={controlRef} className={open ? "theme-control theme-control-open" : "theme-control"}>
+      <button
+        ref={triggerRef}
+        type="button"
+        className="theme-trigger"
+        aria-label={`Color theme: ${currentLabel}`}
+        aria-expanded={open}
+        aria-controls="theme-options"
+        onClick={() => setOpen((isOpen) => !isOpen)}
       >
-        <option value="system">System</option>
-        <option value="light">Light</option>
-        <option value="dark">Dark</option>
-      </select>
-    </label>
+        <SunMoonIcon />
+        <span className="theme-trigger-label">{currentLabel}</span>
+        <ThemeChevronIcon />
+      </button>
+
+      {open ? (
+        <div id="theme-options" className="theme-options" role="group" aria-label="Choose color theme">
+          {options.map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              className="theme-option"
+              aria-pressed={value === option.value}
+              onClick={() => selectTheme(option.value)}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      ) : null}
+    </div>
   );
 }
 
@@ -1083,6 +1139,10 @@ function MenuIcon() {
 
 function SunMoonIcon() {
   return <Icon size={16}><circle cx="12" cy="12" r="3.5" /><path d="M12 2v2" /><path d="M12 20v2" /><path d="m4.93 4.93 1.42 1.42" /><path d="m17.66 17.66 1.41 1.41" /><path d="M2 12h2" /><path d="M20 12h2" /></Icon>;
+}
+
+function ThemeChevronIcon() {
+  return <Icon size={14}><path d="m7 9 5 5 5-5" /></Icon>;
 }
 
 function PrintIcon() {
