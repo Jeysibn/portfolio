@@ -2,6 +2,10 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./styles.css";
+import "./ui-adjustments.css";
+import { normalizeThemePreference, startUiAdjustments } from "./ui-adjustments";
+
+normalizeThemePreference();
 
 const root = document.getElementById("root");
 
@@ -14,3 +18,5 @@ createRoot(root).render(
     <App />
   </StrictMode>,
 );
+
+startUiAdjustments();
