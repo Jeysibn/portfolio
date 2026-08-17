@@ -33,8 +33,17 @@ body::-webkit-scrollbar {
   transform: translate3d(0, 0, 0) !important;
 }
 
-/* Native select menus need explicit foreground/background colors in dark mode. */
+/* Keep the decorative label from becoming a larger implicit select click target. */
+.theme-control {
+  pointer-events: none;
+  user-select: none;
+}
+
 .theme-control select {
+  min-height: 34px;
+  margin: 0;
+  padding-block: 0;
+  pointer-events: auto;
   color: var(--text);
   background: transparent;
   color-scheme: dark;
@@ -84,7 +93,7 @@ body::-webkit-scrollbar {
   display: none !important;
 }
 
-/* Release age is a compact operational metric. */
+/* Release age is deployment metadata, independent of API probe health. */
 .monitor-summary > div:first-child strong {
   font-variant-numeric: tabular-nums;
 }
