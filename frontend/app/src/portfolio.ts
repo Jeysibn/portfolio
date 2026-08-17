@@ -135,7 +135,7 @@ export const projects: Project[] = [
     ],
     repositoryUrl: "https://github.com/Jeysibn/portfolio",
     architectureUrl:
-      "https://raw.githubusercontent.com/Jeysibn/portfolio/main/frontend/assets/architectural-diagram-cloudbacked-portfolio.png",
+      "https://wsrv.nl/?url=https%3A%2F%2Fraw.githubusercontent.com%2FJeysibn%2Fportfolio%2Fmain%2Ffrontend%2Fassets%2Farchitectural-diagram-cloudbacked-portfolio.png&w=1600&output=webp&q=80&we",
     architectureAlt: "Architecture diagram for the cloud-backed portfolio",
   },
   {
@@ -160,7 +160,8 @@ export const projects: Project[] = [
     ],
     technologies: ["K3s", "Argo CD", "Terraform", "Proxmox", "Helm", "GitHub Actions", "Prometheus", "Grafana"],
     repositoryUrl: "https://github.com/Jeysibn/homelab-gitops",
-    architectureUrl: "https://raw.githubusercontent.com/Jeysibn/homelab-gitops/main/docs/Architecture.png",
+    architectureUrl:
+      "https://wsrv.nl/?url=https%3A%2F%2Fraw.githubusercontent.com%2FJeysibn%2Fhomelab-gitops%2Fmain%2Fdocs%2FArchitecture.png&w=1600&output=webp&q=80&we",
     architectureAlt: "Architecture diagram for the Kubernetes GitOps homelab",
   },
 ];
