@@ -168,7 +168,7 @@
     height: 38px;
   }
 
-  /* Keep the main-branch status design; only improve phone scaling. */
+  /* Keep the main-branch status design while making its table geometry clean on phones. */
   .hero-status {
     width: 100%;
     min-width: 0;
@@ -180,17 +180,28 @@
   }
 
   .status-list.monitor-groups {
+    display: block;
     padding: 5px 16px 10px;
   }
 
   .monitor-groups > .monitor-group,
   .monitor-groups > .monitor-group:last-child {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    display: grid;
+    grid-template-columns: 1fr;
+    padding: 0;
   }
 
-  .monitor-group > div {
+  .monitor-group > div,
+  .monitor-group > div:nth-child(odd),
+  .monitor-group > div:nth-child(even) {
     min-width: 0;
-    padding: 9px 8px;
+    padding: 10px 0;
+    border-left: 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .monitor-group > div:first-child {
+    border-top: 0;
   }
 
   .monitor-group dt,
@@ -199,6 +210,10 @@
     overflow: visible;
     overflow-wrap: anywhere;
     text-overflow: clip;
+  }
+
+  .status-list dd {
+    text-align: left;
   }
 
   .status-note {
@@ -214,21 +229,6 @@
 
   .status-list.monitor-groups {
     padding-inline: 14px;
-  }
-
-  .monitor-groups > .monitor-group,
-  .monitor-groups > .monitor-group:last-child {
-    grid-template-columns: 1fr;
-  }
-
-  .monitor-group > div,
-  .monitor-group > div:nth-child(odd) {
-    padding-inline: 0;
-    border-left: 0;
-  }
-
-  .status-list dd {
-    text-align: left;
   }
 
   .status-note {
