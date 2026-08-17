@@ -49,17 +49,6 @@ function setCredentialsAnchor() {
   }
 }
 
-function improveServiceCopy() {
-  const title = document.querySelector<HTMLElement>(".status-console-topline > span:first-child");
-  if (title) title.textContent = "Production status";
-
-  const note = document.querySelector<HTMLElement>(".status-note");
-  if (note) {
-    note.textContent =
-      "Checks the deployed Azure Functions API when the page loads. Portfolio content remains available if the API cannot be reached.";
-  }
-}
-
 function updateStaticCopy() {
   setCredentialsAnchor();
 
@@ -73,7 +62,6 @@ function updateStaticCopy() {
     resumeIntro.textContent = "Everything important is visible here. Download the PDF directly, or review the on-page resume details below.";
   }
 
-  improveServiceCopy();
   renderThemeButton(currentTheme());
 }
 
