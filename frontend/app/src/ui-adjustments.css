@@ -99,26 +99,21 @@
   backdrop-filter: blur(8px);
 }
 
-/* Keep the About copy and cat philosophy card in one vertical flow at every size. */
+/* Preserve the original side-by-side About design, but level the philosophy card with the copy. */
 .about-layout {
-  grid-template-columns: 1fr;
-  gap: clamp(24px, 3vw, 36px);
+  grid-template-columns: 0.92fr 1.08fr;
+  gap: clamp(40px, 7vw, 84px);
+  align-items: center;
 }
 
 .about-layout .prose-column {
   width: 100%;
-  max-width: 74ch;
-}
-
-.about-layout .prose-column p:last-child {
-  margin-bottom: 0;
 }
 
 .about-layout .principles-list {
   width: 100%;
-  max-width: none;
   margin: 0;
-  align-self: start;
+  align-self: center;
 }
 
 /* Theme toggle */
@@ -164,6 +159,27 @@
 
 #credentials-title {
   scroll-margin-top: 90px;
+}
+
+@media (max-width: 980px) {
+  .about-layout {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+
+  .about-layout .prose-column {
+    max-width: none;
+  }
+
+  .about-layout .prose-column p:last-child {
+    margin-bottom: 0;
+  }
+
+  .about-layout .principles-list {
+    max-width: none;
+    align-self: start;
+  }
 }
 
 @media (max-width: 720px) {
