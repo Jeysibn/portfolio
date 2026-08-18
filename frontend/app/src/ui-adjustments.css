@@ -254,7 +254,7 @@
   letter-spacing: -0.03em;
 }
 
-.cert-progress-status {
+.cert-card-current .cert-provider {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -267,7 +267,7 @@
   letter-spacing: 0.08em;
 }
 
-.cert-progress-status::before {
+.cert-card-current .cert-provider::before {
   content: "";
   width: 7px;
   height: 7px;
@@ -289,7 +289,7 @@
   font-size: clamp(1rem, 1.5vw, 1.18rem);
 }
 
-.cert-card-current .cert-description-current {
+.cert-card-current .cert-description {
   position: relative;
   inset: auto;
   display: block;
@@ -302,7 +302,7 @@
   transform: none;
 }
 
-.cert-card-current .cert-description-current::after {
+.cert-card-current .cert-description::after {
   content: "";
   position: absolute;
   left: 0;
@@ -355,8 +355,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .cert-card-current::after,
-  .cert-progress-status::before,
-  .cert-card-current .cert-description-current::after {
+  .cert-card-current .cert-provider::before,
+  .cert-card-current .cert-description::after {
     animation: none !important;
   }
 
@@ -366,11 +366,11 @@
     opacity: 0.55;
   }
 
-  .cert-progress-status::before {
+  .cert-card-current .cert-provider::before {
     box-shadow: none;
   }
 
-  .cert-card-current .cert-description-current::after {
+  .cert-card-current .cert-description::after {
     background-position: 50% 0;
   }
 }
