@@ -203,6 +203,178 @@
   scroll-margin-top: 90px;
 }
 
+/* Current certification study status: active without competing with earned credentials. */
+.cert-card-current {
+  grid-column: 1 / -1;
+  min-height: 188px;
+  isolation: isolate;
+  border-color: color-mix(in srgb, var(--violet) 46%, var(--line-strong));
+  background:
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--violet) 13%, transparent), transparent 44%),
+    linear-gradient(145deg, color-mix(in srgb, var(--cyan) 4%, transparent), transparent 48%),
+    color-mix(in srgb, var(--surface) 95%, transparent);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.025),
+    0 16px 42px color-mix(in srgb, var(--violet) 8%, transparent);
+}
+
+.cert-card-current::before {
+  inset: auto -28px -46px auto;
+  width: 150px;
+  height: 150px;
+  background: color-mix(in srgb, var(--violet) 12%, transparent);
+}
+
+.cert-card-current::after {
+  content: "";
+  position: absolute;
+  z-index: 3;
+  top: -1px;
+  left: -42%;
+  width: 42%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--violet), var(--cyan), transparent);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--violet) 48%, transparent);
+  opacity: 0;
+  animation: certification-border-scan 5.4s ease-in-out infinite;
+}
+
+.cert-card-current:hover,
+.cert-card-current:focus-visible {
+  border-color: color-mix(in srgb, var(--violet) 62%, var(--cyan));
+  box-shadow:
+    0 20px 48px rgb(0 0 0 / 0.18),
+    0 0 0 1px color-mix(in srgb, var(--violet) 16%, transparent);
+}
+
+.cert-card-hashicorp .cert-provider-mark {
+  color: color-mix(in srgb, var(--violet) 82%, var(--text));
+  font-family: var(--mono);
+  font-weight: 750;
+  letter-spacing: -0.03em;
+}
+
+.cert-progress-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+  border: 1px solid color-mix(in srgb, var(--violet) 34%, var(--line));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--violet) 8%, var(--bg-elevated));
+  color: color-mix(in srgb, var(--violet) 72%, var(--text));
+  font-weight: 750;
+  letter-spacing: 0.08em;
+}
+
+.cert-progress-status::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: var(--violet);
+  box-shadow:
+    0 0 0 4px color-mix(in srgb, var(--violet) 10%, transparent),
+    0 0 12px color-mix(in srgb, var(--violet) 72%, transparent);
+  animation: certification-status-pulse 2.5s ease-in-out infinite;
+}
+
+.cert-card-current .cert-card-topline {
+  margin-bottom: 18px;
+}
+
+.cert-card-current h3 {
+  max-width: 44ch;
+  font-size: clamp(1rem, 1.5vw, 1.18rem);
+}
+
+.cert-card-current .cert-description-current {
+  position: relative;
+  inset: auto;
+  display: block;
+  max-width: 78ch;
+  margin: 14px 0 0;
+  padding: 0 0 17px;
+  background: transparent;
+  color: var(--muted);
+  opacity: 1;
+  transform: none;
+}
+
+.cert-card-current .cert-description-current::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: min(420px, 100%);
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--line), var(--violet), var(--cyan), var(--line));
+  background-size: 220% 100%;
+  animation: certification-progress-flow 4.2s linear infinite;
+}
+
+@keyframes certification-border-scan {
+  0%, 15% {
+    transform: translateX(0);
+    opacity: 0;
+  }
+  26% {
+    opacity: 1;
+  }
+  76% {
+    transform: translateX(340%);
+    opacity: 0.88;
+  }
+  100% {
+    transform: translateX(340%);
+    opacity: 0;
+  }
+}
+
+@keyframes certification-status-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.34);
+    opacity: 0.56;
+  }
+}
+
+@keyframes certification-progress-flow {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -120% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cert-card-current::after,
+  .cert-progress-status::before,
+  .cert-card-current .cert-description-current::after {
+    animation: none !important;
+  }
+
+  .cert-card-current::after {
+    left: 0;
+    width: 100%;
+    opacity: 0.55;
+  }
+
+  .cert-progress-status::before {
+    box-shadow: none;
+  }
+
+  .cert-card-current .cert-description-current::after {
+    background-position: 50% 0;
+  }
+}
+
 @media (max-width: 980px) {
   #about .section-heading {
     margin-bottom: 28px;
@@ -267,6 +439,14 @@
 
   .principles-list article {
     padding-inline: 14px;
+  }
+
+  .cert-card-current {
+    min-height: 210px;
+  }
+
+  .cert-card-current .cert-card-topline {
+    align-items: flex-start;
   }
 
   /* Keep the main-branch status design while making its table geometry clean on phones. */
