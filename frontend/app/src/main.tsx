@@ -1,4 +1,5 @@
 import { StrictMode } from "react";
+import { flushSync } from "react-dom";
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./styles.css";
@@ -151,13 +152,19 @@ if (!root) {
   throw new Error("Root element not found.");
 }
 
-createRoot(root).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-);
+const appRoot = createRoot(root);
 
-window.requestAnimationFrame(updateStaticCopy);
+flushSync(() => {
+  appRoot.render(
+    <StrictMode>
+      <App />
+    </StrictMode>,
+  );
+});
+
+// Apply the remaining static compatibility adjustments in the same browser task as
+// the initial React commit so stale source copy can never be painted between frames.
+updateStaticCopy();
 
 document.addEventListener(
   "click",
