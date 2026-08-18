@@ -9,7 +9,7 @@ dev  -> development / integration
 main -> protected production
 ```
 
-Scoped feature branches are used for larger changes before integration into `dev`. Production changes reach `main` only through a pull request.
+Scoped feature branches may be used for larger changes before integration into `dev`. Production changes reach `main` only through a pull request.
 
 ## Development CI
 
@@ -35,6 +35,8 @@ npm install
 The generated build must contain `dist/index.html` plus JavaScript and CSS assets before frontend validation passes.
 
 The current frontend toolchain requires a modern Node runtime. Local development should use Node.js 22.12+; CI uses Node 22.
+
+Development-mode request count is not a production performance metric. Vite serves source modules separately during `npm run dev`. Use `npm run build` followed by `npm run preview` when reviewing the production bundle locally.
 
 ### Backend validation
 
@@ -133,25 +135,37 @@ frontend/**
 .github/workflows/frontend-deploy.yml
 ```
 
+The source application and the published Pages site are intentionally separated:
+
+- source/build repository: `Jeysibn/portfolio`;
+- publication repository: `Jeysibn/jeysibn.github.io`;
+- live URL: `https://jeysibn.github.io/`.
+
 Deployment flow:
 
 ```text
-checkout
+checkout Jeysibn/portfolio
 -> Node.js 22
 -> npm install
 -> TypeScript typecheck
 -> Vite build
--> verify dist/
--> upload dist/ to GitHub Pages
--> deploy
--> curl live Pages URL and verify expected document title
+-> verify frontend/app/dist/
+-> checkout Jeysibn/jeysibn.github.io@main using PAGES_DEPLOY_TOKEN
+-> rsync --delete dist/ into publication repository root
+-> create .nojekyll
+-> commit generated site if changed
+-> push publication repository main
+-> curl https://jeysibn.github.io/
+-> verify expected Jerome Ibon page content
 ```
 
-Deployment target: GitHub Pages.
+The Pages repository is treated as generated deployment output. Source edits belong in `Jeysibn/portfolio`, not directly in `Jeysibn/jeysibn.github.io`.
+
+`PAGES_DEPLOY_TOKEN` is a GitHub Actions secret used only to authenticate the cross-repository checkout/push. It is separate from Azure authentication and must not be exposed in source, logs, or documentation.
 
 Every new frontend build receives a fresh build timestamp, so the visible Release age counter resets with each release.
 
-The live-page verification means successful artifact upload alone is not considered enough evidence of a successful frontend release.
+The live-page verification means a successful push to the publication repository alone is not considered sufficient evidence of a successful frontend release.
 
 ### Backend
 
@@ -200,6 +214,14 @@ Azure OIDC login
 
 A fresh plan is generated on `main` even when PR validation previously generated one because remote state may change between review and merge.
 
+## Frontend Asset Delivery
+
+The Vite build contains the application JavaScript/CSS and static public assets. Large project architecture PNGs are not bundled into the application artifact because they are referenced as public external assets.
+
+Normal project rendering uses resized WebP preview URLs so users do not download the full-resolution PNGs during ordinary browsing. The original PNG is requested only when the user explicitly opens architecture zoom.
+
+This behavior is application-level optimization rather than a separate deployment job. CI still validates the frontend through the normal TypeScript and Vite build pipeline.
+
 ## Documentation-Only Releases
 
 Markdown-only changes do not match the frontend, backend, or Terraform deployment path filters, so synchronizing documentation after a successful release does not redeploy the application or mutate Azure infrastructure.
@@ -220,7 +242,7 @@ Production Terraform deployments do not cancel in-progress applies. Infrastructu
 Feature / developer change
    |
    v
-PR -> dev
+dev
    |
    v
 Development CI
@@ -237,9 +259,14 @@ Production Ready gate
    v
 Merge to protected main
    |
-   +--> React build -> GitHub Pages -> live smoke check
-   +--> Azure Functions deploy -> health/API smoke checks
+   +--> React build
+   |      -> Jeysibn/jeysibn.github.io
+   |      -> https://jeysibn.github.io/ smoke check
+   |
+   +--> Azure Functions deploy
+   |      -> health/API smoke checks
+   |
    +--> Terraform plan -> apply
 ```
 
-The core rule is simple: validation happens before merge, production mutation happens only after merge to `main`, and deployment success is followed by runtime verification where practical.
+The core rule is simple: validation happens before merge, production mutation happens only after merge to `main`, generated frontend output is published to the dedicated Pages repository, and deployment success is followed by runtime verification where practical.
