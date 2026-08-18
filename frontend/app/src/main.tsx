@@ -60,7 +60,26 @@ function updateStaticCopy() {
 
   const availabilityDetail = document.querySelector<HTMLElement>(".availability-pill .availability-detail");
   if (availabilityDetail) {
-    availabilityDetail.textContent = "Cloud Support · DevOps · Cloud Engineering";
+    availabilityDetail.textContent = "Entry-level Cloud & DevOps roles";
+  }
+
+  const heroTitle = document.querySelector<HTMLElement>("#hero-title");
+  if (heroTitle) {
+    heroTitle.textContent = "Jerome Christian Ibon";
+    heroTitle.style.maxWidth = "18ch";
+  }
+
+  const heroIntro = document.querySelector<HTMLElement>(".hero-intro");
+  if (heroIntro) {
+    heroIntro.textContent = "Cloud Support · DevOps · Cloud Engineering";
+    heroIntro.style.maxWidth = "none";
+    heroIntro.style.color = "var(--text)";
+    heroIntro.style.fontWeight = "600";
+  }
+
+  const heroOpportunity = document.querySelector<HTMLElement>(".hero-opportunity");
+  if (heroOpportunity) {
+    heroOpportunity.textContent = "Computer Engineering graduate building cloud infrastructure, automated delivery pipelines, Kubernetes environments, and observable systems.";
   }
 
   const resumeIntro = document.querySelector<HTMLElement>("#resume .section-intro");
