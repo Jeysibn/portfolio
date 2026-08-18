@@ -3,7 +3,7 @@ import pytest
 import function_app
 
 
-def test_build_system_prompt_contains_knowledge_base_content():
+def test_build_system_prompt_contains_portfolio_facts():
     knowledge_base = {
         "name": "Jerome",
         "role": "Cloud and DevOps Engineer",
@@ -13,7 +13,31 @@ def test_build_system_prompt_contains_knowledge_base_content():
 
     assert "Jerome" in prompt
     assert "Cloud and DevOps Engineer" in prompt
-    assert "using ONLY the Knowledge Base" in prompt
+    assert "portfolio-first" in prompt.lower()
+    assert "knowledge base" not in prompt.lower()
+    assert "do not use emojis" in prompt.lower()
+    assert "plain text only" in prompt.lower()
+
+
+def test_sanitize_ai_response_removes_markdown_and_emoji():
+    response = "**Jerome** is focused on Cloud and DevOps. 🚀\n### Details\nUse `Terraform`."
+
+    cleaned = function_app.sanitize_ai_response(response)
+
+    assert cleaned == "Jerome is focused on Cloud and DevOps.\nDetails\nUse Terraform."
+    assert "*" not in cleaned
+    assert "`" not in cleaned
+    assert "🚀" not in cleaned
+
+
+def test_sanitize_ai_response_keeps_normal_technical_text():
+    response = "CI/CD uses GitHub Actions. Kubernetes runs containers across nodes."
+
+    assert function_app.sanitize_ai_response(response) == response
+
+
+def test_rate_limit_message_has_no_emoji():
+    assert "⏳" not in function_app.RATE_LIMIT_MESSAGE
 
 
 def test_load_knowledge_base_returns_dictionary():
