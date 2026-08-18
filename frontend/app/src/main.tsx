@@ -6,6 +6,12 @@ import "./styles.css";
 import "./ui-adjustments.css";
 
 const THEME_STORAGE_KEY = "color-theme";
+const CHAT_STORAGE_KEY = "jeysibn_chat_history";
+const CHAT_SUGGESTIONS = [
+  "Is Jerome qualified for a junior DevOps role?",
+  "What projects best demonstrate Jerome's skills?",
+  "How does Jerome use Terraform and Kubernetes?",
+] as const;
 
 type ThemeMode = "light" | "dark";
 
@@ -91,6 +97,55 @@ function updateStaticCopy() {
   renderThemeButton(currentTheme());
 }
 
+function hasChatHistory() {
+  try {
+    const stored = window.sessionStorage.getItem(CHAT_STORAGE_KEY);
+    if (!stored) return false;
+    const parsed: unknown = JSON.parse(stored);
+    return Array.isArray(parsed) && parsed.length > 0;
+  } catch {
+    return false;
+  }
+}
+
+function setReactInputValue(input: HTMLInputElement, value: string) {
+  const valueSetter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set;
+  valueSetter?.call(input, value);
+  input.dispatchEvent(new Event("input", { bubbles: true }));
+}
+
+function installChatSuggestions() {
+  if (hasChatHistory() || document.querySelector(".chat-suggestions")) return;
+
+  const form = document.querySelector<HTMLFormElement>(".chat-form");
+  const input = document.querySelector<HTMLInputElement>("#chat-input");
+  if (!form || !input) return;
+
+  const suggestions = document.createElement("div");
+  suggestions.className = "chat-suggestions";
+  suggestions.setAttribute("aria-label", "Suggested questions about Jerome");
+
+  const label = document.createElement("span");
+  label.className = "chat-suggestions-label";
+  label.textContent = "Try asking";
+  suggestions.append(label);
+
+  for (const prompt of CHAT_SUGGESTIONS) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "chat-suggestion";
+    button.textContent = prompt;
+    button.addEventListener("click", () => {
+      setReactInputValue(input, prompt);
+      suggestions.remove();
+      input.focus({ preventScroll: true });
+    });
+    suggestions.append(button);
+  }
+
+  form.before(suggestions);
+}
+
 function resolveNavigationSection(destination: HTMLElement) {
   return destination.closest<HTMLElement>("section") ?? destination;
 }
@@ -165,6 +220,7 @@ flushSync(() => {
 // Apply the remaining static compatibility adjustments in the same browser task as
 // the initial React commit so stale source copy can never be painted between frames.
 updateStaticCopy();
+installChatSuggestions();
 
 document.addEventListener(
   "click",
