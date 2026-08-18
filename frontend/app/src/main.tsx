@@ -12,13 +12,6 @@ const CHAT_SUGGESTIONS = [
   "What projects best demonstrate Jerome's skills?",
   "How does Jerome use Terraform and Kubernetes?",
 ] as const;
-const CURRENT_CERTIFICATION = {
-  name: "HashiCorp Certified: Terraform Associate (004)",
-  provider: "HashiCorp",
-  status: "IN PROGRESS",
-  description:
-    "Currently studying for Terraform Associate (004), building on hands-on Terraform use across Azure infrastructure and Proxmox homelab provisioning.",
-} as const;
 
 type ThemeMode = "light" | "dark";
 
@@ -153,43 +146,6 @@ function installChatSuggestions() {
   form.before(suggestions);
 }
 
-function installCurrentCertification() {
-  if (document.querySelector(".cert-card-current")) return;
-
-  const grid = document.querySelector<HTMLElement>(".certification-grid");
-  if (!grid) return;
-
-  const card = document.createElement("article");
-  card.className = "cert-card cert-card-current cert-card-hashicorp";
-  card.tabIndex = 0;
-  card.setAttribute(
-    "aria-label",
-    `${CURRENT_CERTIFICATION.name}. ${CURRENT_CERTIFICATION.status}. Currently studying; this certification is not yet earned.`,
-  );
-
-  const topline = document.createElement("div");
-  topline.className = "cert-card-topline";
-
-  const provider = document.createElement("span");
-  provider.className = "cert-provider-mark";
-  provider.textContent = CURRENT_CERTIFICATION.provider;
-
-  const status = document.createElement("span");
-  status.className = "cert-provider cert-progress-status";
-  status.textContent = CURRENT_CERTIFICATION.status;
-
-  const title = document.createElement("h3");
-  title.textContent = CURRENT_CERTIFICATION.name;
-
-  const description = document.createElement("p");
-  description.className = "cert-description cert-description-current";
-  description.textContent = CURRENT_CERTIFICATION.description;
-
-  topline.append(provider, status);
-  card.append(topline, title, description);
-  grid.append(card);
-}
-
 function resolveNavigationSection(destination: HTMLElement) {
   return destination.closest<HTMLElement>("section") ?? destination;
 }
@@ -265,7 +221,6 @@ flushSync(() => {
 // the initial React commit so stale source copy can never be painted between frames.
 updateStaticCopy();
 installChatSuggestions();
-installCurrentCertification();
 
 document.addEventListener(
   "click",
