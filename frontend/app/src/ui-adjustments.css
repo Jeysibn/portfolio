@@ -161,6 +161,44 @@
   mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M21 12.79A8.5 8.5 0 1 1 11.21 3 6.7 6.7 0 0 0 21 12.79z' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
 
+/* First-conversation portfolio assistant prompts. */
+.chat-suggestions {
+  display: grid;
+  gap: 8px;
+  padding: 0 14px 12px;
+}
+
+.chat-suggestions-label {
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.chat-suggestion {
+  width: 100%;
+  padding: 9px 11px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg-elevated);
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.8rem;
+  line-height: 1.35;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 160ms ease, color 160ms ease, background 160ms ease;
+}
+
+.chat-suggestion:hover,
+.chat-suggestion:focus-visible {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--line-strong));
+  background: color-mix(in srgb, var(--accent) 8%, var(--bg-elevated));
+  color: var(--text);
+  outline: none;
+}
+
 #credentials-title {
   scroll-margin-top: 90px;
 }
@@ -321,5 +359,9 @@
     left: 10px;
     right: 10px;
     bottom: max(10px, env(safe-area-inset-bottom));
+  }
+
+  .chat-suggestions {
+    padding-inline: 12px;
   }
 }

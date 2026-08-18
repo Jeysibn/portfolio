@@ -2,6 +2,7 @@ import hashlib
 import json
 import logging
 import os
+import re
 import time
 import uuid
 
@@ -45,10 +46,26 @@ RATE_LIMIT_MESSAGE = (
     "jeysibn@gmail.com or through LinkedIn."
 )
 
+OUT_OF_SCOPE_MESSAGE = (
+    "That request is outside this portfolio assistant's scope. "
+    "I can help with Jerome's background, projects, skills, qualifications, "
+    "or technologies as they relate to his documented work."
+)
+
 AI_MODEL = os.environ.get("AI_MODEL", "mimo-v2.5-free")
 AI_BASE_URL = os.environ.get("AI_BASE_URL", "https://opencode.ai/zen/v1")
 AI_TEMPERATURE = float(os.environ.get("AI_TEMPERATURE", "0.35"))
 AI_MAX_TOKENS = int(os.environ.get("AI_MAX_TOKENS", "450"))
+
+GENERIC_CODE_PATTERNS = (
+    r"\b(write|create|generate|give me|show me)\b.{0,40}\b(code|script|program|function|dockerfile)\b",
+    r"\b(fix|debug|troubleshoot)\b.{0,40}\b(my|this)\b.{0,40}\b(code|script|javascript|python|java|program)\b",
+    r"\b(teach|explain)\s+me\b",
+)
+
+SIMPLE_CALC_PATTERN = re.compile(
+    r"^\s*[+-]?(?:\d+(?:\.\d+)?|\.\d+)\s*[+\-*/]\s*[+-]?(?:\d+(?:\.\d+)?|\.\d+)\s*$"
+)
 
 
 # ---------------------------------------------------------
@@ -148,6 +165,22 @@ def log_event(event: str, request_id: str, **fields) -> None:
         **fields,
     }
     logger.info("portfolio_event=%s", json.dumps(payload, sort_keys=True))
+
+
+def is_obviously_out_of_scope(user_message: str) -> bool:
+    """Reject common general-purpose use without spending an AI provider request."""
+    normalized = " ".join(user_message.lower().split())
+
+    if not normalized:
+        return False
+
+    if "jerome" in normalized or "portfolio" in normalized:
+        return False
+
+    if SIMPLE_CALC_PATTERN.fullmatch(normalized):
+        return True
+
+    return any(re.search(pattern, normalized) for pattern in GENERIC_CODE_PATTERNS)
 
 
 # =========================================================
@@ -324,6 +357,15 @@ def AiChatAssistant(req: func.HttpRequest) -> func.HttpResponse:
                 body=json.dumps({"error": "Message body cannot be empty."}),
                 mimetype="application/json",
                 status_code=400,
+                headers={**AI_HEADERS, "X-Correlation-ID": request_id},
+            )
+
+        if is_obviously_out_of_scope(user_message):
+            log_event("ai_chat_scope_rejected", request_id)
+            return func.HttpResponse(
+                body=json.dumps({"reply": OUT_OF_SCOPE_MESSAGE}),
+                mimetype="application/json",
+                status_code=200,
                 headers={**AI_HEADERS, "X-Correlation-ID": request_id},
             )
 
