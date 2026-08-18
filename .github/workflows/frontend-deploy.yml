@@ -1,4 +1,4 @@
-name: Deploy Frontend to GitHub Pages
+name: Publish Frontend to GitHub Pages
 
 on:
   push:
@@ -10,8 +10,6 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
   group: production-frontend
@@ -19,15 +17,11 @@ concurrency:
 
 jobs:
   deploy:
-    name: Build and Deploy Frontend
+    name: Build and Publish Frontend
     runs-on: ubuntu-latest
 
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-
     steps:
-      - name: Checkout repository
+      - name: Checkout source repository
         uses: actions/checkout@v7
 
       - name: Setup Node.js
@@ -52,21 +46,37 @@ jobs:
           test -f frontend/app/dist/index.html
           test -d frontend/app/dist/assets
 
-      - name: Setup GitHub Pages
-        uses: actions/configure-pages@v6
-
-      - name: Upload frontend artifact
-        uses: actions/upload-pages-artifact@v5
+      - name: Checkout GitHub Pages repository
+        uses: actions/checkout@v7
         with:
-          path: "./frontend/app/dist"
+          repository: Jeysibn/jeysibn.github.io
+          ref: main
+          token: ${{ secrets.PAGES_DEPLOY_TOKEN }}
+          path: pages-site
 
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v5
+      - name: Publish frontend artifact
+        run: |
+          set -euo pipefail
+
+          rsync -a --delete --exclude='.git' frontend/app/dist/ pages-site/
+          touch pages-site/.nojekyll
+
+          cd pages-site
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+
+          if git diff --cached --quiet; then
+            echo "No frontend changes to publish."
+            exit 0
+          fi
+
+          git commit -m "deploy: portfolio ${GITHUB_SHA}"
+          git push origin main
 
       - name: Verify deployed frontend
         env:
-          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+          PAGE_URL: https://jeysibn.github.io/
         run: |
           set -euo pipefail
 
@@ -90,6 +100,6 @@ jobs:
         run: |
           echo "## React Frontend Deployment ✅" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "Vite production build deployed and verified on GitHub Pages." >> "$GITHUB_STEP_SUMMARY"
-          echo "**Commit:** ${{ github.sha }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "**URL:** ${{ steps.deployment.outputs.page_url }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Vite production build published to Jeysibn/jeysibn.github.io and verified on GitHub Pages." >> "$GITHUB_STEP_SUMMARY"
+          echo "**Source commit:** ${{ github.sha }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "**URL:** https://jeysibn.github.io/" >> "$GITHUB_STEP_SUMMARY"
