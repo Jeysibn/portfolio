@@ -4,11 +4,14 @@ import logging
 import os
 import time
 import uuid
-from pathlib import Path
 
 import azure.functions as func
 from azure.cosmos import CosmosClient, exceptions
 from openai import OpenAI, OpenAIError
+
+from assistant.response_sanitizer import sanitize_ai_response
+from assistant.service import build_chat_messages
+
 
 # ---------------------------------------------------------
 # LOGGING
@@ -37,13 +40,15 @@ MAX_MESSAGES = 10
 RESET_PERIOD_SECONDS = 3600
 
 RATE_LIMIT_MESSAGE = (
-    "⏳ You've reached the maximum limit of 10 messages for this chat session. "
-    "Feel free to connect with Jerome directly via email at "
-    "jeysibn@gmail.com or on LinkedIn!"
+    "You've reached the maximum limit of 10 messages for this chat session. "
+    "You can continue the conversation by contacting Jerome at "
+    "jeysibn@gmail.com or through LinkedIn."
 )
 
-AI_MODEL = "mimo-v2.5-free"
-AI_BASE_URL = "https://opencode.ai/zen/v1"
+AI_MODEL = os.environ.get("AI_MODEL", "mimo-v2.5-free")
+AI_BASE_URL = os.environ.get("AI_BASE_URL", "https://opencode.ai/zen/v1")
+AI_TEMPERATURE = float(os.environ.get("AI_TEMPERATURE", "0.35"))
+AI_MAX_TOKENS = int(os.environ.get("AI_MAX_TOKENS", "450"))
 
 
 # ---------------------------------------------------------
@@ -143,44 +148,6 @@ def log_event(event: str, request_id: str, **fields) -> None:
         **fields,
     }
     logger.info("portfolio_event=%s", json.dumps(payload, sort_keys=True))
-
-
-# ---------------------------------------------------------
-# AI KNOWLEDGE BASE HELPERS
-# ---------------------------------------------------------
-def load_knowledge_base() -> dict:
-    """Load the portfolio knowledge base from JSON."""
-    file_path = Path(__file__).resolve().parent / "data" / "knowledge_base.json"
-
-    try:
-        with file_path.open("r", encoding="utf-8") as file:
-            return json.load(file)
-
-    except (OSError, json.JSONDecodeError):
-        logger.exception("Unable to load the portfolio knowledge base.")
-        return {}
-
-
-def build_system_prompt(kb_data: dict) -> str:
-    """Format the portfolio knowledge base into the AI system prompt."""
-    kb_string = json.dumps(kb_data, indent=2)
-
-    return f"""
-You are Jerome Ibon's AI Assistant on his portfolio website (jeysibn.dev).
-Your primary job is to politely and accurately answer questions about Jerome
-using ONLY the Knowledge Base provided below.
-
-=== JEROME'S KNOWLEDGE BASE ===
-{kb_string}
-
-=== RULES ===
-1. Be professional, friendly, and concise (under 3-4 sentences when possible).
-2. Base your answers strictly on the facts provided in the Knowledge Base above.
-3. If a user asks something not covered in the Knowledge Base or asks off-topic
-   questions (for example general math or writing unrelated code), politely
-   decline:
-   "I can only answer questions related to Jerome's background and experience."
-"""
 
 
 # =========================================================
@@ -360,24 +327,17 @@ def AiChatAssistant(req: func.HttpRequest) -> func.HttpResponse:
                 headers={**AI_HEADERS, "X-Correlation-ID": request_id},
             )
 
-        kb_data = load_knowledge_base()
-        system_prompt = build_system_prompt(kb_data)
-        messages = [{"role": "system", "content": system_prompt}]
+        if not isinstance(chat_history, list):
+            chat_history = []
 
-        for message in chat_history:
-            role = message.get("role")
-            content = message.get("content")
-            if role in {"user", "assistant"} and content:
-                messages.append({"role": role, "content": content})
-
-        messages.append({"role": "user", "content": user_message})
+        messages = build_chat_messages(user_message, chat_history)
 
         client = get_ai_client()
         response = client.chat.completions.create(
             model=AI_MODEL,
             messages=messages,
-            temperature=0.7,
-            max_tokens=350,
+            temperature=AI_TEMPERATURE,
+            max_tokens=AI_MAX_TOKENS,
         )
         response_content = response.choices[0].message.content
 
@@ -390,9 +350,20 @@ def AiChatAssistant(req: func.HttpRequest) -> func.HttpResponse:
                 headers={**AI_HEADERS, "X-Correlation-ID": request_id},
             )
 
+        sanitized_response = sanitize_ai_response(response_content)
+
+        if not sanitized_response:
+            logger.error("AI response was empty after sanitization. request_id=%s", request_id)
+            return func.HttpResponse(
+                body=json.dumps({"error": "The AI assistant did not return a usable response."}),
+                mimetype="application/json",
+                status_code=502,
+                headers={**AI_HEADERS, "X-Correlation-ID": request_id},
+            )
+
         log_event("ai_chat_success", request_id)
         return func.HttpResponse(
-            body=json.dumps({"reply": response_content.strip()}),
+            body=json.dumps({"reply": sanitized_response}),
             mimetype="application/json",
             status_code=200,
             headers={**AI_HEADERS, "X-Correlation-ID": request_id},
