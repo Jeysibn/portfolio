@@ -32,6 +32,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and 
 
 ### Fixed
 
+- **Hero refresh headline flash**: Removed the one-frame timing gap between the initial React render and the compatibility copy update so rapid refreshes no longer expose the stale “Aspiring Cloud & DevOps Engineer” headline before the current name-first hero appears.
 - **Theme interaction scroll jump**: Theme-button interaction now prevents the unwanted page movement that could occur when opening/changing the theme control.
 - **Certification navigation target**: Certification navigation resolves to the Education & Certifications section instead of an inconsistent anchor position.
 - **Mobile monitoring separators**: Removed conflicting multi-column separator geometry on small screens.
