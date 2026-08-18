@@ -2,17 +2,27 @@
 
 ## Purpose
 
-The portfolio AI assistant is intentionally split into application routing, assistant behavior, portfolio facts, and output safeguards. The current design keeps the implementation small while avoiding a large hardcoded prompt inside the Azure Function route.
+The portfolio AI assistant is intentionally split into application routing, assistant behavior, portfolio facts, deterministic scope protection, and output safeguards. The current design keeps the implementation small while avoiding a large hardcoded prompt inside the Azure Function route.
+
+The assistant is intentionally portfolio-specific. It is not exposed as a general-purpose coding, calculation, tutorial, debugging, or career-advice endpoint.
 
 ## Current implementation
 
 ```text
 Browser chat widget
         |
+        +--> first-conversation suggested questions
+        |
         v
 Azure Function: AiChatAssistant
         |
         +--> rate limiting / request validation
+        |
+        +--> deterministic generic-use guard
+        |      |
+        |      +--> obvious coding requests
+        |      +--> simple calculations
+        |      +--> common tutorial/debug requests
         |
         +--> assistant/service.py
         |      |
@@ -35,15 +45,20 @@ JSON response to frontend
 - exposes the HTTP routes;
 - validates chat requests;
 - applies the existing per-visitor Cosmos DB rate limit;
+- rejects obvious general-purpose requests before calling the external AI provider;
 - creates the provider client lazily;
-- invokes the AI provider;
+- invokes the AI provider for requests that require model interpretation;
 - returns API responses and operational errors.
+
+The deterministic guard is deliberately narrow. It handles common abuse patterns cheaply, while the assistant prompt remains responsible for nuanced scope decisions.
 
 `backend/assistant/assistant_prompt.md`
 
 - defines the assistant's portfolio-first behavior;
-- defines the allowed Cloud/DevOps/career-adjacent scope;
-- prevents internal context terminology from being exposed to visitors;
+- restricts technical answers to Jerome's documented work, projects, demonstrated skills, and engineering decisions;
+- explicitly blocks standalone code generation, debugging, tutorials, calculations, command generation, generic career coaching, and other general-purpose assistance;
+- requires out-of-scope requests to be redirected without first answering the requested task;
+- prevents internal context terminology, provider configuration, and model details from being exposed to visitors;
 - requires concise, professional plain-text responses without emoji or Markdown formatting.
 
 `backend/assistant/service.py`
@@ -63,6 +78,35 @@ JSON response to frontend
 
 - remains the current source of truth for verified Jerome-specific facts;
 - is deliberately separate from assistant personality and response rules.
+
+## First-conversation suggestions
+
+When the current browser session has no saved chat history, the frontend shows three portfolio-focused starter questions:
+
+- Is Jerome qualified for a junior DevOps role?
+- What projects best demonstrate Jerome's skills?
+- How does Jerome use Terraform and Kubernetes?
+
+Selecting a suggestion places it in the chat input instead of sending it automatically. This preserves visitor control and avoids consuming a limited chat message before the visitor has a chance to edit the question.
+
+Once a session already contains conversation history, the starter suggestions are not added.
+
+## Scope examples
+
+In scope:
+
+- questions about Jerome's background, education, certifications, experience, projects, and skills;
+- recruiter-style evaluation of Jerome for entry-level or junior roles;
+- explanations of Terraform, Kubernetes, GitHub Actions, Azure, observability, or other technologies when the question is specifically about how they appear in Jerome's documented work.
+
+Out of scope:
+
+- standalone code generation or scripts;
+- debugging a visitor's application;
+- general tutorials or technical training;
+- calculations;
+- architecture or command generation for a visitor's own project;
+- generic resume, interview, or career coaching unrelated to evaluating Jerome.
 
 ## Configuration
 
