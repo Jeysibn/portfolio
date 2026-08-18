@@ -7,21 +7,24 @@
 
 A production-oriented Cloud and DevOps portfolio built as an end-to-end engineering project. The deployed system combines a React + TypeScript single-page frontend, Python Azure Functions APIs, Azure Cosmos DB, Terraform-managed infrastructure, Azure-native observability, a provider-neutral AI portfolio assistant, and GitHub Actions CI/CD using OpenID Connect (OIDC) authentication to Azure.
 
-The current frontend uses a terminal-inspired engineering visual system while keeping the site portfolio-first rather than dashboard-first. It includes live production health, release metadata, interactive project details, detailed skill inspection, certification cards, a fully visible resume, and an opportunity-focused contact experience.
+The current frontend uses a terminal-inspired engineering visual system while keeping the site portfolio-first rather than dashboard-first. It includes a name-first hero, live production health and release metadata, interactive project details, detailed skill inspection, certification cards, a fully visible resume, optimized architecture previews, and an opportunity-focused contact experience.
 
 ## Live Project
 
-- **Portfolio:** https://jeysibn.github.io/portfolio
-- **GitHub:** https://github.com/Jeysibn
+- **Portfolio:** https://jeysibn.github.io/
+- **Source repository:** https://github.com/Jeysibn/portfolio
+- **Pages deployment repository:** https://github.com/Jeysibn/jeysibn.github.io
+- **GitHub profile:** https://github.com/Jeysibn
 - **LinkedIn:** https://www.linkedin.com/in/jeromeibon
 
 ## Architecture
 
-![System Architecture Diagram](frontend/assets/architectural-diagram-cloudbacked-portfolio.png)
+![System Architecture Diagram](frontend/assets/architectural-diagram-cloudbacked-portfolio.svg)
 
 | Layer | Technology | Responsibility |
 |---|---|---|
 | Frontend | React, TypeScript, Vite, Tailwind CSS, GitHub Pages | Single-page portfolio UI, health monitor, visitor counter, AI chat, project details, skills, credentials, resume |
+| Frontend delivery | GitHub Actions + `Jeysibn/jeysibn.github.io` | Builds `frontend/app/dist/`, publishes the generated site to the dedicated Pages repository, and verifies the root production URL |
 | Backend | Azure Functions, Python 3.11 | Health, visitor-counter, and AI-assistant APIs |
 | Database | Azure Cosmos DB for NoSQL | Persistent visitor count, hashed visitor records, chat rate-limit records |
 | AI | OpenAI-compatible external API | Portfolio-specific conversational assistant with provider-neutral frontend branding |
@@ -59,6 +62,12 @@ portfolio/
 │   └── Changelog.md
 ├── frontend/
 │   ├── app/
+│   │   ├── public/
+│   │   │   ├── favicon.svg
+│   │   │   ├── resume.pdf
+│   │   │   └── social-preview.svg
+│   │   ├── scripts/
+│   │   │   └── generate-static-assets.mjs
 │   │   ├── src/
 │   │   │   ├── App.tsx
 │   │   │   ├── api.ts
@@ -66,6 +75,7 @@ portfolio/
 │   │   │   ├── portfolio.ts
 │   │   │   ├── skill-details.ts
 │   │   │   ├── styles.css
+│   │   │   ├── ui-adjustments.css
 │   │   │   └── main.tsx
 │   │   ├── index.html
 │   │   ├── package.json
@@ -78,26 +88,39 @@ portfolio/
 └── README.md
 ```
 
+Generated TypeScript build-info files and Vite build output are ignored and are not source-controlled deployment inputs.
+
 ## Frontend
 
-The portfolio is a single React page hosted on GitHub Pages. Navigation uses document anchors such as `#projects`, `#skills`, and `#contact`, so the application does not require a client-side router or static-hosting fallback rules.
+The portfolio is a single React page hosted at the root GitHub Pages site `https://jeysibn.github.io/`. Navigation uses document anchors, so the application does not require a client-side router or static-hosting fallback rules.
+
+The visible page order is:
+
+```text
+Hero → About → Projects → Experience → Skills → Education & Certifications → Resume → Contact
+```
 
 Current frontend features include:
 
-- responsive desktop and mobile navigation with active-section tracking;
-- System, Light, and Dark theme preferences;
-- an **Aspiring Cloud & DevOps Engineer** hero with an explicit **Open to opportunities** state;
+- responsive desktop and mobile navigation with active-section tracking and section-start alignment;
+- no active navigation item while the visitor is still inside the hero;
+- a compact Light/Dark theme control; when no saved preference exists, the initial theme follows the operating-system preference;
+- a **Jerome Christian Ibon** name-first hero with supporting **Cloud Support · DevOps · Cloud Engineering** positioning;
+- an explicit **Open to opportunities** state for entry-level Cloud/DevOps roles;
 - live production `/api/health` status from Azure Functions;
 - a build-derived **Release age** value that resets with every frontend release;
 - live Manila time in the monitoring panel;
+- a mobile monitoring layout that switches metric groups to a readable single-column presentation;
 - visitor counter with loading and unavailable states;
 - AI assistant with session history, rate-limit/error handling, and a closed state that does not block page interaction;
-- whole-card project interaction with project-specific architecture previews and centered detail dialogs;
-- in-page architecture-diagram zoom instead of raw-image navigation;
+- whole-card project interaction with architecture previews and centered detail dialogs;
+- lightweight resized WebP architecture previews for normal card/detail viewing;
+- deferred full-resolution architecture images that load only when the visitor explicitly opens the architecture zoom;
 - clickable skill capability cards with detailed modal explanations;
 - provider-styled certification cards with hover/focus descriptions;
-- a concise on-page resume summary with progressively disclosed details and print/save output;
-- restrained one-time reveal motion and `prefers-reduced-motion` support.
+- a concise on-page resume with direct PDF download and on-page details;
+- restrained one-time reveal motion and `prefers-reduced-motion` support;
+- responsive About composition with tighter title/body spacing and a terminal-style engineering-principles card.
 
 ### Health and release-age semantics
 
@@ -106,7 +129,26 @@ The hero monitor deliberately separates liveness from release metadata:
 - `/api/health` confirms that the Azure Function worker loaded and can serve HTTP;
 - it does **not** prove Cosmos DB or the external AI provider is healthy;
 - **Release age** is calculated from a Vite build timestamp and is not server uptime;
-- the release-age counter is only shown as active while the production health check is Operational.
+- Azure Functions may scale or recycle independently of the frontend release lifecycle.
+
+### Architecture preview strategy
+
+The original architecture PNG files remain the full-resolution source images. Normal project-card and project-detail rendering uses resized WebP previews so the initial portfolio experience does not download multi-megabyte source diagrams unnecessarily.
+
+Current preview behavior:
+
+```text
+Project card / project detail
+        |
+        v
+resized WebP preview (lazy-loaded)
+        |
+        | user explicitly opens architecture zoom
+        v
+original full-resolution PNG
+```
+
+Preview transformation is performed through `wsrv.nl`; the original GitHub-hosted diagrams remain the source of truth and are used for the explicit full-resolution view.
 
 ### Local frontend development
 
@@ -118,7 +160,16 @@ npm install
 npm run dev
 ```
 
-If `nvm` is available, a Node 22 runtime can be selected before installing dependencies.
+During `npm run dev`, Vite serves React/TypeScript modules separately and opens a development WebSocket for hot module replacement. Those development-only requests are not representative of the production request graph.
+
+To test the same bundling model used for production:
+
+```bash
+npm run build
+npm run preview
+```
+
+Then open the Vite preview URL (normally `http://localhost:4173`) and test with browser cache disabled when measuring initial network cost.
 
 The production Azure Functions API is used by default. To target a local Function host, create a local `.env` from `.env.example`:
 
@@ -133,7 +184,7 @@ npm run typecheck
 npm run build
 ```
 
-Vite writes the deployable GitHub Pages artifact to `frontend/app/dist/`.
+Vite writes the deployable artifact to `frontend/app/dist/`.
 
 ## CI/CD Model
 
@@ -144,7 +195,7 @@ dev  → development and integration
 main → protected production
 ```
 
-Scoped feature branches are used for larger work before integration into `dev`.
+Scoped feature branches may be used for larger work before integration into `dev`.
 
 ### Development
 
@@ -168,14 +219,24 @@ No application or infrastructure mutation occurs from the pull request itself.
 After merge into `main`, path-specific workflows deploy only the affected layer:
 
 ```text
-frontend/**  → Vite build → GitHub Pages → live-page smoke check
-backend/**   → Azure Functions → health + visitor API smoke tests
-terraform/** → Terraform plan + apply
+frontend/**
+  → Vite build
+  → checkout Jeysibn/jeysibn.github.io
+  → rsync dist/ into the Pages repository
+  → commit/push generated site
+  → verify https://jeysibn.github.io/
+
+backend/**
+  → Azure Functions
+  → health + visitor API smoke tests
+
+terraform/**
+  → Terraform plan + apply
 ```
 
-The frontend workflow uploads only `frontend/app/dist/`. Source files and development dependencies are not published to GitHub Pages.
+The source repository remains the source of truth. The `Jeysibn/jeysibn.github.io` repository is the generated deployment target for the frontend artifact.
 
-Production Azure workflows authenticate using GitHub-issued OIDC tokens rather than stored Azure client secrets.
+The frontend workflow uses the repository secret `PAGES_DEPLOY_TOKEN` to authenticate the checkout/push to the dedicated Pages repository. Azure workflows continue to use GitHub OIDC rather than stored Azure client secrets.
 
 See [`docs/cicd.md`](docs/cicd.md).
 
@@ -187,11 +248,12 @@ Key security decisions include:
 - no reusable Azure service-principal client secret in GitHub;
 - protected `main` branch with required PR validation;
 - separate OIDC trust subjects for pull-request planning and production environment deployment;
+- `PAGES_DEPLOY_TOKEN` stored only as a GitHub Actions secret for publishing the generated frontend to the dedicated Pages repository;
 - hashed client IP addresses before persistence in Cosmos DB;
 - AI provider API key stored in GitHub Actions Secrets and passed to Terraform as a sensitive `TF_VAR` input;
 - Terraform state stored remotely in Azure Blob Storage and treated as sensitive;
 - backend dependency auditing in PR validation;
-- local environment and secret files excluded from Git;
+- local environment, TypeScript build-info, and secret files excluded from Git;
 - lazy AI-client initialization so optional AI failures cannot prevent unrelated Function routes from being indexed;
 - no provider API keys or Azure connection strings embedded in the React bundle.
 
@@ -301,7 +363,7 @@ Production visibility includes:
 - structured application events and correlation IDs;
 - Log Analytics with 30-day retention and a `0.1 GB/day` ingestion cap;
 - backend health and visitor-counter post-deployment smoke checks;
-- frontend GitHub Pages post-deployment verification;
+- frontend root-domain post-deployment verification;
 - frontend health monitor with explicit liveness and release-age semantics;
 - initial SLI/SLO targets and KQL troubleshooting queries.
 
@@ -330,6 +392,7 @@ This repository is both a live portfolio and a learning project focused on pract
 - remote state management;
 - observability and post-deployment verification;
 - accessible frontend interaction design;
+- frontend performance and asset-delivery decisions;
 - testing and validation;
 - operational documentation.
 
