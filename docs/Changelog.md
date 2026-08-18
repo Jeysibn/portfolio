@@ -8,7 +8,52 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and 
 
 ## [Unreleased]
 
-_No unreleased changes documented._
+### Added
+
+- **Dedicated GitHub Pages deployment repository**: Frontend production publishing now targets `Jeysibn/jeysibn.github.io`, allowing the portfolio to use the root URL `https://jeysibn.github.io/` while keeping application source and CI/CD in `Jeysibn/portfolio`.
+- **Pages publish credential**: Added the `PAGES_DEPLOY_TOKEN` workflow secret boundary for authenticated checkout/push to the dedicated Pages repository.
+- **Optimized architecture previews**: Project cards and normal project-detail views now request resized WebP previews instead of immediately downloading the original multi-megabyte PNG diagrams.
+- **Deferred full-resolution architecture loading**: Original architecture PNGs are loaded only after the visitor explicitly opens the architecture zoom.
+- **Static frontend assets**: Added a generated resume PDF, favicon, and social-preview asset to the Vite public output.
+
+### Changed
+
+- **Hero information hierarchy**: The primary hero headline is now **Jerome Christian Ibon**. Cloud Support, DevOps, and Cloud Engineering are supporting positioning rather than replacing the portfolio owner’s identity.
+- **Hero copy**: Removed the large “Aspiring Cloud & DevOps Engineer” headline and moved entry-level context into the opportunity/status copy instead of making seniority the dominant message.
+- **Navigation order**: The page/navigation flow is now About → Projects → Experience → Skills → Certifications → Resume → Contact.
+- **Navigation alignment**: Header navigation scrolls sections to the start of the viewport below the sticky header rather than centering section headings.
+- **Active navigation behavior**: No navigation item is shown as active while the visitor is still inside the hero.
+- **Theme control**: Replaced the visible theme dropdown treatment with a compact icon control while retaining saved theme behavior and initial system-preference fallback.
+- **Project cards**: Refined the project showcase into larger architecture-first cards with a clear whole-card interaction cue and preserved project-detail dialogs.
+- **Hero monitoring responsiveness**: Restored the original monitoring-card visual language and changed phone layouts to a single-column metric presentation for reliable separators and readable values.
+- **About section composition**: Preserved the side-by-side desktop design while tightening heading/body spacing and aligning the terminal-style `cat philosophy.txt` principles card with the About copy.
+- **Frontend deployment flow**: The production workflow now builds `frontend/app/dist/`, checks out `Jeysibn/jeysibn.github.io`, synchronizes the generated artifact with `rsync --delete`, commits the result, pushes to the Pages repository, and verifies the root production URL.
+- **Frontend local-performance guidance**: Production-style local comparisons now use `npm run build` + `npm run preview` instead of judging request count from Vite development mode.
+
+### Fixed
+
+- **Theme interaction scroll jump**: Theme-button interaction now prevents the unwanted page movement that could occur when opening/changing the theme control.
+- **Certification navigation target**: Certification navigation resolves to the Education & Certifications section instead of an inconsistent anchor position.
+- **Mobile monitoring separators**: Removed conflicting multi-column separator geometry on small screens.
+- **About spacing regression**: Reduced excessive empty space between the About heading and its content.
+- **Architecture asset mismatch**: Corrected project architecture references so existing image assets are used instead of requesting a missing file format.
+- **Closed chatbot interaction boundary**: Retained pointer-event isolation so the hidden assistant cannot block underlying page controls.
+
+### Removed
+
+- **Obsolete `ui-adjustments.ts` module**: Consolidated its small runtime behavior into the active frontend entrypoint and removed the extra development module request.
+- **Tracked TypeScript build cache**: Removed `frontend/app/tsconfig.tsbuildinfo` from source control and added `*.tsbuildinfo` to `.gitignore`.
+
+### Security
+
+- **Separated Pages publishing from Azure authentication**: Azure deployments continue using OIDC; the dedicated Pages repository uses only the `PAGES_DEPLOY_TOKEN` GitHub Actions secret required for frontend publication.
+- **Full-resolution diagrams remain source-controlled**: The preview service receives public diagram URLs only; no application secrets or Azure credentials are involved in image transformation.
+
+### Operations
+
+- **Root-domain smoke test**: Frontend deployment verification now checks `https://jeysibn.github.io/` after publishing the generated site to the dedicated Pages repository.
+- **Preview/full-resolution asset split**: Normal browsing uses lightweight previews while explicit zoom remains the path to full-resolution diagrams, reducing ordinary page-transfer cost.
+- **Documentation sync**: README, architecture, CI/CD, runbook, contribution, security, and changelog documentation were updated to match the current `dev` implementation.
 
 ---
 
