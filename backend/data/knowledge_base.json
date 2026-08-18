@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "last_updated": "2026-08-16",
+    "last_updated": "2026-08-18",
     "purpose": "Authoritative knowledge source for Jerome Ibon's portfolio AI assistant.",
     "scope": "Professional background, education, certifications, technical skills, projects, career interests, availability, and current learning.",
     "accuracy_note": "Professional employment and personal/home-lab project experience are intentionally distinguished to avoid overstating production experience."
@@ -13,7 +13,7 @@
     "location": "Malolos, Bulacan, Philippines",
     "email": "jeysibn@gmail.com",
     "portfolio": "https://jeysibn.dev",
-    "github_pages_portfolio": "https://jeysibn.github.io/portfolio",
+    "github_pages_portfolio": "https://jeysibn.github.io/",
     "linkedin": "https://linkedin.com/in/jeromeibon",
     "github": "https://github.com/Jeysibn",
     "languages": [
@@ -92,6 +92,8 @@
       "YAML"
     ],
     "observability": [
+      "Azure Application Insights",
+      "Azure Log Analytics",
       "Prometheus",
       "Grafana",
       "Loki"
@@ -126,7 +128,14 @@
       "Bash",
       "PowerShell",
       "JavaScript",
+      "TypeScript",
       "HTML"
+    ],
+    "frontend": [
+      "React",
+      "TypeScript",
+      "Vite",
+      "Tailwind CSS"
     ],
     "security_and_support_tools": [
       "Trend Vision One",
@@ -181,16 +190,17 @@
     {
       "name": "Cloud-Backed Portfolio",
       "repository": "https://github.com/Jeysibn/portfolio",
-      "live_site": "https://jeysibn.github.io/portfolio",
+      "live_site": "https://jeysibn.github.io/",
       "type": "Cloud / Serverless / DevOps Portfolio",
       "status": "Active and deployed",
-      "purpose": "Build a portfolio that is also a hands-on DevOps system, demonstrating cloud architecture, Infrastructure as Code, automated validation, secure cloud authentication, protected releases, serverless APIs, persistence, testing, and operational documentation.",
+      "purpose": "Build a portfolio that is also a hands-on DevOps system, demonstrating cloud architecture, Infrastructure as Code, automated validation, secure cloud authentication, protected releases, serverless APIs, persistence, testing, observability, and operational documentation.",
       "architecture": {
-        "frontend": "HTML, JavaScript, Tailwind CSS hosted on GitHub Pages.",
+        "frontend": "React + TypeScript single-page application built with Vite. Source lives in Jeysibn/portfolio; the generated frontend/app/dist artifact is published to the dedicated Jeysibn/jeysibn.github.io repository and served at the root GitHub Pages domain.",
         "backend": "Python 3.11 Azure Functions using the Python v2 programming model.",
         "database": "Azure Cosmos DB for NoSQL with PortfolioDB, Counter, and VisitorIPs containers.",
         "infrastructure": "Terraform with the AzureRM provider in Azure Korea Central.",
         "terraform_state": "Remote Terraform state stored in Azure Blob Storage.",
+        "observability": "Workspace-based Azure Application Insights and Log Analytics provide request, latency, failure, exception, and structured operational telemetry.",
         "ai": "An OpenAI-compatible API integration powers a portfolio-specific AI assistant. The frontend intentionally uses model-neutral branding so backend model changes do not require a frontend branding change.",
         "authentication": "GitHub Actions authenticates to Azure using GitHub OIDC federation with Microsoft Entra ID instead of a reusable Azure client secret.",
         "branching": "Two-branch model: dev for development/integration and main for protected production."
@@ -203,16 +213,19 @@
         "Counter container",
         "VisitorIPs container with a 24-hour TTL",
         "Linux Consumption App Service Plan (Y1)",
-        "Python 3.11 Azure Function App"
+        "Python 3.11 Azure Function App",
+        "Log Analytics workspace with cost guardrails",
+        "Workspace-based Application Insights"
       ],
       "cicd": {
-        "development": "Pushes to dev validate frontend files and JavaScript, Python dependencies and syntax, Ruff linting, pytest tests, and Terraform formatting/init/validate.",
+        "development": "Pushes to dev validate the React frontend with dependency installation, strict TypeScript typechecking, a Vite production build and artifact verification, plus Python dependency/syntax/Ruff/pytest checks and Terraform formatting/init-without-backend/validation.",
         "pull_request": "A dev-to-main PR performs production-readiness validation including frontend artifact creation, backend dependency auditing, tests, Azure Function package creation, Azure OIDC authentication, remote-backend Terraform planning, and a final Production Ready gate.",
-        "production": "Merges to main trigger path-specific workflows: frontend changes deploy to GitHub Pages, backend changes deploy to Azure Functions, and Terraform changes run production plan/apply.",
+        "production": "Merges to main trigger path-specific workflows. Frontend changes build frontend/app/dist in Jeysibn/portfolio, then publish that artifact to the dedicated Jeysibn/jeysibn.github.io repository and verify https://jeysibn.github.io/. Backend changes deploy to Azure Functions and run API smoke checks; Terraform changes run a production plan and apply.",
         "concurrency": "CI cancels obsolete development/PR runs while production Terraform deployment does not cancel in-progress applies."
       },
       "security_and_reliability": [
         "Uses short-lived GitHub OIDC tokens for Azure authentication instead of storing an Azure service principal client secret.",
+        "Uses a dedicated GitHub Actions Pages publishing token only for cross-repository publication to Jeysibn/jeysibn.github.io; it is separate from Azure OIDC authentication.",
         "Hashes visitor IP addresses with SHA-256 before storage.",
         "Visitor/rate-limit records use a Cosmos DB TTL of 86400 seconds.",
         "Backend dependencies are audited during PR validation.",
@@ -225,7 +238,9 @@
         "Portfolio-specific AI assistant.",
         "Per-IP AI chat rate limit of 10 messages per hour.",
         "Session-based browser chat history.",
-        "Automated frontend, backend, and infrastructure deployment."
+        "Live Azure Functions health monitor with build-derived release metadata and Manila time.",
+        "Interactive whole-card project details with lightweight WebP architecture previews and full-resolution diagrams loaded only on explicit zoom.",
+        "Automated frontend, backend, and infrastructure deployment with post-deployment verification."
       ],
       "testing": [
         "pytest tests cover visitor-counter logic, AI chat behavior, route behavior, and lazy AI client initialization.",
@@ -234,10 +249,11 @@
       "operational_lessons": [
         "A deployment pipeline can report successful package deployment even when runtime routes are not healthy, so deployment success and runtime readiness should be treated as separate signals.",
         "Optional external integrations should not be initialized at module import time because configuration failures can break function discovery.",
-        "The project roadmap includes post-deploy health checks and observability to detect runtime failures automatically."
+        "Post-deployment health/API checks and Azure-native observability are implemented so runtime verification follows deployment rather than relying on upload success alone."
       ],
       "cost_awareness": [
         "Uses Azure Functions Linux Consumption (Y1), Standard LRS storage, and Cosmos DB free tier to stay suitable for an Azure for Students subscription.",
+        "Log Analytics uses bounded retention and an ingestion cap as telemetry cost guardrails.",
         "Jerome uses an Azure for Students subscription for this project."
       ]
     },
@@ -304,7 +320,7 @@
     "Advanced cloud networking and hybrid-cloud topologies.",
     "Optimizing Kubernetes deployments and GitOps workflows using Helm and Argo CD.",
     "Integrating AI agents into CI/CD workflows for operational automation.",
-    "Cloud operations and observability practices for the portfolio, including health checks, monitoring, alerts, and post-deploy verification.",
+    "Continuing to improve Azure observability, frontend performance, and release verification for the Cloud-Backed Portfolio.",
     "Continuing to improve the Enterprise GitOps Homelab and Cloud-Backed Portfolio while actively job hunting."
   ],
   "student_resources": {
@@ -389,7 +405,7 @@
     },
     {
       "question": "Does Jerome have CI/CD experience?",
-      "answer": "Yes. He builds GitHub Actions workflows for development validation, pull-request production-readiness checks, Terraform planning, dependency auditing, package creation, and path-specific production deployments. His homelab also uses CI quality gates before GitOps reconciliation."
+      "answer": "Yes. He builds GitHub Actions workflows for React/TypeScript frontend validation, backend linting/tests and packaging, dependency auditing, authenticated Terraform planning, path-specific production deployments, and cross-repository GitHub Pages publication. His homelab also uses CI quality gates before GitOps reconciliation."
     },
     {
       "question": "How does Jerome use GitOps?",
@@ -397,7 +413,7 @@
     },
     {
       "question": "What observability tools has Jerome used?",
-      "answer": "Jerome uses Prometheus, Grafana, and Loki in his Kubernetes home lab. He is also planning stronger Azure observability, health checks, and alerting for his cloud portfolio."
+      "answer": "Jerome uses Prometheus, Grafana, and Loki in his Kubernetes home lab, and Azure Application Insights plus Log Analytics in his cloud portfolio for request, failure, latency, exception, and operational telemetry."
     },
     {
       "question": "What certifications does Jerome hold?",

@@ -6,7 +6,7 @@ This runbook documents common operational checks and recovery steps for the Clou
 
 ## Check Deployment Status
 
-Start with GitHub Actions.
+Start with GitHub Actions in `Jeysibn/portfolio`.
 
 Expected production workflows:
 
@@ -20,42 +20,104 @@ A successful deployment job is not the same as runtime readiness. Verify the aff
 
 ## Frontend Incident
 
+### Current publication model
+
+The frontend source and generated Pages site are separate:
+
+```text
+Source:       Jeysibn/portfolio
+Publication:  Jeysibn/jeysibn.github.io
+Live URL:     https://jeysibn.github.io/
+```
+
+The source repository is authoritative. Do not treat direct edits in the publication repository as the normal recovery mechanism.
+
 ### Symptoms
 
 - portfolio page does not load;
 - latest frontend changes are missing;
-- GitHub Pages deployment failed;
-- theme controls are unreadable;
+- Pages publication failed;
+- the dedicated Pages repository was not updated;
+- theme controls behave incorrectly;
 - project/skill dialogs do not open;
+- architecture previews are missing or the full-resolution zoom does not load;
 - the closed chatbot blocks clicks underneath it;
-- the health monitor or Release age presentation looks incorrect.
+- the health monitor or Release age presentation looks incorrect;
+- navigation scroll alignment or active-section state is incorrect.
 
 ### Checks
 
-1. Open the latest `Deploy Frontend to GitHub Pages` workflow run.
-2. Confirm the Vite build and `dist/` artifact verification passed.
-3. Confirm the Pages artifact upload completed.
-4. Confirm the Pages deployment step completed.
-5. Confirm the live-page verification passed.
-6. Verify the repository Pages configuration still points to GitHub Actions.
-7. Check browser developer tools for static asset failures and API failures separately.
+1. Open the latest **Publish Frontend to GitHub Pages** workflow run in `Jeysibn/portfolio`.
+2. Confirm dependency installation, TypeScript validation, Vite build, and `dist/` artifact verification passed.
+3. Confirm checkout of `Jeysibn/jeysibn.github.io` succeeded.
+4. Confirm the publish step synchronized `frontend/app/dist/` to the publication repository and pushed a generated commit when content changed.
+5. Confirm `PAGES_DEPLOY_TOKEN` is present as a repository secret if the cross-repository checkout/push fails. Do not print its value.
+6. Confirm the final smoke verification against `https://jeysibn.github.io/` passed.
+7. If the workflow pushed successfully but the live page is stale, inspect the Pages configuration and latest commit in `Jeysibn/jeysibn.github.io`.
+8. Check browser developer tools for static asset failures, architecture-preview failures, and API failures separately.
 
 ### Frontend smoke checklist
 
 After a frontend release, verify:
 
-- the page loads in Dark, Light, and System themes;
-- the theme selector remains readable in each theme;
+- `https://jeysibn.github.io/` loads successfully;
+- the hero headline displays **Jerome Christian Ibon** and supporting Cloud/DevOps role positioning;
+- no navigation item is active while still inside the hero;
+- navigation order is About → Projects → Experience → Skills → Certifications → Resume → Contact;
+- navigation lands sections below the sticky header without centering the heading in the viewport;
+- the theme icon toggles Light/Dark and persists the selected value;
+- with no saved theme, initial load follows the browser/OS preference;
 - the hero health monitor transitions from Checking to the appropriate state;
 - Release age is displayed as release metadata rather than uptime;
+- phone-sized monitoring metrics remain readable with clean separators;
 - project cards open centered project-detail dialogs;
-- architecture diagrams zoom in-page rather than navigating to raw image URLs;
+- project cards/details use lightweight architecture previews during normal browsing;
+- the original full-resolution diagram is requested only when architecture zoom is explicitly opened;
 - skill cards open their detail dialogs;
 - certification descriptions are readable through hover/focus behavior;
-- the resume is visible without requiring a download;
+- the resume is visible on-page and the PDF download works;
 - the Contact CTA is reachable from the hero;
 - closing the chatbot leaves underlying page elements clickable;
-- keyboard focus remains visible on interactive cards and controls.
+- keyboard focus remains visible on interactive cards and controls;
+- About heading/body spacing and the `cat philosophy.txt` principles card remain visually balanced at desktop and mobile sizes.
+
+## Frontend Network and Performance Checks
+
+### Do not compare `npm run dev` directly with production
+
+Vite development mode serves source modules separately and uses a WebSocket for hot-module replacement. Requests such as React modules, `.tsx` source files, `@react-refresh`, and the Vite client are expected locally and disappear into bundled production assets.
+
+For a production-like local comparison:
+
+```bash
+cd frontend/app
+npm install
+npm run build
+npm run preview
+```
+
+Open the preview URL (normally `http://localhost:4173`), enable **Disable cache** in browser DevTools, and hard refresh.
+
+### Architecture preview behavior
+
+The full architecture PNG files are intentionally large. Normal browsing should use resized WebP previews through `wsrv.nl`.
+
+Expected flow:
+
+```text
+card/detail -> lightweight WebP preview
+explicit architecture zoom -> original PNG
+```
+
+If a project card preview fails:
+
+1. inspect the failed preview URL in the Network panel;
+2. confirm the source GitHub-hosted PNG is publicly reachable;
+3. confirm the preview URL contains the expected source URL and resize/WebP parameters;
+4. test the original PNG independently;
+5. treat a preview-CDN failure separately from an original-asset failure.
+
+A preview service failure should not be confused with Azure API health.
 
 ### Local Vite startup failure
 
@@ -277,7 +339,9 @@ terraform validate
 
 ### Frontend
 
-Revert the offending commit through the normal `dev -> main` pull-request flow. A new merge to `main` rebuilds the Vite artifact, generates a fresh release timestamp, and deploys the corrected static site.
+Revert the offending source commit through the normal `dev -> main` pull-request flow. A new merge to `main` rebuilds the Vite artifact, generates a fresh release timestamp, republishes `Jeysibn/jeysibn.github.io`, and verifies `https://jeysibn.github.io/`.
+
+Avoid treating direct edits in the publication repository as the normal rollback path because they create drift from the source repository.
 
 ### Backend
 
@@ -289,4 +353,4 @@ Do not manually roll back Terraform state. Revert or correct the Terraform confi
 
 ## Operational Principle
 
-The repository is the source of truth for application code and desired infrastructure configuration. Prefer corrective commits and automated delivery over untracked manual production changes.
+`Jeysibn/portfolio` is the source of truth for application code and desired infrastructure configuration. `Jeysibn/jeysibn.github.io` is generated frontend publication output. Prefer corrective commits and automated delivery over untracked manual production changes.
