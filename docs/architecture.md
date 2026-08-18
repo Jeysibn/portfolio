@@ -9,6 +9,7 @@ Browser
   |
   | HTTPS
   v
+https://jeysibn.github.io/
 GitHub Pages
 React + TypeScript SPA
   |
@@ -28,35 +29,57 @@ Azure Functions telemetry ------> Application Insights
                            Log Analytics
 ```
 
+Application source, CI/CD, backend code, and Terraform remain in `Jeysibn/portfolio`. The generated frontend artifact is published to the dedicated Pages repository `Jeysibn/jeysibn.github.io` so the live portfolio can use the root GitHub Pages URL.
+
 Infrastructure is managed with Terraform and delivery is automated with GitHub Actions.
 
 ## Frontend
 
-The frontend is a Vite-built React + TypeScript single-page application hosted on GitHub Pages. Source lives under `frontend/app`; Vite emits the static production artifact to `frontend/app/dist`, and only that generated output is uploaded to GitHub Pages.
+The frontend is a Vite-built React + TypeScript single-page application. Source lives under `frontend/app`; Vite emits the static production artifact to `frontend/app/dist`.
 
-The application uses document-anchor navigation instead of client-side routes. The deployed page presents one continuous About → Experience → Projects → Skills & Tools → Education & Certifications → Resume → Contact flow.
+The application uses document-anchor navigation instead of client-side routes. The visible flow is:
+
+```text
+Hero → About → Projects → Experience → Skills → Education & Certifications → Resume → Contact
+```
+
+Navigation scrolls the selected section to the start of the viewport beneath the sticky header. The hero intentionally has no active navigation item; active-section indication begins when a content section is reached.
 
 ### Frontend responsibilities
 
-- responsive navigation with active-section tracking;
-- System, Light, and Dark theme preferences;
+- responsive desktop and mobile navigation with active-section tracking;
+- compact Light/Dark theme switching with saved-preference persistence and initial system-preference fallback;
 - typed portfolio content rendering;
+- a name-first hero centered on `Jerome Christian Ibon` with Cloud Support / DevOps / Cloud Engineering positioning;
 - live Azure Function `/api/health` status;
 - build-derived release-age display;
 - live Manila time in the monitoring panel;
+- responsive monitoring-card geometry, including single-column phone metrics;
 - visitor-counter display;
 - AI assistant conversation state and session history;
 - whole-card project-detail interaction;
 - centered project-detail dialogs;
-- in-page architecture-diagram zoom;
+- lightweight project architecture previews;
+- in-page full-resolution architecture zoom;
 - clickable skill-detail dialogs;
 - provider-styled certification cards;
-- fully visible on-page resume plus print/save output;
+- fully visible on-page resume plus direct PDF download;
 - keyboard focus behavior and reduced-motion support.
 
 The AI interface remains provider-neutral so backend model/provider changes do not require frontend branding changes.
 
 The frontend never receives the AI provider secret or Azure connection strings. Sensitive provider interaction remains server-side.
+
+## Theme Behavior
+
+Theme selection is intentionally compact in the current UI.
+
+On initial load:
+
+1. if `color-theme` contains `light` or `dark`, the saved value is applied;
+2. otherwise the browser operating-system preference is used.
+
+The visible header control toggles between Light and Dark and persists the selected value. Theme changes update the document color scheme and browser theme-color metadata.
 
 ## Frontend Monitoring Semantics
 
@@ -72,7 +95,37 @@ It does **not** query Cosmos DB or the external AI provider, so an Operational h
 
 The frontend build injects a compile-time timestamp through Vite. The UI calculates **Release age** from that timestamp and resets naturally with every new frontend build/release.
 
-Release age is **not server uptime**. Azure Functions is serverless and may scale or recycle instances independently of the frontend release lifecycle. The frontend only advances the release-age presentation while the production health check is Operational.
+Release age is **not server uptime**. Azure Functions is serverless and may scale or recycle instances independently of the frontend release lifecycle.
+
+## Architecture Image Delivery
+
+The project showcase contains large architecture diagrams. The original PNG files remain the full-resolution source assets, but normal portfolio browsing does not fetch those originals immediately.
+
+```text
+Project card
+   |
+   v
+lazy-loaded resized WebP preview
+   |
+   v
+Project details
+   |
+   v
+same lightweight preview
+   |
+   | explicit "open architecture" action
+   v
+original full-resolution PNG
+```
+
+Preview transformation uses `wsrv.nl` with width, WebP, quality, and no-upscale parameters. Only public diagram URLs are passed to that service; no credentials or application data are involved.
+
+The original diagram locations remain the source of truth:
+
+- Cloud-Backed Portfolio architecture: public GitHub-hosted PNG in `Jeysibn/portfolio`;
+- Homelab GitOps architecture: public GitHub-hosted PNG in `Jeysibn/homelab-gitops`.
+
+This split keeps normal page-transfer cost low while preserving a full-resolution inspection path for visitors who request it.
 
 ## Backend
 
@@ -193,7 +246,7 @@ Two long-lived branches are used:
 - `dev` — development and integration
 - `main` — protected production
 
-Scoped feature branches are used for larger changes before integration into `dev`.
+Scoped feature branches may be used for larger changes before integration into `dev`.
 
 ### Development validation
 
@@ -212,14 +265,41 @@ A `dev → main` pull request builds the frontend artifact, validates the backen
 
 Dependabot uses a backend-disabled Terraform validation path without Azure login because repository secrets are intentionally unavailable to Dependabot.
 
-### Production deployment
+### Frontend production deployment
+
+The source repository does not directly host the production Pages branch. After a frontend-affecting merge to `main`:
+
+```text
+Jeysibn/portfolio main
+        |
+        | build frontend/app/dist/
+        v
+GitHub Actions frontend-deploy.yml
+        |
+        | PAGES_DEPLOY_TOKEN
+        v
+checkout Jeysibn/jeysibn.github.io@main
+        |
+        | rsync --delete dist/ → repository root
+        | create .nojekyll
+        | commit generated site
+        v
+push main
+        |
+        v
+https://jeysibn.github.io/
+        |
+        v
+live-page smoke verification
+```
+
+`Jeysibn/portfolio` remains the source of truth. `Jeysibn/jeysibn.github.io` is treated as the generated publication repository.
+
+### Backend and infrastructure production deployment
 
 After merge into `main`, path-specific workflows deploy only the affected layer:
 
 ```text
-frontend/**
-  React/Vite build → GitHub Pages → live page verification
-
 backend/**
   Azure Functions deploy → /health verification → visitor API smoke test
 
@@ -233,7 +313,9 @@ Documentation-only changes do not trigger application or infrastructure deployme
 
 GitHub Actions authenticates to Azure using OpenID Connect workload identity federation with Microsoft Entra ID. GitHub receives a short-lived OIDC token for each eligible workflow job and exchanges it for Azure credentials.
 
-Application secrets such as the AI provider key are managed separately from Azure workload identity.
+Frontend publication to the separate GitHub Pages repository is a different trust boundary. It uses the repository secret `PAGES_DEPLOY_TOKEN` only for checkout/push access to `Jeysibn/jeysibn.github.io`; it is not used for Azure authentication.
+
+Application secrets such as the AI provider key are managed separately from both deployment mechanisms.
 
 See [azure-oidc.md](azure-oidc.md).
 
@@ -246,11 +328,13 @@ The project favors:
 - short-lived cloud credentials;
 - explicit application-secret handling;
 - automated validation before production;
+- generated frontend publication from a separate source repository;
 - post-deployment verification rather than upload-only success;
 - observable runtime behavior;
 - accurate monitoring semantics rather than decorative uptime claims;
 - typed frontend/backend contracts where practical;
 - accessible interaction patterns;
+- performance-aware asset loading;
 - low operational cost;
 - explicit documentation;
 - enough separation to stay maintainable without unnecessary enterprise complexity.
