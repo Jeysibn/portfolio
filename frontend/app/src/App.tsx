@@ -97,7 +97,7 @@ const certificationDetails = [
     name: "HashiCorp Certified: Terraform Associate (004)",
     provider: "IN PROGRESS",
     mark: "HashiCorp",
-    tone: "current cert-card-hashicorp",
+    tone: "hashicorp",
     description:
       "Currently studying for Terraform Associate (004), building on hands-on Terraform use across Azure infrastructure and Proxmox homelab provisioning.",
   },
