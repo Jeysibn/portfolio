@@ -13,6 +13,9 @@ def test_assistant_prompt_contains_behavior_rules():
     assert "never mention" in prompt
     assert "do not use emojis" in prompt
     assert "plain text only" in prompt
+    assert "not a general-purpose ai assistant" in prompt
+    assert "do not provide standalone coding help" in prompt
+    assert "do not answer any part" in prompt
 
 
 def test_build_chat_messages_separates_prompt_and_portfolio_facts():
@@ -59,6 +62,34 @@ def test_sanitize_ai_response_keeps_technical_wildcards():
     response = 'kubectl get pods --selector="app=*"'
 
     assert sanitize_ai_response(response) == response
+
+
+@pytest.mark.parametrize(
+    "message",
+    [
+        "1 + 10",
+        "Give me simple Python code that prints hello world",
+        "Write a JavaScript function for me",
+        "Create a Dockerfile for my app",
+        "Debug my Python code",
+        "Teach me Kubernetes",
+    ],
+)
+def test_generic_requests_are_rejected_without_ai(message):
+    assert function_app.is_obviously_out_of_scope(message)
+
+
+@pytest.mark.parametrize(
+    "message",
+    [
+        "How did Jerome use Terraform?",
+        "Can you explain Jerome's Kubernetes project?",
+        "Is Jerome qualified for a junior DevOps role?",
+        "What technologies are shown in this portfolio?",
+    ],
+)
+def test_portfolio_requests_are_not_rejected(message):
+    assert not function_app.is_obviously_out_of_scope(message)
 
 
 def test_rate_limit_message_has_no_emoji():
