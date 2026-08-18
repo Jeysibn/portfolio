@@ -93,6 +93,14 @@ const certificationDetails = [
     description:
       "Covers Git and GitHub fundamentals, repositories, collaboration workflows, project management, and modern development practices.",
   },
+  {
+    name: "HashiCorp Certified: Terraform Associate (004)",
+    provider: "IN PROGRESS",
+    mark: "HashiCorp",
+    tone: "current cert-card-hashicorp",
+    description:
+      "Currently studying for Terraform Associate (004), building on hands-on Terraform use across Azure infrastructure and Proxmox homelab provisioning.",
+  },
 ] as const;
 
 const skillCodes = ["CLOUD", "K8S", "CI/CD", "OBS", "NET", "OPS"] as const;
