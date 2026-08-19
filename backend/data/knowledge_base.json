@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "last_updated": "2026-08-18",
+    "last_updated": "2026-08-19",
     "purpose": "Authoritative knowledge source for Jerome Ibon's portfolio AI assistant.",
     "scope": "Professional background, education, certifications, technical skills, projects, career interests, availability, and current learning.",
     "accuracy_note": "Professional employment and personal/home-lab project experience are intentionally distinguished to avoid overstating production experience."
@@ -67,6 +67,15 @@
     "Oracle Cloud Infrastructure (OCI) Foundations Associate",
     "Trend Vision One Server and Workload Protection Professional",
     "GitHub Foundations"
+  ],
+  "certifications_in_progress": [
+    {
+      "name": "HashiCorp Certified: Terraform Associate (004)",
+      "provider": "HashiCorp",
+      "status": "Currently studying",
+      "earned": false,
+      "context": "Jerome is currently studying for the HashiCorp Certified: Terraform Associate (004) exam, building on hands-on Terraform use in his Azure portfolio infrastructure and Proxmox homelab provisioning."
+    }
   ],
   "technical_skills": {
     "cloud_and_virtualization": [
@@ -317,6 +326,7 @@
     }
   ],
   "current_learning": [
+    "Studying for HashiCorp Certified: Terraform Associate (004).",
     "Advanced cloud networking and hybrid-cloud topologies.",
     "Optimizing Kubernetes deployments and GitOps workflows using Helm and Argo CD.",
     "Integrating AI agents into CI/CD workflows for operational automation.",
@@ -337,7 +347,7 @@
   "frequently_asked_questions": [
     {
       "question": "What is Jerome doing currently?",
-      "answer": "Jerome is actively job hunting while upskilling through hands-on Cloud and DevOps projects, primarily his Enterprise GitOps Homelab and Cloud-Backed Portfolio."
+      "answer": "Jerome is actively job hunting while upskilling through hands-on Cloud and DevOps projects, primarily his Enterprise GitOps Homelab and Cloud-Backed Portfolio. He is also currently studying for HashiCorp Certified: Terraform Associate (004)."
     },
     {
       "question": "When can Jerome start?",
@@ -417,7 +427,11 @@
     },
     {
       "question": "What certifications does Jerome hold?",
-      "answer": "Oracle Cloud Infrastructure Foundations Associate, Trend Vision One Server and Workload Protection Professional, and GitHub Foundations."
+      "answer": "Oracle Cloud Infrastructure Foundations Associate, Trend Vision One Server and Workload Protection Professional, and GitHub Foundations. HashiCorp Certified: Terraform Associate (004) is currently being studied for and is not yet an earned certification."
+    },
+    {
+      "question": "What certification is Jerome currently studying for?",
+      "answer": "Jerome is currently studying for HashiCorp Certified: Terraform Associate (004). It is in progress and should not be described as an earned certification."
     },
     {
       "question": "Does Jerome have networking experience?",
@@ -439,6 +453,7 @@
   "response_guardrails": [
     "Answer only from facts present in this knowledge base.",
     "Do not invent employment, certifications, project results, production responsibilities, or years of experience.",
+    "Do not describe HashiCorp Certified: Terraform Associate (004) as earned, held, passed, or completed; Jerome is currently studying for it and it remains in progress.",
     "Clearly distinguish professional employment from personal portfolio and home-lab project experience.",
     "Do not convert personal observations such as approximately one month without observed downtime into an uptime percentage or SLA.",
     "Do not describe the current Raspberry Pi 4B as a Kubernetes node; it currently provides remote connectivity through Tailscale.",

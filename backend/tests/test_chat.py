@@ -16,6 +16,8 @@ def test_assistant_prompt_contains_behavior_rules():
     assert "not a general-purpose ai assistant" in prompt
     assert "do not provide standalone coding help" in prompt
     assert "do not answer any part" in prompt
+    assert "in progress" in prompt
+    assert "must never be described as earned" in prompt
 
 
 def test_build_chat_messages_separates_prompt_and_portfolio_facts():
@@ -101,6 +103,20 @@ def test_load_knowledge_base_returns_dictionary():
 
     assert isinstance(knowledge_base, dict)
     assert knowledge_base
+
+
+def test_terraform_associate_is_recorded_as_in_progress_not_earned():
+    knowledge_base = load_knowledge_base()
+    terraform_name = "HashiCorp Certified: Terraform Associate (004)"
+
+    assert terraform_name not in knowledge_base["certifications"]
+    current = knowledge_base["certifications_in_progress"]
+    terraform = next(item for item in current if item["name"] == terraform_name)
+
+    assert terraform["earned"] is False
+    assert terraform["status"] == "Currently studying"
+    assert any(terraform_name in item for item in knowledge_base["current_learning"])
+    assert any("do not describe hashicorp certified" in item.lower() for item in knowledge_base["response_guardrails"])
 
 
 def test_ai_client_is_lazy_at_module_import():
