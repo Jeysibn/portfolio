@@ -204,7 +204,7 @@
 }
 
 /* Current certification study status: active without competing with earned credentials. */
-.cert-card-current {
+.cert-card-hashicorp {
   grid-column: 1 / -1;
   min-height: 188px;
   isolation: isolate;
@@ -218,14 +218,14 @@
     0 16px 42px color-mix(in srgb, var(--violet) 8%, transparent);
 }
 
-.cert-card-current::before {
+.cert-card-hashicorp::before {
   inset: auto -28px -46px auto;
   width: 150px;
   height: 150px;
   background: color-mix(in srgb, var(--violet) 12%, transparent);
 }
 
-.cert-card-current::after {
+.cert-card-hashicorp::after {
   content: "";
   position: absolute;
   z-index: 3;
@@ -239,8 +239,8 @@
   animation: certification-border-scan 5.4s ease-in-out infinite;
 }
 
-.cert-card-current:hover,
-.cert-card-current:focus-visible {
+.cert-card-hashicorp:hover,
+.cert-card-hashicorp:focus-visible {
   border-color: color-mix(in srgb, var(--violet) 62%, var(--cyan));
   box-shadow:
     0 20px 48px rgb(0 0 0 / 0.18),
@@ -254,7 +254,7 @@
   letter-spacing: -0.03em;
 }
 
-.cert-card-current .cert-provider {
+.cert-card-hashicorp .cert-provider {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -267,7 +267,7 @@
   letter-spacing: 0.08em;
 }
 
-.cert-card-current .cert-provider::before {
+.cert-card-hashicorp .cert-provider::before {
   content: "";
   width: 7px;
   height: 7px;
@@ -280,16 +280,16 @@
   animation: certification-status-pulse 2.5s ease-in-out infinite;
 }
 
-.cert-card-current .cert-card-topline {
+.cert-card-hashicorp .cert-card-topline {
   margin-bottom: 18px;
 }
 
-.cert-card-current h3 {
+.cert-card-hashicorp h3 {
   max-width: 44ch;
   font-size: clamp(1rem, 1.5vw, 1.18rem);
 }
 
-.cert-card-current .cert-description {
+.cert-card-hashicorp .cert-description {
   position: relative;
   inset: auto;
   display: block;
@@ -302,7 +302,7 @@
   transform: none;
 }
 
-.cert-card-current .cert-description::after {
+.cert-card-hashicorp .cert-description::after {
   content: "";
   position: absolute;
   left: 0;
@@ -354,23 +354,23 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cert-card-current::after,
-  .cert-card-current .cert-provider::before,
-  .cert-card-current .cert-description::after {
+  .cert-card-hashicorp::after,
+  .cert-card-hashicorp .cert-provider::before,
+  .cert-card-hashicorp .cert-description::after {
     animation: none !important;
   }
 
-  .cert-card-current::after {
+  .cert-card-hashicorp::after {
     left: 0;
     width: 100%;
     opacity: 0.55;
   }
 
-  .cert-card-current .cert-provider::before {
+  .cert-card-hashicorp .cert-provider::before {
     box-shadow: none;
   }
 
-  .cert-card-current .cert-description::after {
+  .cert-card-hashicorp .cert-description::after {
     background-position: 50% 0;
   }
 }
@@ -441,11 +441,11 @@
     padding-inline: 14px;
   }
 
-  .cert-card-current {
+  .cert-card-hashicorp {
     min-height: 210px;
   }
 
-  .cert-card-current .cert-card-topline {
+  .cert-card-hashicorp .cert-card-topline {
     align-items: flex-start;
   }
 
