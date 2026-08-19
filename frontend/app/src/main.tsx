@@ -94,6 +94,11 @@ function updateStaticCopy() {
     resumeIntro.textContent = "Everything important is visible here. Download the PDF directly, or review the on-page resume details below.";
   }
 
+  const contactHeading = document.querySelector<HTMLElement>("#contact .contact-intro h3");
+  if (contactHeading) {
+    contactHeading.textContent = "I’m open to professional opportunities, collaborations, and meaningful conversations.";
+  }
+
   renderThemeButton(currentTheme());
 }
 
