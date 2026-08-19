@@ -15,6 +15,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and 
 - **Optimized architecture previews**: Project cards and normal project-detail views now request resized WebP previews instead of immediately downloading the original multi-megabyte PNG diagrams.
 - **Deferred full-resolution architecture loading**: Original architecture PNGs are loaded only after the visitor explicitly opens the architecture zoom.
 - **Static frontend assets**: Added a generated resume PDF, favicon, and social-preview asset to the Vite public output.
+- **Terraform Associate study credential**: Added `HashiCorp Certified: Terraform Associate (004)` to the Certifications section as a clearly marked `IN PROGRESS` credential with a restrained border scan, pulsing status indicator, moving progress accent, responsive behavior, and a static reduced-motion fallback.
+- **Certification-state AI guardrail**: Added structured `certifications_in_progress` knowledge, recruiter-facing FAQ coverage, and tests so the portfolio assistant can discuss the Terraform Associate study accurately without presenting it as an earned certification.
 
 ### Changed
 
@@ -29,6 +31,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and 
 - **About section composition**: Preserved the side-by-side desktop design while tightening heading/body spacing and aligning the terminal-style `cat philosophy.txt` principles card with the About copy.
 - **Frontend deployment flow**: The production workflow now builds `frontend/app/dist/`, checks out `Jeysibn/jeysibn.github.io`, synchronizes the generated artifact with `rsync --delete`, commits the result, pushes to the Pages repository, and verifies the root production URL.
 - **Frontend local-performance guidance**: Production-style local comparisons now use `npm run build` + `npm run preview` instead of judging request count from Vite development mode.
+- **Portfolio assistant knowledge**: Current learning now includes active preparation for Terraform Associate (004), while the earned-certification list remains limited to certifications already completed.
 
 ### Fixed
 
