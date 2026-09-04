@@ -652,3 +652,262 @@
     padding-inline: 12px;
   }
 }
+
+/* ============================================================
+   Direction B redesign — bold type + line illustration, cool
+   sage-biased monochrome, single cobalt accent. Overrides the
+   legacy terminal/dashboard hero + AI-generated diagram framing.
+   This block intentionally loads last (ui-adjustments.css is the
+   final stylesheet import) so its tokens win the cascade over the
+   older palette blocks earlier in styles.css.
+============================================================ */
+
+:root {
+  --bg: #10160f;
+  --bg-elevated: #151d13;
+  --surface: #171f15;
+  --surface-strong: #1c261a;
+  --text: #eef1ec;
+  --muted: #8e988e;
+  --faint: #6d7770;
+  --line: rgb(150 170 150 / 0.14);
+  --line-strong: rgb(150 170 150 / 0.26);
+  --accent: #7d9bff;
+  --accent-soft: #b7c6ff;
+  --accent-ink: #0c1330;
+  --cyan: #7d9bff;
+  --violet: #7d9bff;
+  --blue: #7d9bff;
+  --success: #7bd99a;
+  --danger: #ff9b9b;
+  --shadow: 0 20px 48px rgb(0 0 0 / 0.32);
+  --sans: "Work Sans", ui-sans-serif, system-ui, sans-serif;
+  --display: "Big Shoulders Display", ui-sans-serif, sans-serif;
+}
+
+:root[data-theme="light"] {
+  --bg: #f2f4f1;
+  --bg-elevated: #ebeee9;
+  --surface: #ffffff;
+  --surface-strong: #e6ebe4;
+  --text: #131a17;
+  --muted: #5b665f;
+  --faint: #778077;
+  --line: rgb(50 70 55 / 0.14);
+  --line-strong: rgb(50 70 55 / 0.26);
+  --accent: #2f4b8f;
+  --accent-soft: #24386e;
+  --accent-ink: #eef2ff;
+  --cyan: #2f4b8f;
+  --violet: #2f4b8f;
+  --blue: #2f4b8f;
+  --success: #16794a;
+  --danger: #a52828;
+  --shadow: 0 20px 48px rgb(29 42 34 / 0.12);
+}
+
+body,
+.hero-copy,
+.hero-opportunity,
+.about-layout,
+.contact-panel {
+  font-family: var(--sans);
+}
+
+body {
+  background: var(--bg) !important;
+}
+
+/* Kill the old decorative glow / gradient / pulse layer site-wide */
+body::before,
+.site-shell::before,
+.hero-section::after,
+.hero-copy::before,
+.status-console::before,
+.status-console::after {
+  display: none !important;
+}
+
+*,
+*::before,
+*::after {
+  animation-name: none !important;
+}
+
+[data-reveal] {
+  animation: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* ---------- Hero: bold headline + line illustration ---------- */
+.hero-section-b {
+  padding-block: clamp(48px, 8vw, 96px);
+}
+
+.hero-grid-b {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(240px, 0.85fr);
+  gap: clamp(32px, 5vw, 64px);
+  align-items: center;
+}
+
+.hero-copy-b {
+  max-width: none;
+}
+
+.hero-eyebrow-b {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 20px;
+}
+
+.hero-title-b {
+  font-family: var(--display);
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: clamp(2.6rem, 6.2vw, 4.6rem);
+  line-height: 0.94;
+  letter-spacing: -0.01em;
+  margin: 0 0 20px;
+  color: var(--text);
+  text-wrap: balance;
+}
+
+.hero-role-b {
+  font-family: var(--sans);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--accent);
+  margin: 0 0 14px;
+}
+
+.hero-opportunity {
+  max-width: 46ch;
+  color: var(--muted);
+}
+
+.availability-pill-b {
+  margin: 24px 0;
+}
+
+.hero-actions-b {
+  margin-top: 8px;
+}
+
+.hero-illo-b {
+  width: 100%;
+  height: auto;
+  max-width: 320px;
+  justify-self: center;
+  color: var(--text);
+}
+
+.hero-illo-accent {
+  color: var(--accent);
+}
+
+@media (max-width: 900px) {
+  .hero-grid-b {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-illo-b {
+    order: -1;
+    max-width: 220px;
+  }
+}
+
+/* ---------- Status strip: quiet, compact, relocated out of the hero ---------- */
+.status-strip {
+  margin: 0 auto;
+  max-width: 1180px;
+  padding: 20px clamp(20px, 4vw, 48px) 8px;
+}
+
+.status-strip-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px clamp(18px, 3vw, 32px);
+  padding: 16px clamp(16px, 3vw, 24px);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.status-strip-inner .service-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding-right: clamp(18px, 3vw, 32px);
+  border-right: 1px solid var(--line);
+}
+
+.status-strip-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.74rem;
+  color: var(--muted);
+}
+
+.status-strip-row dt {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--faint);
+}
+
+.status-strip-row dt::after {
+  content: ":";
+}
+
+.status-strip-row dd {
+  margin: 0;
+  color: var(--text);
+}
+
+.status-strip-row dd.status-value-good {
+  color: var(--success);
+}
+
+.status-strip .status-note {
+  margin: 10px clamp(16px, 3vw, 24px) 0;
+  font-size: 0.78rem;
+  color: var(--faint);
+}
+
+@media (max-width: 640px) {
+  .status-strip-inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .status-strip-inner .service-state {
+    border-right: none;
+    padding-right: 0;
+  }
+}
+
+/* ---------- Flatten remaining card/glow surfaces to match the new discipline ---------- */
+.project-row,
+.skill-card,
+.education-block,
+.cert-card,
+.resume-preview,
+.contact-panel {
+  box-shadow: none;
+}
+
+.project-visual {
+  background: var(--bg-elevated);
+}

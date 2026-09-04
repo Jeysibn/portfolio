@@ -202,6 +202,7 @@ function App() {
           <Skills onOpenSkill={setSelectedSkill} />
           <Credentials />
           <Resume />
+          <StatusStrip />
           <Contact />
         </main>
 
@@ -367,22 +368,27 @@ function ThemeSelect({
 
 function Hero() {
   return (
-    <section className="hero-section" aria-labelledby="hero-title">
-      <div className="hero-grid">
-        <div className="hero-copy">
-          <div className="availability-pill">
+    <section className="hero-section hero-section-b" aria-labelledby="hero-title">
+      <div className="hero-grid hero-grid-b">
+        <div className="hero-copy hero-copy-b">
+          <p className="hero-eyebrow-b">Portfolio — {new Date().getFullYear()}</p>
+          <h1 id="hero-title" className="hero-title-b">
+            Jerome
+            <br />
+            Christian
+            <br />
+            Ibon
+          </h1>
+          <p className="hero-role-b">Cloud Support · DevOps · Cloud Engineering</p>
+          <p className="hero-opportunity">
+            Computer Engineering graduate building cloud infrastructure, automated delivery pipelines, Kubernetes environments, and observable systems.
+          </p>
+          <div className="availability-pill availability-pill-b">
             <span className="availability-dot" aria-hidden="true" />
             <span>Open to opportunities</span>
             <span className="availability-detail">Entry-level Cloud &amp; DevOps roles</span>
           </div>
-          <h1 id="hero-title" style={{ maxWidth: "18ch" }}>Jerome Christian Ibon</h1>
-          <p className="hero-intro" style={{ maxWidth: "none", color: "var(--text)", fontWeight: 600 }}>
-            Cloud Support · DevOps · Cloud Engineering
-          </p>
-          <p className="hero-opportunity">
-            Computer Engineering graduate building cloud infrastructure, automated delivery pipelines, Kubernetes environments, and observable systems.
-          </p>
-          <div className="hero-actions">
+          <div className="hero-actions hero-actions-b">
             <a href="#contact" className="button button-primary">
               Contact me <ArrowDownIcon />
             </a>
@@ -392,13 +398,39 @@ function Hero() {
           </div>
         </div>
 
-        <SystemStatus />
+        <HeroIllustration />
       </div>
     </section>
   );
 }
 
-function SystemStatus() {
+function HeroIllustration() {
+  return (
+    <svg
+      className="hero-illo-b"
+      viewBox="0 0 240 260"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      role="img"
+      aria-label="Line illustration of a cloud connected to two server nodes"
+    >
+      <path d="M60 210 C 60 150, 40 140, 55 90 C 65 55, 100 40, 120 60" />
+      <circle cx="120" cy="60" r="16" />
+      <path d="M60 210 L 60 236 M 100 214 L 100 240 M 40 214 L 30 236" />
+      <path d="M20 168 h30 M18 180 h34" />
+      <rect x="130" y="120" width="34" height="30" rx="2" />
+      <rect x="176" y="150" width="34" height="30" rx="2" className="hero-illo-accent" />
+      <rect x="130" y="180" width="34" height="30" rx="2" />
+      <path d="M147 120 L 147 100 L 120 76" />
+      <path d="M164 135 L 200 135 L 200 150" className="hero-illo-accent" />
+    </svg>
+  );
+}
+
+function StatusStrip() {
   const [state, setState] = useState<"checking" | "healthy" | "degraded">("checking");
   const releaseAge = useReleaseAge();
   const manilaTime = useClock(manilaTimeFormatter, 1_000);
@@ -420,31 +452,17 @@ function SystemStatus() {
   const releaseStamp = hasValidBuildTimestamp ? releaseFormatter.format(buildStartedAt) : "local build";
 
   return (
-    <aside className="status-console hero-status" aria-label="Live portfolio service status">
-      <div className="status-console-topline">
-        <span>Live service check</span>
+    <aside className="status-strip" aria-label="Live portfolio service status">
+      <div className="status-strip-inner">
         <span className={`service-state service-state-${state}`}>
           <span className="state-dot" aria-hidden="true" /> {stateLabel}
         </span>
+        <StatusRow label="API" value="Azure Functions" />
+        <StatusRow label="Release" value={releaseStamp} />
+        <StatusRow label="Release age" value={releaseAge} />
+        <StatusRow label="Delivery" value="GitHub Actions" />
+        <StatusRow label="Manila" value={manilaTime} />
       </div>
-      <dl className="status-list monitor-groups">
-        <div className="monitor-group" aria-label="Service health">
-          <StatusRow label="API" value="Azure Functions" />
-          <StatusRow label="Health" value={stateLabel} emphasis={state === "healthy"} />
-          <StatusRow label="Probe" value={state === "healthy" ? "Passing" : stateLabel} />
-        </div>
-        <div className="monitor-group" aria-label="Release information">
-          <StatusRow label="Release" value={releaseStamp} />
-          <StatusRow label="Release age" value={releaseAge} />
-          <StatusRow label="Delivery" value="GitHub Actions" />
-        </div>
-        <div className="monitor-group" aria-label="Runtime context">
-          <StatusRow label="Infrastructure" value="Terraform" />
-          <StatusRow label="Telemetry" value="Application Insights" />
-          <StatusRow label="Runtime" value="Serverless" />
-          <StatusRow label="Manila" value={manilaTime} />
-        </div>
-      </dl>
       <p className="status-note">Health is checked against the production API when this page loads.</p>
     </aside>
   );
@@ -452,7 +470,7 @@ function SystemStatus() {
 
 function StatusRow({ label, value, emphasis = false }: { label: string; value: string; emphasis?: boolean }) {
   return (
-    <div>
+    <div className="status-strip-row">
       <dt>{label}</dt>
       <dd className={emphasis ? "status-value-good" : undefined}>{value}</dd>
     </div>
