@@ -373,14 +373,14 @@ function Hero() {
           <div className="availability-pill">
             <span className="availability-dot" aria-hidden="true" />
             <span>Open to opportunities</span>
-            <span className="availability-detail">Cloud · DevOps · Cloud Engineering</span>
+            <span className="availability-detail">Entry-level Cloud &amp; DevOps roles</span>
           </div>
-          <h1 id="hero-title">Aspiring Cloud &amp; DevOps Engineer.</h1>
-          <p className="hero-intro">
-            I’m Jerome, a Computer Engineering graduate focused on Cloud, DevOps, and Cloud Engineering. I turn infrastructure, delivery, and operations into version-controlled systems instead of manual checklists.
+          <h1 id="hero-title" style={{ maxWidth: "18ch" }}>Jerome Christian Ibon</h1>
+          <p className="hero-intro" style={{ maxWidth: "none", color: "var(--text)", fontWeight: 600 }}>
+            Cloud Support · DevOps · Cloud Engineering
           </p>
           <p className="hero-opportunity">
-            I’m currently open to entry-level Cloud Support, DevOps, and Cloud Engineering opportunities.
+            Computer Engineering graduate building cloud infrastructure, automated delivery pipelines, Kubernetes environments, and observable systems.
           </p>
           <div className="hero-actions">
             <a href="#contact" className="button button-primary">
@@ -662,7 +662,7 @@ function Resume() {
     <Section
       id="resume"
       title="Resume"
-      intro="Everything important is visible here. Download the PDF directly, or use print when you want a browser-generated copy."
+      intro="Everything important is visible here. Download the PDF directly, or review the on-page resume details below."
     >
       <article className="resume-preview" data-reveal="">
         <header className="resume-preview-header">
@@ -778,7 +778,7 @@ function Contact() {
             <span className="availability-dot" aria-hidden="true" />
             <span>Open to opportunities</span>
           </div>
-          <h3>Let’s talk about Cloud and DevOps engineering, or the infrastructure problem your team is trying to untangle.</h3>
+          <h3>I’m open to professional opportunities, collaborations, and meaningful conversations.</h3>
           <p>
             I’m interested in entry-level Cloud Support, DevOps, and Cloud Engineering roles where I can keep building production judgment alongside strong engineering teams.
           </p>
