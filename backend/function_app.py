@@ -7,6 +7,7 @@ import time
 import uuid
 
 import azure.functions as func
+from azure.core import MatchConditions
 from azure.cosmos import CosmosClient, exceptions
 from openai import OpenAI, OpenAIError
 
@@ -39,6 +40,7 @@ SERVICE_VERSION = os.environ.get("APP_VERSION", "development")
 
 MAX_MESSAGES = 10
 RESET_PERIOD_SECONDS = 3600
+CONCURRENCY_RETRY_ATTEMPTS = 3
 
 RATE_LIMIT_MESSAGE = (
     "You've reached the maximum limit of 10 messages for this chat session. "
@@ -57,6 +59,8 @@ AI_BASE_URL = os.environ.get("AI_BASE_URL", "https://opencode.ai/zen/v1")
 AI_TEMPERATURE = float(os.environ.get("AI_TEMPERATURE", "0.35"))
 AI_MAX_TOKENS = int(os.environ.get("AI_MAX_TOKENS", "450"))
 
+ALLOWED_ORIGIN = os.environ.get("ALLOWED_ORIGIN", "https://jeysibn.github.io")
+
 GENERIC_CODE_PATTERNS = (
     r"\b(write|create|generate|give me|show me)\b.{0,40}\b(code|script|program|function|dockerfile)\b",
     r"\b(fix|debug|troubleshoot)\b.{0,40}\b(my|this)\b.{0,40}\b(code|script|javascript|python|java|program)\b",
@@ -72,13 +76,13 @@ SIMPLE_CALC_PATTERN = re.compile(
 # CORS HEADERS
 # ---------------------------------------------------------
 COUNTER_HEADERS = {
-    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
     "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type",
 }
 
 AI_HEADERS = {
-    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
     "Access-Control-Allow-Methods": "POST, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type",
 }
@@ -127,7 +131,16 @@ def get_ai_client() -> OpenAI:
 # SHARED HELPERS
 # ---------------------------------------------------------
 def get_client_ip(req: func.HttpRequest) -> str:
-    """Extract the originating client IP from Azure/proxy headers."""
+    """Extract the originating client IP from Azure/proxy headers.
+
+    `X-Forwarded-For` is a comma-separated hop list where each proxy *appends*
+    the address it saw the request come from. The right-most entry is the one
+    added by Azure's own front-end, which the caller cannot forge; a client
+    can freely set the header itself (or any earlier entry) to claim an
+    arbitrary "first" address. Trusting the left-most entry would let a caller
+    spoof the identity used for visitor counting and, more importantly, the
+    per-visitor AI chat rate limit. Always trust the last hop instead.
+    """
     forwarded_for = (
         req.headers.get("x-forwarded-for")
         or req.headers.get("x-client-ip")
@@ -135,7 +148,8 @@ def get_client_ip(req: func.HttpRequest) -> str:
         or "127.0.0.1"
     )
 
-    client_ip = forwarded_for.split(",")[0].strip()
+    hops = [hop.strip() for hop in forwarded_for.split(",") if hop.strip()]
+    client_ip = hops[-1] if hops else "127.0.0.1"
 
     if client_ip.count(":") == 1:
         client_ip = client_ip.split(":")[0]
@@ -237,25 +251,45 @@ def GetVisitorCount(req: func.HttpRequest) -> func.HttpResponse:
         except exceptions.CosmosResourceNotFoundError:
             has_visited = False
 
-        try:
-            item = counter_container.read_item(
-                item=document_id,
-                partition_key=document_id,
-            )
-        except exceptions.CosmosResourceNotFoundError:
-            item = counter_container.create_item(
-                body={"id": document_id, "count": 0}
-            )
+        # `read_item` -> mutate -> `replace_item` is not atomic. Two concurrent
+        # first-time visitors could both read the same count and overwrite each
+        # other's increment. Guard the write with the item's `_etag` so Cosmos
+        # rejects a stale replace, and retry a bounded number of times on the
+        # narrow chance of a genuine race.
+        updated_item = None
+        for _ in range(CONCURRENCY_RETRY_ATTEMPTS):
+            try:
+                item = counter_container.read_item(
+                    item=document_id,
+                    partition_key=document_id,
+                )
+            except exceptions.CosmosResourceNotFoundError:
+                item = counter_container.create_item(
+                    body={"id": document_id, "count": 0}
+                )
 
-        if not has_visited:
-            item["count"] += 1
-            updated_item = counter_container.replace_item(
-                item=document_id,
-                body=item,
+            if not has_visited:
+                item["count"] += 1
+                try:
+                    updated_item = counter_container.replace_item(
+                        item=document_id,
+                        body=item,
+                        etag=item.get("_etag"),
+                        match_condition=MatchConditions.IfNotModified,
+                    )
+                    ips_container.create_item(body={"id": ip_hash})
+                    break
+                except exceptions.CosmosAccessConditionFailedError:
+                    continue
+            else:
+                updated_item = item
+                break
+
+        if updated_item is None:
+            raise exceptions.CosmosHttpResponseError(
+                message="Visitor counter update could not be committed after concurrent retries.",
+                status_code=409,
             )
-            ips_container.create_item(body={"id": ip_hash})
-        else:
-            updated_item = item
 
         log_event(
             "visitor_counter_success",
@@ -304,40 +338,57 @@ def AiChatAssistant(req: func.HttpRequest) -> func.HttpResponse:
         ips_container = database.get_container_client(VISITOR_IPS_CONTAINER_NAME)
         current_time = int(time.time())
 
-        try:
-            rate_doc = ips_container.read_item(
-                item=rate_limit_id,
-                partition_key=rate_limit_id,
-            )
-            last_updated = rate_doc.get("last_updated", 0)
-            window_expired = current_time - last_updated > RESET_PERIOD_SECONDS
+        # Same read-then-write race as the visitor counter: guard the rate-limit
+        # replace with the document's `_etag` and retry on conflict, so two
+        # near-simultaneous requests from the same visitor can't both read the
+        # count before either write lands and slip past the limit.
+        for _ in range(CONCURRENCY_RETRY_ATTEMPTS):
+            try:
+                rate_doc = ips_container.read_item(
+                    item=rate_limit_id,
+                    partition_key=rate_limit_id,
+                )
+                last_updated = rate_doc.get("last_updated", 0)
+                window_expired = current_time - last_updated > RESET_PERIOD_SECONDS
 
-            if window_expired:
-                rate_doc["count"] = 1
-                rate_doc["last_updated"] = current_time
-                ips_container.replace_item(item=rate_limit_id, body=rate_doc)
-            else:
-                current_count = rate_doc.get("count", 0)
-                if current_count >= MAX_MESSAGES:
-                    log_event("ai_chat_rate_limited", request_id)
-                    return func.HttpResponse(
-                        body=json.dumps({"reply": RATE_LIMIT_MESSAGE}),
-                        mimetype="application/json",
-                        status_code=200,
-                        headers={**AI_HEADERS, "X-Correlation-ID": request_id},
+                if window_expired:
+                    rate_doc["count"] = 1
+                    rate_doc["last_updated"] = current_time
+                else:
+                    current_count = rate_doc.get("count", 0)
+                    if current_count >= MAX_MESSAGES:
+                        log_event("ai_chat_rate_limited", request_id)
+                        return func.HttpResponse(
+                            body=json.dumps({"reply": RATE_LIMIT_MESSAGE}),
+                            mimetype="application/json",
+                            status_code=200,
+                            headers={**AI_HEADERS, "X-Correlation-ID": request_id},
+                        )
+                    rate_doc["count"] = current_count + 1
+
+                ips_container.replace_item(
+                    item=rate_limit_id,
+                    body=rate_doc,
+                    etag=rate_doc.get("_etag"),
+                    match_condition=MatchConditions.IfNotModified,
+                )
+                break
+
+            except exceptions.CosmosAccessConditionFailedError:
+                continue
+
+            except exceptions.CosmosResourceNotFoundError:
+                try:
+                    ips_container.create_item(
+                        body={
+                            "id": rate_limit_id,
+                            "count": 1,
+                            "last_updated": current_time,
+                        }
                     )
-
-                rate_doc["count"] = current_count + 1
-                ips_container.replace_item(item=rate_limit_id, body=rate_doc)
-
-        except exceptions.CosmosResourceNotFoundError:
-            ips_container.create_item(
-                body={
-                    "id": rate_limit_id,
-                    "count": 1,
-                    "last_updated": current_time,
-                }
-            )
+                    break
+                except exceptions.CosmosResourceExistsError:
+                    continue
 
         try:
             req_body = req.get_json()
