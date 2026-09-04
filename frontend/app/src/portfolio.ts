@@ -31,8 +31,6 @@ export interface Project {
   highlights: string[];
   technologies: string[];
   repositoryUrl: string;
-  architectureUrl?: string;
-  architectureAlt?: string;
 }
 
 export const navigation = [
@@ -134,9 +132,6 @@ export const projects: Project[] = [
       "Application Insights",
     ],
     repositoryUrl: "https://github.com/Jeysibn/portfolio",
-    architectureUrl:
-      "https://wsrv.nl/?url=https%3A%2F%2Fraw.githubusercontent.com%2FJeysibn%2Fportfolio%2Fmain%2Ffrontend%2Fassets%2Farchitectural-diagram-cloudbacked-portfolio.png&w=1600&output=webp&q=80&we",
-    architectureAlt: "Architecture diagram for the cloud-backed portfolio",
   },
   {
     id: "homelab-gitops",
@@ -160,9 +155,6 @@ export const projects: Project[] = [
     ],
     technologies: ["K3s", "Argo CD", "Terraform", "Proxmox", "Helm", "GitHub Actions", "Prometheus", "Grafana"],
     repositoryUrl: "https://github.com/Jeysibn/homelab-gitops",
-    architectureUrl:
-      "https://wsrv.nl/?url=https%3A%2F%2Fraw.githubusercontent.com%2FJeysibn%2Fhomelab-gitops%2Fmain%2Fdocs%2FArchitecture.png&w=1600&output=webp&q=80&we",
-    architectureAlt: "Architecture diagram for the Kubernetes GitOps homelab",
   },
 ];
 

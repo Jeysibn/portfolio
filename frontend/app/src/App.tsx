@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 
-import { fetchHealth, fetchVisitorCount, sendChatMessage } from "./api";
+import { fetchVisitorCount, sendChatMessage } from "./api";
 import { useActiveSection, useTheme } from "./hooks";
 import {
   certifications,
@@ -16,57 +16,8 @@ import {
 import type { ChatMessage, Project, SkillGroup, ThemePreference } from "./portfolio";
 import { skillDetails } from "./skill-details";
 
-declare const __BUILD_TIMESTAMP__: string;
-
 const sectionIds = navigation.map((item) => item.id);
 const CHAT_STORAGE_KEY = "jeysibn_chat_history";
-const buildStartedAt = new Date(__BUILD_TIMESTAMP__);
-const hasValidBuildTimestamp = !Number.isNaN(buildStartedAt.getTime());
-const releaseFormatter = new Intl.DateTimeFormat("en-US", {
-  timeZone: "Asia/Manila",
-  month: "short",
-  day: "2-digit",
-  hour: "2-digit",
-  minute: "2-digit",
-  hour12: false,
-});
-const manilaTimeFormatter = new Intl.DateTimeFormat("en-US", {
-  timeZone: "Asia/Manila",
-  hour: "numeric",
-  minute: "2-digit",
-  second: "2-digit",
-  hour12: true,
-});
-
-function formatReleaseAge(now = new Date()) {
-  if (!hasValidBuildTimestamp) return "unknown";
-  const elapsed = Math.max(0, now.getTime() - buildStartedAt.getTime());
-  const totalMinutes = Math.floor(elapsed / 60_000);
-  const days = Math.floor(totalMinutes / 1_440);
-  const hours = Math.floor((totalMinutes % 1_440) / 60);
-  const minutes = totalMinutes % 60;
-  if (days > 0) return `${days}d ${hours}h`;
-  if (hours > 0) return `${hours}h ${minutes}m`;
-  return `${minutes}m`;
-}
-
-function useClock(formatter: Intl.DateTimeFormat, interval: number) {
-  const [value, setValue] = useState(() => formatter.format(new Date()));
-  useEffect(() => {
-    const timer = window.setInterval(() => setValue(formatter.format(new Date())), interval);
-    return () => window.clearInterval(timer);
-  }, [formatter, interval]);
-  return value;
-}
-
-function useReleaseAge() {
-  const [value, setValue] = useState(() => formatReleaseAge());
-  useEffect(() => {
-    const timer = window.setInterval(() => setValue(formatReleaseAge()), 30_000);
-    return () => window.clearInterval(timer);
-  }, []);
-  return value;
-}
 
 const certificationDetails = [
   {
@@ -180,7 +131,6 @@ function App() {
   const { preference, setPreference } = useTheme();
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [selectedSkill, setSelectedSkill] = useState<SkillGroup | null>(null);
-  const [zoomedArchitecture, setZoomedArchitecture] = useState<Project | null>(null);
 
   useScrollReveal();
 
@@ -202,19 +152,13 @@ function App() {
           <Skills onOpenSkill={setSelectedSkill} />
           <Credentials />
           <Resume />
-          <StatusStrip />
           <Contact />
         </main>
 
         <Footer />
         <ChatWidget />
-        <ProjectDialog
-          project={selectedProject}
-          onClose={() => setSelectedProject(null)}
-          onOpenArchitecture={setZoomedArchitecture}
-        />
+        <ProjectDialog project={selectedProject} onClose={() => setSelectedProject(null)} />
         <SkillDialog group={selectedSkill} onClose={() => setSelectedSkill(null)} />
-        <ArchitectureDialog project={zoomedArchitecture} onClose={() => setZoomedArchitecture(null)} />
       </div>
 
       <PrintResume />
@@ -430,50 +374,61 @@ function HeroIllustration() {
   );
 }
 
-function StatusStrip() {
-  const [state, setState] = useState<"checking" | "healthy" | "degraded">("checking");
-  const releaseAge = useReleaseAge();
-  const manilaTime = useClock(manilaTimeFormatter, 1_000);
+function ProjectIllustration({ id, className }: { id: string; className?: string }) {
+  const classes = className ? `project-illo ${className}` : "project-illo";
 
-  useEffect(() => {
-    const controller = new AbortController();
-
-    fetchHealth(controller.signal)
-      .then(() => setState("healthy"))
-      .catch((error: unknown) => {
-        if (error instanceof DOMException && error.name === "AbortError") return;
-        setState("degraded");
-      });
-
-    return () => controller.abort();
-  }, []);
-
-  const stateLabel = state === "checking" ? "Checking" : state === "healthy" ? "Operational" : "Unavailable";
-  const releaseStamp = hasValidBuildTimestamp ? releaseFormatter.format(buildStartedAt) : "local build";
+  if (id === "homelab-gitops") {
+    return (
+      <svg
+        className={classes}
+        viewBox="0 0 240 200"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        role="img"
+        aria-label="Line illustration of a git repository syncing to a small cluster of server nodes"
+      >
+        <rect x="16" y="70" width="52" height="40" rx="3" />
+        <circle cx="42" cy="90" r="7" />
+        <path d="M42 83 V 66 M 42 97 V 110" />
+        <path d="M68 84 H 108" />
+        <path d="M68 96 H 108" className="project-illo-accent" />
+        <path d="M100 80 L 108 84 L 100 88 M 100 92 L 108 96 L 100 100" />
+        <rect x="112" y="30" width="48" height="34" rx="3" />
+        <rect x="112" y="72" width="48" height="34" rx="3" className="project-illo-accent" />
+        <rect x="112" y="114" width="48" height="34" rx="3" />
+        <path d="M108 47 H 112 M 108 89 H 112 M 108 131 H 112" />
+        <path d="M160 47 H 200 M 160 89 H 200 M 160 131 H 200" />
+        <path d="M200 30 V 148" />
+      </svg>
+    );
+  }
 
   return (
-    <aside className="status-strip" aria-label="Live portfolio service status">
-      <div className="status-strip-inner">
-        <span className={`service-state service-state-${state}`}>
-          <span className="state-dot" aria-hidden="true" /> {stateLabel}
-        </span>
-        <StatusRow label="API" value="Azure Functions" />
-        <StatusRow label="Release" value={releaseStamp} />
-        <StatusRow label="Release age" value={releaseAge} />
-        <StatusRow label="Delivery" value="GitHub Actions" />
-        <StatusRow label="Manila" value={manilaTime} />
-      </div>
-      <p className="status-note">Health is checked against the production API when this page loads.</p>
-    </aside>
-  );
-}
-
-function StatusRow({ label, value, emphasis = false }: { label: string; value: string; emphasis?: boolean }) {
-  return (
-    <div className="status-strip-row">
-      <dt>{label}</dt>
-      <dd className={emphasis ? "status-value-good" : undefined}>{value}</dd>
-    </div>
+    <svg
+      className={classes}
+      viewBox="0 0 220 180"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      role="img"
+      aria-label="Line illustration of a browser connecting through an API to a database"
+    >
+      <rect x="14" y="24" width="72" height="48" rx="3" />
+      <path d="M14 36 H 86" />
+      <circle cx="24" cy="30" r="2" />
+      <circle cx="32" cy="30" r="2" />
+      <path d="M86 48 L 122 48" className="project-illo-accent" />
+      <rect x="126" y="24" width="70" height="48" rx="3" className="project-illo-accent" />
+      <path d="M50 72 L 50 100 L 122 100" />
+      <rect x="94" y="104" width="52" height="46" rx="26" />
+      <path d="M94 118 H 146 M 94 132 H 146" />
+      <path d="M161 72 L 161 100 L 146 100" />
+    </svg>
   );
 }
 
@@ -558,14 +513,7 @@ function Projects({ onOpenProject }: { onOpenProject: (project: Project) => void
             }}
           >
             <div className="project-visual">
-              {project.architectureUrl ? (
-                <img
-                  src={project.architectureUrl}
-                  alt=""
-                  loading="lazy"
-                  decoding="async"
-                />
-              ) : null}
+              <ProjectIllustration id={project.id} />
               <span className="project-visual-label" aria-hidden="true">Architecture preview</span>
             </div>
 
@@ -862,11 +810,9 @@ function Section({
 function ProjectDialog({
   project,
   onClose,
-  onOpenArchitecture,
 }: {
   project: Project | null;
   onClose: () => void;
-  onOpenArchitecture: (project: Project) => void;
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
 
@@ -907,12 +853,9 @@ function ProjectDialog({
             </button>
           </div>
 
-          {project.architectureUrl ? (
-            <button type="button" className="architecture-link" onClick={() => onOpenArchitecture(project)}>
-              <img src={project.architectureUrl} alt={project.architectureAlt || `${project.title} architecture`} loading="lazy" />
-              <span>Open architecture diagram <ExpandIcon /></span>
-            </button>
-          ) : null}
+          <div className="case-architecture" aria-hidden="true">
+            <ProjectIllustration id={project.id} className="case-architecture-illo" />
+          </div>
 
           <div className="case-section">
             <h3>Why it exists</h3>
@@ -997,48 +940,6 @@ function SkillDialog({ group, onClose }: { group: SkillGroup | null; onClose: ()
             ))}
           </div>
         </article>
-      ) : null}
-    </dialog>
-  );
-}
-
-function ArchitectureDialog({ project, onClose }: { project: Project | null; onClose: () => void }) {
-  const dialogRef = useRef<HTMLDialogElement>(null);
-
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-    if (project && !dialog.open) dialog.showModal();
-    if (!project && dialog.open) dialog.close();
-  }, [project]);
-
-  return (
-    <dialog
-      ref={dialogRef}
-      className="image-zoom-dialog"
-      aria-labelledby="architecture-caption"
-      onCancel={(event) => {
-        event.preventDefault();
-        onClose();
-      }}
-      onClick={(event) => {
-        if (event.target === event.currentTarget) onClose();
-      }}
-    >
-      {project?.architectureUrl ? (
-        <div className="image-zoom-frame">
-          <button type="button" className="inspection-close" aria-label="Close architecture diagram" onClick={onClose} autoFocus>
-            <CloseIcon />
-          </button>
-          <img
-            className="image-zoom-content"
-            src={project.architectureUrl}
-            alt={project.architectureAlt || `${project.title} architecture`}
-          />
-          <p id="architecture-caption" className="image-zoom-caption">
-            {project.architectureAlt || `${project.title} architecture`}
-          </p>
-        </div>
       ) : null}
     </dialog>
   );
@@ -1321,10 +1222,6 @@ function ArrowDownIcon() {
 
 function ExternalIcon() {
   return <Icon size={16}><path d="M14 5h5v5" /><path d="M10 14 19 5" /><path d="M19 13v6H5V5h6" /></Icon>;
-}
-
-function ExpandIcon() {
-  return <Icon size={16}><path d="M8 3H3v5" /><path d="m3 3 6 6" /><path d="M16 21h5v-5" /><path d="m21 21-6-6" /></Icon>;
 }
 
 function CloseIcon() {
