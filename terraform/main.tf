@@ -93,7 +93,7 @@ resource "azurerm_linux_function_app" "function" {
       python_version = "3.11"
     }
     cors {
-      allowed_origins = ["https://jeysibn.github.io"]
+      allowed_origins = [var.production_frontend_origin]
     }
   }
 
@@ -102,6 +102,11 @@ resource "azurerm_linux_function_app" "function" {
     "AzureWebJobsFeatureFlags"              = "EnableWorkerIndexing"
     "OPENCODE_API_KEY"                      = var.opencode_api_key
     "APPLICATIONINSIGHTS_CONNECTION_STRING" = azurerm_application_insights.portfolio.connection_string
+    # Mirrors the platform-level CORS origin above so the Function code's own
+    # Access-Control-Allow-Origin header (see backend/function_app.py) can never
+    # drift into a wider policy (e.g. "*") than what the platform allows.
+    "ALLOWED_ORIGIN" = var.production_frontend_origin
+    "APP_VERSION"    = var.app_version
   }
 
   lifecycle {
