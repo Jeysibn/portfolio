@@ -755,6 +755,7 @@ input {
   background: transparent;
   color: var(--text);
   overflow: hidden;
+  overscroll-behavior: contain;
 }
 
 .case-dialog::backdrop {
@@ -3160,6 +3161,7 @@ body::before {
   position: relative;
   max-height: 88dvh;
   overflow-y: auto;
+  overscroll-behavior: contain;
   padding: clamp(28px, 5vw, 48px);
   border: 1px solid color-mix(in srgb, var(--cyan) 30%, var(--line-strong));
   border-radius: 16px;
