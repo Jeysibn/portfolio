@@ -334,9 +334,9 @@ function Hero() {
           </div>
           <div className="hero-actions hero-actions-b">
             <a href="#contact" className="button button-primary">
-              Contact me <ArrowDownIcon />
+              Contact me
             </a>
-            <a href="https://github.com/Jeysibn" target="_blank" rel="noreferrer" className="button button-secondary">
+            <a href="https://github.com/Jeysibn" target="_blank" rel="noreferrer" className="button button-text">
               GitHub <ExternalIcon />
             </a>
           </div>
@@ -471,20 +471,19 @@ function Experience() {
       <div className="timeline">
         {experience.map((item) => (
           <article key={`${item.organization}-${item.role}`} className="timeline-item" data-reveal="">
-            <div className="timeline-meta">
-              <time>{item.period}</time>
-              <span>{item.location}</span>
-            </div>
-            <div className="timeline-content">
+            <div className="timeline-row">
               <h3>{item.role}</h3>
-              <p className="timeline-org">{item.organization}</p>
-              <p className="timeline-summary">{item.summary}</p>
-              <ul>
-                {item.highlights.map((highlight) => (
-                  <li key={highlight}>{highlight}</li>
-                ))}
-              </ul>
+              <time>{item.period}</time>
             </div>
+            <p className="timeline-meta">
+              <span className="timeline-org">{item.organization}</span> · {item.location}
+            </p>
+            <p className="timeline-summary">{item.summary}</p>
+            <ul>
+              {item.highlights.map((highlight) => (
+                <li key={highlight}>{highlight}</li>
+              ))}
+            </ul>
           </article>
         ))}
       </div>
@@ -514,14 +513,12 @@ function Projects({ onOpenProject }: { onOpenProject: (project: Project) => void
           >
             <div className="project-visual">
               <ProjectIllustration id={project.id} />
-              <span className="project-visual-label" aria-hidden="true">Architecture preview</span>
             </div>
 
             <div className="project-copy">
               <p className="project-category">{project.category}</p>
               <div className="project-title-row">
                 <h3>{project.title}</h3>
-                <span className="project-open-cue" aria-hidden="true"><ArrowRightIcon /></span>
               </div>
               <p>{project.summary}</p>
               <div className="technology-line" aria-label="Project technologies">
@@ -1210,14 +1207,6 @@ function Icon({ children, size = 18 }: { children: ReactNode; size?: number }) {
       {children}
     </svg>
   );
-}
-
-function ArrowRightIcon() {
-  return <Icon><path d="M5 12h14" /><path d="m14 7 5 5-5 5" /></Icon>;
-}
-
-function ArrowDownIcon() {
-  return <Icon><path d="M12 5v14" /><path d="m7 14 5 5 5-5" /></Icon>;
 }
 
 function ExternalIcon() {
