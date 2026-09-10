@@ -11,5 +11,12 @@ export default defineConfig({
   build: {
     outDir: "dist",
     sourcemap: true,
+    rollupOptions: {
+      input: {
+        home: new URL("./index.html", import.meta.url).pathname,
+        cloudPortfolio: new URL("./cloud-portfolio.html", import.meta.url).pathname,
+        homelabGitops: new URL("./homelab-gitops.html", import.meta.url).pathname,
+      },
+    },
   },
 });

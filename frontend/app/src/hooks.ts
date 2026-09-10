@@ -34,7 +34,7 @@ export function useTheme() {
 
     const themeColor = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
     if (themeColor) {
-      themeColor.content = effectiveTheme === "dark" ? "#10160f" : "#f2f4f1";
+      themeColor.content = effectiveTheme === "dark" ? "#0b0f0d" : "#edf0eb";
     }
   }, [effectiveTheme]);
 

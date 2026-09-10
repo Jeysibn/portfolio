@@ -76,9 +76,10 @@ function scrollSectionIntoView(section: HTMLElement) {
   const absoluteTop = window.scrollY + rect.top;
   const targetTop = Math.max(0, absoluteTop - headerHeight - 18);
 
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   window.scrollTo({
     top: targetTop,
-    behavior: "smooth",
+    behavior: reduceMotion ? "auto" : "smooth",
   });
 }
 

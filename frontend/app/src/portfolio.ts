@@ -34,8 +34,8 @@ export interface Project {
 }
 
 export const navigation = [
-  { label: "About", id: "about" },
-  { label: "Projects", id: "projects" },
+  { label: "Work", id: "projects" },
+  { label: "Approach", id: "about" },
   { label: "Experience", id: "experience" },
   { label: "Skills", id: "skills" },
   { label: "Certifications", id: "credentials-title" },
@@ -148,7 +148,7 @@ export const projects: Project[] = [
       "Prometheus and Grafana provide operational visibility across the cluster and workloads.",
     ],
     highlights: [
-      "Multi-node k3s cluster across Raspberry Pi and repurposed x86 hardware.",
+      "Current single-node k3s environment on Proxmox, with a Raspberry Pi providing remote access through Tailscale.",
       "App-of-Apps GitOps structure with ordered application deployment.",
       "Automated DNS, TLS, persistent storage, and declarative workload management.",
       "Repository structure separates reusable Kubernetes manifests from environment-specific configuration.",

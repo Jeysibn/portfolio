@@ -1,1248 +1,165 @@
-
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
-
-import { fetchVisitorCount, sendChatMessage } from "./api";
+import { fetchHealth, fetchVisitorCount, sendChatMessage } from "./api";
 import { useActiveSection, useTheme } from "./hooks";
-import {
-  certifications,
-  education,
-  experience,
-  navigation,
-  professionalSummary,
-  projects,
-  skillGroups,
-} from "./portfolio";
-import type { ChatMessage, Project, SkillGroup, ThemePreference } from "./portfolio";
-import { skillDetails } from "./skill-details";
+import { certifications, education, experience, navigation, professionalSummary, projects, skillGroups } from "./portfolio";
+import type { ChatMessage, Project, ThemePreference } from "./portfolio";
+import { attachTilt, useCaseStudyMotion, usePortfolioMotion, useProjectStory, useTraceMotion } from "./motion";
 
-const sectionIds = navigation.map((item) => item.id);
 const CHAT_STORAGE_KEY = "jeysibn_chat_history";
-
-const certificationDetails = [
-  {
-    name: certifications[0],
-    provider: "Oracle",
-    mark: "ORACLE",
-    tone: "oracle",
-    description:
-      "Foundational validation of OCI services, cloud concepts, architecture, security, pricing, and support fundamentals.",
-  },
-  {
-    name: certifications[1],
-    provider: "TrendAI",
-    mark: "TrendAI",
-    tone: "trend",
-    description:
-      "Professional credential focused on protecting and operating server and workload environments with Trend Vision One.",
-  },
-  {
-    name: certifications[2],
-    provider: "GitHub",
-    mark: "GitHub",
-    tone: "github",
-    description:
-      "Covers Git and GitHub fundamentals, repositories, collaboration workflows, project management, and modern development practices.",
-  },
-  {
-    name: "HashiCorp Certified: Terraform Associate (004)",
-    provider: "IN PROGRESS",
-    mark: "HashiCorp",
-    tone: "hashicorp",
-    description:
-      "Currently studying for Terraform Associate (004), building on hands-on Terraform use across Azure infrastructure and Proxmox homelab provisioning.",
-  },
-] as const;
-
-const skillCodes = ["CLOUD", "K8S", "CI/CD", "OBS", "NET", "OPS"] as const;
-
-function useScrollReveal() {
-  useEffect(() => {
-    const elements = Array.from(document.querySelectorAll<HTMLElement>("[data-reveal]"));
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    if (reduceMotion || !("IntersectionObserver" in window)) {
-      elements.forEach((element) => element.classList.add("is-visible"));
-      return;
-    }
-
-    document.documentElement.classList.add("motion-ready");
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-          entry.target.classList.add("is-visible");
-          observer.unobserve(entry.target);
-        });
-      },
-      {
-        threshold: 0.12,
-        rootMargin: "0px 0px -8% 0px",
-      },
-    );
-
-    elements.forEach((element) => observer.observe(element));
-
-    return () => {
-      observer.disconnect();
-      document.documentElement.classList.remove("motion-ready");
-    };
-  }, []);
-}
-
-function ScrollProgress() {
-  const progressRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    let frame = 0;
-
-    const update = () => {
-      const scrollable = document.documentElement.scrollHeight - window.innerHeight;
-      const progress = scrollable > 0 ? Math.min(1, Math.max(0, window.scrollY / scrollable)) : 0;
-      if (progressRef.current) progressRef.current.style.transform = `scaleX(${progress})`;
-    };
-
-    const requestUpdate = () => {
-      window.cancelAnimationFrame(frame);
-      frame = window.requestAnimationFrame(update);
-    };
-
-    update();
-    window.addEventListener("scroll", requestUpdate, { passive: true });
-    window.addEventListener("resize", requestUpdate);
-
-    return () => {
-      window.cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", requestUpdate);
-      window.removeEventListener("resize", requestUpdate);
-    };
-  }, []);
-
-  return (
-    <div className="scroll-progress-track" aria-hidden="true">
-      <div ref={progressRef} className="scroll-progress-bar" />
-    </div>
-  );
-}
+const cloudDiagramUrl = new URL("../../assets/architectural-diagram-cloudbacked-portfolio.svg", import.meta.url).href;
+const homelabDiagramUrl = "https://raw.githubusercontent.com/Jeysibn/homelab-gitops/main/docs/Architecture.png";
 
 function App() {
-  const activeSection = useActiveSection(sectionIds);
+  const project = projects.find((item) => location.pathname.endsWith(`${item.id}.html`));
+  return project ? <CaseStudy project={project} /> : <Home />;
+}
+
+function Home() {
+  const active = useActiveSection(navigation.map((item) => item.id));
   const { preference, setPreference } = useTheme();
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-  const [selectedSkill, setSelectedSkill] = useState<SkillGroup | null>(null);
-
-  useScrollReveal();
-
-  return (
-    <>
-      <div className="site-shell">
-        <ScrollProgress />
-        <Header
-          activeSection={activeSection}
-          themePreference={preference}
-          onThemeChange={setPreference}
-        />
-
-        <main id="top">
-          <Hero />
-          <About />
-          <Projects onOpenProject={setSelectedProject} />
-          <Experience />
-          <Skills onOpenSkill={setSelectedSkill} />
-          <Credentials />
-          <Resume />
-          <Contact />
-        </main>
-
-        <Footer />
-        <ChatWidget />
-        <ProjectDialog project={selectedProject} onClose={() => setSelectedProject(null)} />
-        <SkillDialog group={selectedSkill} onClose={() => setSelectedSkill(null)} />
-      </div>
-
-      <PrintResume />
-    </>
-  );
+  const scope = useRef<HTMLDivElement>(null);
+  usePortfolioMotion(scope);
+  return <div className="app-shell" ref={scope}><a className="skip-link" href="#main-content">Skip to main content</a><Header active={active} preference={preference} onThemeChange={setPreference} /><main id="main-content"><Hero /><Projects /><About /><Experience /><Skills /><Credentials /><Resume /><Contact /></main><Footer /><ChatWidget /><PrintResume /></div>;
 }
 
-function Header({
-  activeSection,
-  themePreference,
-  onThemeChange,
-}: {
-  activeSection: string;
-  themePreference: ThemePreference;
-  onThemeChange: (preference: ThemePreference) => void;
-}) {
-  const [menuOpen, setMenuOpen] = useState(false);
-
-  return (
-    <header className="site-header">
-      <div className="header-inner">
-        <a href="#top" className="wordmark" aria-label="Jeysibn home" onClick={() => setMenuOpen(false)}>
-          Jeysibn<span aria-hidden="true">/</span>
-        </a>
-
-        <nav className="desktop-nav" aria-label="Primary navigation">
-          {navigation.map((item) => (
-            <a
-              key={item.id}
-              href={`#${item.id}`}
-              className={activeSection === item.id ? "nav-link nav-link-active" : "nav-link"}
-              aria-current={activeSection === item.id ? "location" : undefined}
-            >
-              {item.label}
-            </a>
-          ))}
-        </nav>
-
-        <div className="header-actions">
-          <ThemeSelect value={themePreference} onChange={onThemeChange} />
-          <button
-            type="button"
-            className="icon-button mobile-menu-button"
-            aria-label={menuOpen ? "Close navigation" : "Open navigation"}
-            aria-expanded={menuOpen}
-            aria-controls="mobile-navigation"
-            onClick={() => setMenuOpen((open) => !open)}
-          >
-            {menuOpen ? <CloseIcon /> : <MenuIcon />}
-          </button>
-        </div>
-      </div>
-
-      <div id="mobile-navigation" className={menuOpen ? "mobile-nav mobile-nav-open" : "mobile-nav"}>
-        <nav aria-label="Mobile navigation">
-          {navigation.map((item) => (
-            <a
-              key={item.id}
-              href={`#${item.id}`}
-              className={activeSection === item.id ? "mobile-nav-link mobile-nav-link-active" : "mobile-nav-link"}
-              onClick={() => setMenuOpen(false)}
-            >
-              {item.label}
-            </a>
-          ))}
-        </nav>
-      </div>
-    </header>
-  );
-}
-
-function ThemeSelect({
-  value,
-  onChange,
-}: {
-  value: ThemePreference;
-  onChange: (preference: ThemePreference) => void;
-}) {
+function Header({ active, preference, onThemeChange }: { active: string; preference: ThemePreference; onThemeChange: (value: ThemePreference) => void }) {
   const [open, setOpen] = useState(false);
-  const controlRef = useRef<HTMLDivElement>(null);
-  const triggerRef = useRef<HTMLButtonElement>(null);
-  const options: Array<{ value: ThemePreference; label: string }> = [
-    { value: "system", label: "System" },
-    { value: "light", label: "Light" },
-    { value: "dark", label: "Dark" },
-  ];
-  const currentLabel = options.find((option) => option.value === value)?.label ?? "System";
-
+  const trigger = useRef<HTMLButtonElement>(null);
+  const nav = useRef<HTMLElement>(null);
+  useLayoutEffect(() => {
+    const current = nav.current?.querySelector<HTMLElement>("[aria-current]");
+    if (!nav.current || !current) return;
+    nav.current.style.setProperty("--nav-x", `${current.offsetLeft}px`);
+    nav.current.style.setProperty("--nav-w", `${current.offsetWidth}`);
+  }, [active]);
   useEffect(() => {
     if (!open) return;
-
-    const handlePointerDown = (event: PointerEvent) => {
-      if (event.target instanceof Node && !controlRef.current?.contains(event.target)) {
-        setOpen(false);
-      }
-    };
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== "Escape") return;
-      setOpen(false);
-      triggerRef.current?.focus({ preventScroll: true });
-    };
-
-    document.addEventListener("pointerdown", handlePointerDown);
-    document.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.removeEventListener("pointerdown", handlePointerDown);
-      document.removeEventListener("keydown", handleKeyDown);
-    };
+    const onKey = (event: KeyboardEvent) => { if (event.key === "Escape") { setOpen(false); trigger.current?.focus(); } };
+    addEventListener("keydown", onKey); return () => removeEventListener("keydown", onKey);
   }, [open]);
+  return <header className="site-header"><div className="header-inner"><a className="wordmark" href="#top" aria-label="Jerome Ibon, home">JI<span aria-hidden="true">/</span></a><nav ref={nav} className="desktop-nav" aria-label="Primary navigation">{navigation.map((item) => <a key={item.id} href={`#${item.id}`} aria-current={active === item.id ? "location" : undefined}>{item.label}</a>)}<i className="nav-indicator" aria-hidden="true" /></nav><div className="header-actions"><ThemeControl value={preference} onChange={onThemeChange} /><button ref={trigger} type="button" className="icon-button menu-button" aria-expanded={open} aria-controls="mobile-menu" aria-label={open ? "Close navigation" : "Open navigation"} onClick={() => setOpen(!open)}>{open ? <CloseIcon /> : <MenuIcon />}</button></div></div><div id="mobile-menu" className="mobile-menu" hidden={!open}><nav aria-label="Mobile navigation">{navigation.map((item) => <a key={item.id} href={`#${item.id}`} onClick={() => setOpen(false)}>{item.label}</a>)}</nav></div></header>;
+}
 
-  const selectTheme = (preference: ThemePreference) => {
-    onChange(preference);
-    setOpen(false);
-    window.requestAnimationFrame(() => triggerRef.current?.focus({ preventScroll: true }));
+function ThemeControl({ value, onChange }: { value: ThemePreference; onChange: (value: ThemePreference) => void }) {
+  const dark = value === "dark";
+  const toggle = () => {
+    const update = () => onChange(dark ? "light" : "dark");
+    const transitionDocument = document as Document & { startViewTransition?: (callback: () => void) => void };
+    if (!matchMedia("(prefers-reduced-motion: reduce)").matches && transitionDocument.startViewTransition) transitionDocument.startViewTransition(update);
+    else update();
   };
-
-  return (
-    <div ref={controlRef} className={open ? "theme-control theme-control-open" : "theme-control"}>
-      <button
-        ref={triggerRef}
-        type="button"
-        className="theme-trigger"
-        aria-label={`Color theme: ${currentLabel}`}
-        aria-expanded={open}
-        aria-controls="theme-options"
-        onClick={() => setOpen((isOpen) => !isOpen)}
-      >
-        <SunMoonIcon />
-        <span className="theme-trigger-label">{currentLabel}</span>
-        <ThemeChevronIcon />
-      </button>
-
-      {open ? (
-        <div id="theme-options" className="theme-options" role="group" aria-label="Choose color theme">
-          {options.map((option) => (
-            <button
-              key={option.value}
-              type="button"
-              className="theme-option"
-              aria-pressed={value === option.value}
-              onClick={() => selectTheme(option.value)}
-            >
-              {option.label}
-            </button>
-          ))}
-        </div>
-      ) : null}
-    </div>
-  );
+  return <button type="button" className="theme-button" aria-label={`Use ${dark ? "light" : "dark"} theme`} onClick={toggle}>{dark ? <SunIcon /> : <MoonIcon />}<span>{dark ? "Light" : "Dark"}</span></button>;
 }
 
 function Hero() {
-  return (
-    <section className="hero-section hero-section-b" aria-labelledby="hero-title">
-      <div className="hero-grid hero-grid-b">
-        <div className="hero-copy hero-copy-b">
-          <p className="hero-eyebrow-b">Portfolio — {new Date().getFullYear()}</p>
-          <h1 id="hero-title" className="hero-title-b">
-            Jerome
-            <br />
-            Christian
-            <br />
-            Ibon
-          </h1>
-          <p className="hero-role-b">Cloud Support · DevOps · Cloud Engineering</p>
-          <p className="hero-opportunity">
-            Computer Engineering graduate building cloud infrastructure, automated delivery pipelines, Kubernetes environments, and observable systems.
-          </p>
-          <div className="availability-pill availability-pill-b">
-            <span className="availability-dot" aria-hidden="true" />
-            <span>Open to opportunities</span>
-            <span className="availability-detail">Entry-level Cloud &amp; DevOps roles</span>
-          </div>
-          <div className="hero-actions hero-actions-b">
-            <a href="#contact" className="button button-primary">
-              Contact me
-            </a>
-            <a href="https://github.com/Jeysibn" target="_blank" rel="noreferrer" className="button button-text">
-              GitHub <ExternalIcon />
-            </a>
-          </div>
-        </div>
-
-        <HeroIllustration />
-      </div>
-    </section>
-  );
+  return <section id="top" className="hero" aria-labelledby="hero-title"><div className="hero-inner"><div className="hero-identity"><p className="hero-role" data-hero-support>Cloud Support · DevOps · Cloud Engineering</p><h1 id="hero-title" aria-label="Jerome Christian Ibon"><span className="motion-mask hero-name-row"><span data-hero-line data-axis="x">Jerome</span></span><span className="motion-mask hero-name-row is-offset"><span data-hero-line data-axis="y">Christian</span></span><span className="motion-mask hero-name-row"><span data-hero-line data-axis="lock">Ibon</span></span></h1><span className="hero-rule" aria-hidden="true" /></div><div className="hero-system"><InfrastructurePulse /><p className="system-caption" data-hero-support>Source → delivery → service → signals</p></div><div className="hero-copy"><p className="hero-statement" data-hero-support>I build cloud systems that are automated, observable, and meant to be operated.</p><p className="hero-context" data-hero-support>Computer Engineering graduate combining enterprise technical support with hands-on cloud infrastructure, delivery automation, and Kubernetes projects.</p><p className="availability" data-hero-support><span aria-hidden="true" />Open to entry-level opportunities</p><div className="action-row" data-hero-support><a className="button primary" href="#projects">View selected work</a><a className="button secondary" href="#contact">Contact</a><a className="text-link" href="./resume.pdf">Résumé <DownloadIcon /></a><a className="text-link" href="https://github.com/Jeysibn" target="_blank" rel="noreferrer">GitHub <ExternalIcon /></a></div><div data-hero-support><LiveProof /></div></div><a className="scroll-cue" href="#projects" data-hero-support><span>Scroll to trace the work</span><i aria-hidden="true" /></a></div><span className="handoff-line" aria-hidden="true" /></section>;
 }
 
-function HeroIllustration() {
-  return (
-    <svg
-      className="hero-illo-b"
-      viewBox="0 0 240 260"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      role="img"
-      aria-label="Line illustration of a cloud connected to two server nodes"
-    >
-      <path d="M60 210 C 60 150, 40 140, 55 90 C 65 55, 100 40, 120 60" />
-      <circle cx="120" cy="60" r="16" />
-      <path d="M60 210 L 60 236 M 100 214 L 100 240 M 40 214 L 30 236" />
-      <path d="M20 168 h30 M18 180 h34" />
-      <rect x="130" y="120" width="34" height="30" rx="2" />
-      <rect x="176" y="150" width="34" height="30" rx="2" className="hero-illo-accent" />
-      <rect x="130" y="180" width="34" height="30" rx="2" />
-      <path d="M147 120 L 147 100 L 120 76" />
-      <path d="M164 135 L 200 135 L 200 150" className="hero-illo-accent" />
-    </svg>
-  );
+function InfrastructurePulse() {
+  return <svg className="infrastructure-pulse" viewBox="0 0 620 250" aria-hidden="true"><path className="pulse-route pulse-path" pathLength="1" d="M30 126H158C206 126 196 52 246 52H374C420 52 414 126 462 126H590" /><path className="pulse-path branch" pathLength="1" d="M246 52V198H462" /><g className="pulse-node" transform="translate(20 108)"><rect width="82" height="36" /><text x="41" y="23">browser</text></g><g className="pulse-node" transform="translate(220 34)"><rect width="104" height="36" /><text x="52" y="23">functions</text></g><g className="pulse-node pulse-destination" transform="translate(462 108)"><rect width="108" height="36" /><text x="54" y="23">observability</text></g><g className="pulse-node" transform="translate(220 180)"><rect width="104" height="36" /><text x="52" y="23">delivery</text></g><circle className="pulse-packet" r="5" cx="0" cy="0" /></svg>;
 }
 
-function ProjectIllustration({ id, className }: { id: string; className?: string }) {
-  const classes = className ? `project-illo ${className}` : "project-illo";
+function LiveProof() {
+  const [status, setStatus] = useState("Checking live API");
+  useEffect(() => { const c = new AbortController(); fetchHealth(c.signal).then(() => setStatus("Azure Functions API is responding")).catch(() => setStatus("Live status unavailable")); return () => c.abort(); }, []);
+  return <p className="live-proof" aria-live="polite"><span>Behind this site</span>{status}</p>;
+}
 
-  if (id === "homelab-gitops") {
-    return (
-      <svg
-        className={classes}
-        viewBox="0 0 240 200"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        role="img"
-        aria-label="Line illustration of a git repository syncing to a small cluster of server nodes"
-      >
-        <rect x="16" y="70" width="52" height="40" rx="3" />
-        <circle cx="42" cy="90" r="7" />
-        <path d="M42 83 V 66 M 42 97 V 110" />
-        <path d="M68 84 H 108" />
-        <path d="M68 96 H 108" className="project-illo-accent" />
-        <path d="M100 80 L 108 84 L 100 88 M 100 92 L 108 96 L 100 100" />
-        <rect x="112" y="30" width="48" height="34" rx="3" />
-        <rect x="112" y="72" width="48" height="34" rx="3" className="project-illo-accent" />
-        <rect x="112" y="114" width="48" height="34" rx="3" />
-        <path d="M108 47 H 112 M 108 89 H 112 M 108 131 H 112" />
-        <path d="M160 47 H 200 M 160 89 H 200 M 160 131 H 200" />
-        <path d="M200 30 V 148" />
-      </svg>
-    );
-  }
+function Section({ id, title, intro, children }: { id: string; title: string; intro: string; children: ReactNode }) {
+  return <section id={id} className="section" data-motion-section={id} aria-labelledby={`${id}-title`}><div className="section-heading"><h2 id={`${id}-title`}>{title}</h2><p>{intro}</p></div>{children}</section>;
+}
 
-  return (
-    <svg
-      className={classes}
-      viewBox="0 0 220 180"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      role="img"
-      aria-label="Line illustration of a browser connecting through an API to a database"
-    >
-      <rect x="14" y="24" width="72" height="48" rx="3" />
-      <path d="M14 36 H 86" />
-      <circle cx="24" cy="30" r="2" />
-      <circle cx="32" cy="30" r="2" />
-      <path d="M86 48 L 122 48" className="project-illo-accent" />
-      <rect x="126" y="24" width="70" height="48" rx="3" className="project-illo-accent" />
-      <path d="M50 72 L 50 100 L 122 100" />
-      <rect x="94" y="104" width="52" height="46" rx="26" />
-      <path d="M94 118 H 146 M 94 132 H 146" />
-      <path d="M161 72 L 161 100 L 146 100" />
-    </svg>
-  );
+function projectDiagramAlt(project: Project) {
+  return project.id === "cloud-portfolio"
+    ? "Architecture of the portfolio across GitHub Pages, Azure Functions, Cosmos DB, observability, Terraform, and GitHub Actions."
+    : "Architecture of the current single-node K3s GitOps homelab on Proxmox.";
+}
+
+function Projects() {
+  const [active, setActive] = useState(0);
+  const scope = useRef<HTMLDivElement>(null);
+  const visual = useRef<HTMLDivElement>(null);
+  useProjectStory(scope, setActive);
+  useEffect(() => visual.current ? attachTilt(visual.current) : undefined, [active]);
+  return <Section id="projects" title="Selected work" intro="Two personal systems that show how I provision infrastructure, automate delivery, and leave evidence for operators."><div className="project-story" ref={scope}><div className="project-narratives">{projects.map((project, index) => <article className={`project-narrative ${active === index ? "is-active" : ""}`} key={project.id} data-project-index={index}><p className="project-category">Field note {String(index + 1).padStart(2, "0")} · {project.category}</p><h3>{project.title}</h3><div className="project-mobile-artifact"><img src={project.id === "cloud-portfolio" ? cloudDiagramUrl : homelabDiagramUrl} alt={projectDiagramAlt(project)} loading={index ? "lazy" : "eager"} width={project.id === "cloud-portfolio" ? 1600 : 2048} height={project.id === "cloud-portfolio" ? 960 : 1152} /></div><p>{project.purpose}</p><ul className="signal-list">{project.outcomes.slice(0, 3).map((item) => <li key={item}>{item}</li>)}</ul><p className="technology-line">{project.technologies.join(" · ")}</p><div className="project-links"><a href={`./${project.id}.html`}>Read case study <ArrowIcon /></a><a href={project.repositoryUrl} target="_blank" rel="noreferrer">Repository <ExternalIcon /></a></div></article>)}</div><aside className="project-stage" aria-live="polite"><div className="project-stage-frame" ref={visual} tabIndex={0}><div className="project-stage-meta"><span>{String(active + 1).padStart(2, "0")} / {String(projects.length).padStart(2, "0")}</span><strong>{projects[active].title}</strong></div>{projects.map((project, index) => <img className={active === index ? "is-active" : ""} key={project.id} src={project.id === "cloud-portfolio" ? cloudDiagramUrl : homelabDiagramUrl} alt={active === index ? projectDiagramAlt(project) : ""} aria-hidden={active !== index} loading={index ? "lazy" : "eager"} width={project.id === "cloud-portfolio" ? 1600 : 2048} height={project.id === "cloud-portfolio" ? 960 : 1152} />)}<span className="stage-progress" aria-hidden="true"><i style={{ transform: `scaleX(${(active + 1) / projects.length})` }} /></span></div></aside></div></Section>;
 }
 
 function About() {
-  const principles = [
-    ["Automate the repeatable", "CI/CD and infrastructure as code replace fragile manual steps."],
-    ["Observe before guessing", "Health checks, logs, metrics, and traces make behavior measurable."],
-    ["Design for recovery", "Small blast radius, reproducible configuration, and clear runbooks reduce incident friction."],
-    ["Keep cost visible", "Serverless and free-tier-aware choices keep experimentation sustainable."],
-  ] as const;
-
-  return (
-    <Section id="about" title="About">
-      <div className="about-layout" data-reveal="">
-        <div className="prose-column">
-          <p>
-            Supporting real users taught me that infrastructure diagrams only matter when the system still makes sense under pressure. Manual fixes may solve one incident, but they don’t scale into reliable operations.
-          </p>
-          <p>
-            That pushed me toward DevOps and cloud engineering: provisioning with Terraform, delivering through GitHub Actions and GitOps, operating Kubernetes, and instrumenting services so failures leave evidence.
-          </p>
-        </div>
-
-        <div className="principles-list" aria-label="Engineering principles">
-          {principles.map(([title, description]) => (
-            <article key={title}>
-              <h3>{title}</h3>
-              <p>{description}</p>
-            </article>
-          ))}
-        </div>
-      </div>
-    </Section>
-  );
+  const principles = [["Automate repeatable work", "Put routine provisioning and delivery in version-controlled workflows."], ["Observe before guessing", "Use health signals, logs, metrics, and traces to investigate behavior."], ["Design for recovery", "Prefer reproducible configuration, small failure boundaries, and usable runbooks."], ["Keep systems understandable", "Document ownership and tradeoffs so the next action is clear."]];
+  return <Section id="about" title="Engineering approach" intro="Support work taught me that a system matters most when somebody has to understand it under pressure."><div className="about-layout"><div className="about-copy"><p>That experience pulled me toward cloud and DevOps work: provisioning with Terraform, delivering through GitHub Actions and GitOps, operating Kubernetes, and instrumenting services so failures leave useful evidence.</p><p>I am early in my engineering career. These projects show the habits I am building now and the direction I want to deepen with an experienced team.</p></div><div className="principle-list">{principles.map(([title, copy]) => <article key={title}><h3>{title}</h3><p>{copy}</p></article>)}</div></div></Section>;
 }
 
 function Experience() {
-  return (
-    <Section id="experience" title="Experience">
-      <div className="timeline">
-        {experience.map((item) => (
-          <article key={`${item.organization}-${item.role}`} className="timeline-item" data-reveal="">
-            <div className="timeline-row">
-              <h3>{item.role}</h3>
-              <time>{item.period}</time>
-            </div>
-            <p className="timeline-meta">
-              <span className="timeline-org">{item.organization}</span> · {item.location}
-            </p>
-            <p className="timeline-summary">{item.summary}</p>
-            <ul>
-              {item.highlights.map((highlight) => (
-                <li key={highlight}>{highlight}</li>
-              ))}
-            </ul>
-          </article>
-        ))}
-      </div>
-    </Section>
-  );
+  return <Section id="experience" title="Experience" intro="Enterprise support and IT operations are the practical foundation behind my infrastructure work."><div className="experience-list">{experience.map((item) => <article className="experience-row" key={item.role}><div className="experience-meta"><time>{item.period}</time><span>{item.location}</span></div><div><h3>{item.role}</h3><p className="organization">{item.organization}</p><p>{item.summary}</p><ul>{item.highlights.map((point) => <li key={point}>{point}</li>)}</ul></div></article>)}</div></Section>;
 }
 
-function Projects({ onOpenProject }: { onOpenProject: (project: Project) => void }) {
-  return (
-    <Section id="projects" title="Projects">
-      <div className="project-list">
-        {projects.map((project) => (
-          <article
-            key={project.id}
-            className={`project-row project-${project.id}`}
-            data-reveal=""
-            role="button"
-            tabIndex={0}
-            aria-haspopup="dialog"
-            aria-label={`View ${project.title} project details`}
-            onClick={() => onOpenProject(project)}
-            onKeyDown={(event) => {
-              if (event.key !== "Enter" && event.key !== " ") return;
-              event.preventDefault();
-              onOpenProject(project);
-            }}
-          >
-            <div className="project-visual">
-              <ProjectIllustration id={project.id} />
-            </div>
-
-            <div className="project-copy">
-              <p className="project-category">{project.category}</p>
-              <div className="project-title-row">
-                <h3>{project.title}</h3>
-              </div>
-              <p>{project.summary}</p>
-              <div className="technology-line" aria-label="Project technologies">
-                {project.technologies.slice(0, 5).map((technology) => (
-                  <span key={technology}>{technology}</span>
-                ))}
-              </div>
-            </div>
-          </article>
-        ))}
-      </div>
-    </Section>
-  );
-}
-
-function Skills({ onOpenSkill }: { onOpenSkill: (group: SkillGroup) => void }) {
-  return (
-    <Section
-      id="skills"
-      title="Skills & Tools"
-      intro="These are the technologies I use across cloud projects, labs, troubleshooting, automation, and deployment workflows."
-    >
-      <div className="skills-grid" aria-label="Technical skill groups">
-        {skillGroups.map((group, index) => (
-          <button
-            key={group.label}
-            type="button"
-            className="skill-card"
-            data-reveal=""
-            aria-haspopup="dialog"
-            onClick={() => onOpenSkill(group)}
-          >
-            <span className="skill-card-head">
-              <span className="skill-code" aria-hidden="true">{skillCodes[index]}</span>
-              <span>
-                <span className="skill-card-index">0{index + 1}</span>
-                <h3>{group.label}</h3>
-              </span>
-            </span>
-            <span className="skill-chip-list">
-              {group.items.map((item) => (
-                <span key={item}>{item}</span>
-              ))}
-            </span>
-          </button>
-        ))}
-      </div>
-    </Section>
-  );
+function Skills() {
+  const capabilityNotes = [
+    "Provision and operate compute across public cloud, virtualization, and homelab environments.",
+    "Package workloads and manage declarative application state in Kubernetes.",
+    "Turn infrastructure and delivery changes into reviewable, repeatable workflows.",
+    "Collect the signals needed to investigate health, latency, and failure.",
+    "Work across operating systems, identity, connectivity, DNS, and remote access.",
+    "Automate routine operations and support secure technical investigation.",
+  ];
+  return <Section id="skills" title="Capabilities" intro="An operational view of the stack: what each capability enables, followed by the tools I have used to practice it."><div className="capability-stack">{skillGroups.map((group, index) => <article className="capability-row" key={group.label}><div className="capability-index" aria-hidden="true">{String(index + 1).padStart(2, "0")}</div><div className="capability-name"><h3>{group.label}</h3><span className="capability-signal" aria-hidden="true"><i /></span></div><p className="capability-note">{capabilityNotes[index]}</p><p className="capability-tools">{group.items.join(" · ")}</p></article>)}</div></Section>;
 }
 
 function Credentials() {
-  return (
-    <section className="credentials-section" aria-labelledby="credentials-title">
-      <div className="section-inner credentials-layout">
-        <div data-reveal="">
-          <h2 id="credentials-title">Education &amp; Certifications</h2>
-        </div>
-
-        <div className="credentials-content">
-          <article className="education-block" data-reveal="">
-            <p className="detail-label">Education</p>
-            <div className="education-heading">
-              <span className="education-mark" aria-hidden="true">NU</span>
-              <div>
-                <h3>{education.degree}</h3>
-                <p>{education.school} · {education.location}</p>
-              </div>
-            </div>
-            <p className="education-period">{education.period}</p>
-            <p className="thesis">Thesis: {education.thesis}</p>
-          </article>
-
-          <section className="certification-block" aria-labelledby="certifications-heading">
-            <div className="credential-subheading" data-reveal="">
-              <p className="detail-label">Certifications</p>
-            </div>
-            <div className="certification-grid">
-              {certificationDetails.map((certification) => (
-                <article
-                  key={certification.name}
-                  className={`cert-card cert-card-${certification.tone}`}
-                  tabIndex={0}
-                  data-reveal=""
-                >
-                  <div className="cert-card-topline">
-                    <span className="cert-provider-mark" aria-hidden="true">{certification.mark}</span>
-                    <span className="cert-provider">{certification.provider}</span>
-                  </div>
-                  <h3 id={certification.name === certifications[0] ? "certifications-heading" : undefined}>{certification.name}</h3>
-                  <p className="cert-description">{certification.description}</p>
-                </article>
-              ))}
-            </div>
-          </section>
-        </div>
-      </div>
-    </section>
-  );
+  return <section className="section" aria-labelledby="credentials-title"><div className="section-heading"><h2 id="credentials-title">Education &amp; credentials</h2><p>Formal study and compact credibility signals, with current study stated separately.</p></div><div className="credential-layout"><article className="education"><p className="section-label">Education</p><h3>{education.degree}</h3><p>{education.school} · {education.location}</p><time>{education.period}</time><p>Thesis: {education.thesis}</p></article><div className="credentials"><p className="section-label">Earned</p><ul>{certifications.map((item) => <li key={item}>{item}</li>)}</ul><p className="section-label studying">Currently studying</p><p>HashiCorp Certified: Terraform Associate (004)</p></div></div></section>;
 }
 
 function Resume() {
-  return (
-    <Section
-      id="resume"
-      title="Resume"
-      intro="Everything important is visible here. Download the PDF directly, or review the on-page resume details below."
-    >
-      <article className="resume-preview" data-reveal="">
-        <header className="resume-preview-header">
-          <div>
-            <p className="detail-label">Resume / CV</p>
-            <h3>Jerome Christian V. Ibon</h3>
-            <p>Cloud Support · DevOps · Cloud Engineering · Kubernetes · GitOps · Infrastructure Automation</p>
-            <p className="resume-contact-line">Malolos, Bulacan, Philippines · jeysibn@gmail.com · linkedin.com/in/jeromeibon</p>
-          </div>
-          <div className="resume-actions">
-            <a className="button button-primary" href="./resume.pdf" download="Jerome-Ibon-Resume.pdf">
-              Download resume (PDF) <DownloadIcon />
-            </a>
-            <button type="button" className="button button-secondary" onClick={() => window.print()}>
-              Print / save resume <PrintIcon />
-            </button>
-          </div>
-        </header>
-
-        <div className="resume-summary">
-          <h3>Professional summary</h3>
-          <p>{professionalSummary}</p>
-        </div>
-
-        <details className="resume-details">
-          <summary>View full resume <span className="resume-disclosure-icon" aria-hidden="true" /></summary>
-          <div className="resume-preview-grid">
-          <div className="resume-main-column">
-            <ResumePreviewSection title="Professional experience">
-              {experience.map((item) => (
-                <article key={`${item.organization}-resume`} className="resume-entry">
-                  <div className="resume-entry-heading">
-                    <div>
-                      <h4>{item.role}</h4>
-                      <p>{item.organization} · {item.location}</p>
-                    </div>
-                    <time>{item.period}</time>
-                  </div>
-                  <p>{item.summary}</p>
-                  <ul>
-                    {item.highlights.map((highlight) => <li key={highlight}>{highlight}</li>)}
-                  </ul>
-                </article>
-              ))}
-            </ResumePreviewSection>
-
-            <ResumePreviewSection title="Projects / home lab">
-              {projects.map((project) => (
-                <article key={`${project.id}-resume`} className="resume-entry">
-                  <div className="resume-entry-heading">
-                    <div>
-                      <h4>{project.title}</h4>
-                      <p>{project.category}</p>
-                    </div>
-                  </div>
-                  <ul>
-                    {project.highlights.slice(0, 3).map((highlight) => <li key={highlight}>{highlight}</li>)}
-                  </ul>
-                </article>
-              ))}
-            </ResumePreviewSection>
-          </div>
-
-          <aside className="resume-side-column">
-            <ResumePreviewSection title="Technical skills">
-              <div className="resume-skill-groups">
-                {skillGroups.map((group) => (
-                  <div key={`${group.label}-resume`}>
-                    <h4>{group.label}</h4>
-                    <p>{group.items.join(" · ")}</p>
-                  </div>
-                ))}
-              </div>
-            </ResumePreviewSection>
-
-            <ResumePreviewSection title="Education">
-              <div className="resume-entry compact">
-                <h4>{education.degree}</h4>
-                <p>{education.school} · {education.location}</p>
-                <p>{education.period}</p>
-                <p>Thesis: {education.thesis}</p>
-              </div>
-            </ResumePreviewSection>
-
-            <ResumePreviewSection title="Certifications">
-              <ul className="resume-cert-list">
-                {certifications.map((certification) => <li key={`${certification}-resume`}>{certification}</li>)}
-              </ul>
-            </ResumePreviewSection>
-          </aside>
-          </div>
-        </details>
-      </article>
-    </Section>
-  );
-}
-
-function ResumePreviewSection({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <section className="resume-preview-section">
-      <h3>{title}</h3>
-      {children}
-    </section>
-  );
+  return <Section id="resume" title="Résumé" intro="A concise on-page summary, with the PDF one action away."><div className="resume-panel"><div><p className="section-label">Jerome Christian V. Ibon</p><h3>Cloud Support · DevOps · Cloud Engineering</h3><p>{professionalSummary}</p></div><div className="resume-actions"><a className="button primary" href="./resume.pdf">Download PDF <DownloadIcon /></a><button className="button secondary" type="button" onClick={() => print()}>Print summary <PrintIcon /></button></div></div></Section>;
 }
 
 function Contact() {
-  return (
-    <Section id="contact" title="Contact">
-      <div className="contact-panel" data-reveal="">
-        <div className="contact-intro">
-          <div className="contact-availability">
-            <span className="availability-dot" aria-hidden="true" />
-            <span>Open to opportunities</span>
-          </div>
-          <h3>I’m open to professional opportunities, collaborations, and meaningful conversations.</h3>
-          <p>
-            I’m interested in entry-level Cloud Support, DevOps, and Cloud Engineering roles where I can keep building production judgment alongside strong engineering teams.
-          </p>
-          <div className="role-tags" aria-label="Roles of interest">
-            <span>Cloud Support</span>
-            <span>DevOps</span>
-            <span>Cloud Engineering</span>
-          </div>
-        </div>
+  return <Section id="contact" title="Contact" intro="I’m open to entry-level Cloud Support, DevOps, Cloud Engineering, Platform, and Infrastructure opportunities."><div className="contact-layout"><p className="contact-statement">If the work here is relevant to your team, email is the simplest way to start a conversation.</p><div className="contact-links"><ContactLink label="Email" value="jeysibn@gmail.com" href="mailto:jeysibn@gmail.com" /><ContactLink label="LinkedIn" value="jeromeibon" href="https://www.linkedin.com/in/jeromeibon" external /><ContactLink label="GitHub" value="Jeysibn" href="https://github.com/Jeysibn" external /></div></div></Section>;
+}
+function ContactLink({ label, value, href, external = false }: { label: string; value: string; href: string; external?: boolean }) { return <a href={href} target={external ? "_blank" : undefined} rel={external ? "noreferrer" : undefined}><span>{label}</span><strong>{value}</strong>{external ? <ExternalIcon /> : <ArrowIcon />}</a>; }
 
-        <div className="contact-actions" aria-label="Contact links">
-          <a className="contact-action contact-action-primary" href="mailto:jeysibn@gmail.com">
-            <span>
-              <small>Best way to reach me</small>
-              <strong>jeysibn@gmail.com</strong>
-            </span>
-            <ExternalIcon />
-          </a>
-          <a className="contact-action" href="https://linkedin.com/in/jeromeibon" target="_blank" rel="noreferrer">
-            <span>
-              <small>Professional profile</small>
-              <strong>LinkedIn</strong>
-            </span>
-            <ExternalIcon />
-          </a>
-          <a className="contact-action" href="https://github.com/Jeysibn" target="_blank" rel="noreferrer">
-            <span>
-              <small>Code & infrastructure</small>
-              <strong>GitHub</strong>
-            </span>
-            <ExternalIcon />
-          </a>
-        </div>
-      </div>
-    </Section>
-  );
+type TraceKey = "request" | "persist" | "deliver" | "observe";
+const traces: Record<TraceKey, [string, string, string]> = {
+  request: ["Request", "Browser → Functions", "The static React frontend calls three anonymous HTTPS routes: health, visitor count, and the portfolio assistant."],
+  persist: ["Persist", "Functions → Cosmos DB", "Cosmos DB stores the counter, hashed visitor identifiers, and temporary assistant rate-limit records with TTL cleanup."],
+  deliver: ["Deliver", "GitHub → Pages and Azure", "Path-specific workflows publish the frontend separately and deploy the backend with short-lived Azure OIDC authentication."],
+  observe: ["Observe", "Functions → Application Insights", "Request, latency, failure, exception, and structured event telemetry flows into Application Insights and Log Analytics."],
+};
+
+function CaseStudy({ project }: { project: Project }) {
+  const { preference, setPreference } = useTheme(); const cloud = project.id === "cloud-portfolio";
+  useCaseStudyMotion();
+  useEffect(() => { document.title = `${project.title} | Jerome Ibon`; }, [project.title]);
+  return <><a className="skip-link" href="#case-content">Skip to case study</a><header className="case-header"><a className="wordmark" href="./index.html" aria-label="Jerome Ibon, home">JI<span aria-hidden="true">/</span></a><a href="./index.html#projects">Back to selected work</a><ThemeControl value={preference} onChange={setPreference} /></header><main id="case-content" className="case-main"><header className="case-masthead"><p className="project-category">{project.category} · Personal project</p><h1>{project.title}</h1><p>{project.summary}</p><div className="action-row"><a className="button primary" href={project.repositoryUrl} target="_blank" rel="noreferrer">View repository <ExternalIcon /></a><a className="button secondary" href="./index.html#contact">Contact Jerome</a></div></header>{cloud ? <SystemTrace /> : <figure className="case-artifact"><a href={homelabDiagramUrl} target="_blank" rel="noreferrer" aria-label="Open the homelab architecture diagram at full size"><img src={homelabDiagramUrl} alt="Architecture of the current single-node K3s homelab, including GitHub Actions validation, Argo CD, networking, storage, DNS, and observability." width="2048" height="1152" loading="lazy" /></a><figcaption>Repository architecture artifact. K3s is single-node and the Raspberry Pi provides remote access through Tailscale. The diagram’s Calico placement is stale: current implementation documents Calico as bootstrap-owned before Argo CD.</figcaption></figure>}<div className="case-layout"><nav className="case-index" aria-label="Case study contents">{["context", "architecture", "delivery", "operations", "tradeoffs"].map((id) => <a key={id} href={`#${id}`}>{id[0].toUpperCase() + id.slice(1)}</a>)}</nav><article className="case-article">{cloud ? <CloudStory /> : <HomelabStory />}</article></div></main><Footer /></>;
 }
 
-function Section({
-  id,
-  title,
-  intro,
-  children,
-}: {
-  id: string;
-  title: string;
-  intro?: string;
-  children: ReactNode;
-}) {
-  return (
-    <section id={id} className="content-section" aria-labelledby={`${id}-title`}>
-      <div className="section-inner">
-        <div className="section-heading" data-reveal="">
-          <h2 id={`${id}-title`}>{title}</h2>
-          {intro ? <p className="section-intro">{intro}</p> : null}
-        </div>
-        {children}
-      </div>
-    </section>
-  );
+function SystemTrace() {
+  const [active, setActive] = useState<TraceKey>("request");
+  useTraceMotion(active);
+  const mobileNodes = active === "deliver" ? ["GitHub", "Actions + OIDC", "Pages + Azure"] : active === "persist" ? ["Browser", "Azure Functions", "Cosmos DB"] : active === "observe" ? ["Azure Functions", "Telemetry", "App Insights"] : ["Browser", "Azure Functions", "API response"];
+  return <figure className={`system-trace trace-${active}`}><figcaption>Explore one real path through the live portfolio system.</figcaption><div className="trace-controls" aria-label="Architecture paths">{(Object.keys(traces) as TraceKey[]).map((key) => <button type="button" key={key} aria-pressed={active === key} onClick={() => setActive(key)}>{traces[key][0]}</button>)}</div><svg className="trace-diagram" viewBox="0 0 1000 430" role="img" aria-labelledby="trace-title trace-desc"><title id="trace-title">Cloud-backed portfolio architecture</title><desc id="trace-desc">GitHub Actions deploys React to GitHub Pages and Python APIs to Azure Functions. The browser calls Functions, which connects to Cosmos DB, an AI provider, and Application Insights.</desc><Node x={40} y={170} a="Browser" b="React + Vite" /><Node x={270} y={40} a="GitHub" b="Actions + OIDC" /><Node x={270} y={300} a="GitHub Pages" b="Static frontend" /><Node x={525} y={170} a="Azure Functions" b="Python v2 APIs" wide /><Node x={785} y={45} a="Cosmos DB" b="TTL records" /><Node x={785} y={178} a="AI provider" b="Server-side only" /><Node x={785} y={311} a="App Insights" b="Log Analytics" /><path className="path deliver" d="M355 124V300M440 82H612V170M440 82H485V342H440" /><path className="path request" d="M190 212H525M700 218H785" /><path className="path persist" d="M700 194C748 194 744 82 785 82" /><path className="path observe" d="M700 236C748 236 744 348 785 348" /></svg><div className="trace-mobile-map" aria-hidden="true"><span>{mobileNodes[0]}</span><i>→</i><span>{mobileNodes[1]}</span><i>→</i><span>{mobileNodes[2]}</span></div><a className="diagram-link" href={cloudDiagramUrl} target="_blank" rel="noreferrer">Open full system map <ExternalIcon /></a><div className="trace-note" aria-live="polite"><p>{traces[active][0]} path</p><h2>{traces[active][1]}</h2><p>{traces[active][2]}</p></div></figure>;
 }
+function Node({ x, y, a, b, wide = false }: { x: number; y: number; a: string; b: string; wide?: boolean }) { const width = wide ? 175 : 170; return <g className="trace-node"><rect x={x} y={y} width={width} height="84"/><text x={x + width / 2} y={y + 34}>{a}</text><text x={x + width / 2} y={y + 60}>{b}</text></g>; }
+function Story({ id, title, children }: { id: string; title: string; children: ReactNode }) { return <section id={id}><h2>{title}</h2>{children}</section>; }
 
-function ProjectDialog({
-  project,
-  onClose,
-}: {
-  project: Project | null;
-  onClose: () => void;
-}) {
-  const dialogRef = useRef<HTMLDialogElement>(null);
+function CloudStory() { return <><Story id="context" title="A portfolio treated as a service"><p>The goal was to move beyond static hosting and use a small personal site to practice the lifecycle of a cloud service: provision it, deliver it, observe it, and verify it after deployment.</p><p>The public frontend must stay inexpensive and fast, while visitor and assistant features require server-side state and secrets.</p></Story><Story id="architecture" title="Static at the edge, dynamic behind an API"><p>Vite builds React and TypeScript for GitHub Pages. Anonymous HTTPS calls reach a Python Azure Functions app with separate health, visitor-count, and assistant routes. Cosmos DB persists visitor data and rate-limit state; the AI credential remains server-side.</p><p>The health route deliberately checks worker liveness only. It does not claim that Cosmos DB or the AI provider is healthy.</p></Story><Story id="delivery" title="Delivery follows the changed layer"><p>Frontend, backend, and Terraform workflows deploy independently by path. Pull requests typecheck and build the frontend, run backend tests and dependency checks, and create an authenticated Terraform plan. Production Azure workflows use GitHub-issued OIDC tokens instead of a reusable client secret.</p><p>Backend delivery follows package deployment with health and visitor API checks because successful upload does not prove runtime readiness.</p></Story><Story id="operations" title="Failures should leave evidence"><p>Application Insights and Log Analytics collect request, latency, failure, exception, and structured application events. Correlation identifiers support investigation without intentionally logging raw IP addresses, prompts, responses, secrets, or connection strings.</p><p>The visitor route hashes client IPs before persistence. Temporary visitor and chat rate-limit records use TTL cleanup.</p></Story><Story id="tradeoffs" title="Small system, explicit boundaries"><p>GitHub Pages keeps static delivery simple, while Azure Functions avoids an idle application server. This split creates a CORS boundary and two release paths, so configuration and post-deployment verification matter.</p><p>The project is a personal learning system; it does not claim enterprise traffic, uptime, or measured business impact.</p></Story></>; }
 
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-
-    if (project && !dialog.open) {
-      dialog.showModal();
-    } else if (!project && dialog.open) {
-      dialog.close();
-    }
-  }, [project]);
-
-  return (
-    <dialog
-      ref={dialogRef}
-      className="case-dialog"
-      aria-labelledby="case-dialog-title"
-      onCancel={(event) => {
-        event.preventDefault();
-        onClose();
-      }}
-      onClick={(event) => {
-        if (event.target === event.currentTarget) onClose();
-      }}
-    >
-      {project ? (
-        <article className="case-panel">
-          <div className="case-header">
-            <div>
-              <p className="project-category">{project.category}</p>
-              <h2 id="case-dialog-title">{project.title}</h2>
-              <p>{project.summary}</p>
-            </div>
-            <button type="button" className="icon-button" aria-label="Close case study" onClick={onClose} autoFocus>
-              <CloseIcon />
-            </button>
-          </div>
-
-          <div className="case-architecture" aria-hidden="true">
-            <ProjectIllustration id={project.id} className="case-architecture-illo" />
-          </div>
-
-          <div className="case-section">
-            <h3>Why it exists</h3>
-            <p>{project.purpose}</p>
-          </div>
-
-          <div className="case-section">
-            <h3>Operating outcomes</h3>
-            <ul>
-              {project.outcomes.map((outcome) => (
-                <li key={outcome}>{outcome}</li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="case-section">
-            <h3>Engineering highlights</h3>
-            <ul>
-              {project.highlights.map((highlight) => (
-                <li key={highlight}>{highlight}</li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="case-section">
-            <h3>Technology</h3>
-            <div className="technology-cloud">
-              {project.technologies.map((technology) => (
-                <span key={technology}>{technology}</span>
-              ))}
-            </div>
-          </div>
-
-          <a className="button button-primary case-repository" href={project.repositoryUrl} target="_blank" rel="noreferrer">
-            View repository <ExternalIcon />
-          </a>
-        </article>
-      ) : null}
-    </dialog>
-  );
-}
-
-function SkillDialog({ group, onClose }: { group: SkillGroup | null; onClose: () => void }) {
-  const dialogRef = useRef<HTMLDialogElement>(null);
-
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-    if (group && !dialog.open) dialog.showModal();
-    if (!group && dialog.open) dialog.close();
-  }, [group]);
-
-  const detail = group ? skillDetails[group.label] : null;
-
-  return (
-    <dialog
-      ref={dialogRef}
-      className="skill-detail-dialog"
-      aria-labelledby="skill-dialog-title"
-      onCancel={(event) => {
-        event.preventDefault();
-        onClose();
-      }}
-      onClick={(event) => {
-        if (event.target === event.currentTarget) onClose();
-      }}
-    >
-      {group && detail ? (
-        <article className="skill-detail-panel">
-          <button type="button" className="inspection-close" aria-label="Close skill details" onClick={onClose} autoFocus>
-            <CloseIcon />
-          </button>
-          <h2 id="skill-dialog-title">{group.label}</h2>
-          <p className="skill-detail-summary">{detail.summary}</p>
-          <p className="skill-detail-practice">{detail.practice}</p>
-          <div className="skill-detail-list">
-            {group.items.map((item) => (
-              <div key={`${group.label}-${item}`}>
-                <h3>{item}</h3>
-                <p>{detail.itemDescriptions[item] || "Used as part of my cloud, DevOps, support, and infrastructure workflows."}</p>
-              </div>
-            ))}
-          </div>
-        </article>
-      ) : null}
-    </dialog>
-  );
-}
-
-function Footer() {
-  return (
-    <footer className="site-footer">
-      <div className="footer-inner">
-        <div>
-          <strong>Jeysibn</strong>
-          <span>React + TypeScript frontend · Terraform-managed Azure backend</span>
-        </div>
-        <VisitorCounter />
-      </div>
-    </footer>
-  );
-}
-
-function VisitorCounter() {
-  const [count, setCount] = useState<number | null>(null);
-  const [failed, setFailed] = useState(false);
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    fetchVisitorCount(controller.signal)
-      .then((value) => setCount(value))
-      .catch((error: unknown) => {
-        if (error instanceof DOMException && error.name === "AbortError") return;
-        setFailed(true);
-      });
-
-    return () => controller.abort();
-  }, []);
-
-  return (
-    <p className="visitor-count" aria-live="polite" title={failed ? "Visitor counter is temporarily unavailable" : undefined}>
-      <span>Visitors</span>
-      <strong>{failed ? "Unavailable" : count === null ? "Checking…" : count.toLocaleString()}</strong>
-    </p>
-  );
-}
+function HomelabStory() { return <><Story id="context" title="A reproducible place to practice operations"><p>This active personal homelab uses a repurposed laptop running Proxmox VE. The current Kubernetes environment is one K3s server node. A Raspberry Pi 4B provides remote access through Tailscale; it is not currently a Kubernetes node.</p><p>An earlier experiment used an Ubuntu Server laptop and Raspberry Pi as two K3s nodes. That mixed-architecture setup exposed image and workload compatibility constraints.</p></Story><Story id="architecture" title="Bootstrap first, reconciliation second"><p>Terraform provisions the virtual machine. Bootstrap scripts configure networking, install K3s and Calico, verify cluster networking, and only then install Argo CD. Calico is bootstrap-owned because Argo CD cannot operate until a working CNI exists.</p><p>Argo CD uses App-of-Apps and ordered sync waves for storage, ingress, DNS, observability, and workloads.</p></Story><Story id="delivery" title="Changes are checked before reconciliation"><p>GitHub Actions validates shell scripts and YAML, renders Helm templates, and checks Kubernetes schemas. After merge, Argo CD detects the desired-state change and reconciles from main.</p></Story><Story id="operations" title="A DNS failure became an acceptance test"><p>During a September 2026 bootstrap, pod routing and TCP ClusterIP traffic worked while UDP DNS through CoreDNS failed. Investigation traced it to a broad Calico UDP NOTRACK rule interacting with kube-proxy iptables service NAT.</p><p>For the single-node topology, disabling overlay encapsulation removed the rule. Bootstrap now requires an acceptance test covering pod routing, service traffic, internal DNS, and external DNS before Argo CD installation.</p></Story><Story id="tradeoffs" title="Single-node means honest limits"><p>Longhorn and GitOps improve repeatability and operational practice, but a single-node cluster does not provide workload or storage high availability. Future multi-node work must re-evaluate encapsulation instead of copying the single-node Calico setting.</p><p>The repository documents a rebuild path, recovery utilities, service ownership, and troubleshooting evidence. These demonstrate operating habits rather than a production availability claim.</p></Story></>; }
 
 type ChatUiMessage = ChatMessage & { error?: boolean };
-
-function loadChatHistory(): ChatUiMessage[] {
-  try {
-    const stored = window.sessionStorage.getItem(CHAT_STORAGE_KEY);
-    if (!stored) return [];
-
-    const parsed: unknown = JSON.parse(stored);
-    if (!Array.isArray(parsed)) return [];
-
-    return parsed
-      .filter(
-        (message): message is ChatMessage =>
-          typeof message === "object" &&
-          message !== null &&
-          "role" in message &&
-          (message.role === "user" || message.role === "assistant") &&
-          "content" in message &&
-          typeof message.content === "string",
-      )
-      .slice(-20);
-  } catch {
-    return [];
-  }
-}
-
+function loadChat(): ChatUiMessage[] { try { const value = JSON.parse(sessionStorage.getItem(CHAT_STORAGE_KEY) || "[]"); return Array.isArray(value) ? value.slice(-20) : []; } catch { return []; } }
 function ChatWidget() {
-  const [open, setOpen] = useState(false);
-  const [messages, setMessages] = useState<ChatUiMessage[]>(loadChatHistory);
-  const [input, setInput] = useState("");
-  const [sending, setSending] = useState(false);
-  const messagesRef = useRef<HTMLDivElement>(null);
-  const requestRef = useRef<AbortController | null>(null);
-
-  useEffect(() => {
-    if (open) {
-      messagesRef.current?.scrollTo({ top: messagesRef.current.scrollHeight });
-    }
-  }, [messages, open, sending]);
-
-  useEffect(() => () => requestRef.current?.abort(), []);
-
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const message = input.trim();
-    if (!message || sending) return;
-
-    const history = messages.filter((item) => !item.error).map(({ role, content }) => ({ role, content }));
-    const userMessage: ChatMessage = { role: "user", content: message };
-
-    setMessages((current) => [...current, userMessage]);
-    setInput("");
-    setSending(true);
-
-    const controller = new AbortController();
-    requestRef.current = controller;
-
-    try {
-      const reply = await sendChatMessage(message, history, controller.signal);
-      const assistantMessage: ChatMessage = { role: "assistant", content: reply };
-      const persisted = [...history, userMessage, assistantMessage].slice(-20);
-
-      setMessages(persisted);
-      window.sessionStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(persisted));
-    } catch (error: unknown) {
-      if (error instanceof DOMException && error.name === "AbortError") return;
-      const detail = error instanceof Error ? error.message : "The assistant could not be reached.";
-      setMessages((current) => [
-        ...current,
-        {
-          role: "assistant",
-          content: `I couldn’t complete that request. ${detail} Please try again.`,
-          error: true,
-        },
-      ]);
-    } finally {
-      setSending(false);
-      requestRef.current = null;
-    }
-  }
-
-  return (
-    <div className="chat-widget">
-      <div className={open ? "chat-panel chat-panel-open" : "chat-panel"} aria-hidden={!open}>
-        <div className="chat-header">
-          <div>
-            <strong>Portfolio assistant</strong>
-            <span>Azure Functions · provider-neutral AI</span>
-          </div>
-          <button type="button" className="icon-button" aria-label="Close assistant" onClick={() => setOpen(false)}>
-            <CloseIcon />
-          </button>
-        </div>
-
-        <div ref={messagesRef} className="chat-messages" role="log" aria-live="polite" aria-label="Assistant conversation">
-          <div className="chat-message chat-message-assistant">
-            Ask about my experience, projects, technical stack, or how this portfolio is engineered.
-          </div>
-          {messages.map((message, index) => (
-            <div
-              key={`${message.role}-${index}-${message.content.slice(0, 16)}`}
-              className={`chat-message chat-message-${message.role}${message.error ? " chat-message-error" : ""}`}
-            >
-              {message.content}
-            </div>
-          ))}
-          {sending ? <div className="chat-message chat-message-assistant chat-typing">Assistant is thinking<span aria-hidden="true">…</span></div> : null}
-        </div>
-
-        <form className="chat-form" onSubmit={handleSubmit}>
-          <label htmlFor="chat-input" className="sr-only">Ask the portfolio assistant</label>
-          <input
-            id="chat-input"
-            value={input}
-            onChange={(event) => setInput(event.target.value)}
-            placeholder="Ask about a project…"
-            maxLength={500}
-            disabled={sending}
-            autoComplete="off"
-          />
-          <button type="submit" className="chat-send" disabled={sending || !input.trim()} aria-label="Send message">
-            <SendIcon />
-          </button>
-        </form>
-      </div>
-
-      <button
-        type="button"
-        className="chat-trigger"
-        aria-label={open ? "Close portfolio assistant" : "Open portfolio assistant"}
-        aria-expanded={open}
-        onClick={() => setOpen((current) => !current)}
-      >
-        <ChatIcon />
-        <span>Ask about Jerome</span>
-      </button>
-    </div>
-  );
+  const [open, setOpen] = useState(false), [closing, setClosing] = useState(false), [messages, setMessages] = useState<ChatUiMessage[]>(loadChat), [input, setInput] = useState(""), [sending, setSending] = useState(false); const trigger = useRef<HTMLButtonElement>(null), field = useRef<HTMLInputElement>(null), closeTimer = useRef<number>(0); const id = useId();
+  const close = () => { if (matchMedia("(prefers-reduced-motion: reduce)").matches) { setOpen(false); requestAnimationFrame(() => trigger.current?.focus()); return; } setClosing(true); closeTimer.current = window.setTimeout(() => { setOpen(false); setClosing(false); trigger.current?.focus(); }, 160); };
+  useEffect(() => () => clearTimeout(closeTimer.current), []);
+  useEffect(() => { if (!open) return; if (matchMedia("(min-width: 681px)").matches) field.current?.focus(); const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") close(); }; addEventListener("keydown", onKey); return () => removeEventListener("keydown", onKey); }, [open]);
+  async function submit(event: FormEvent) { event.preventDefault(); const content = input.trim(); if (!content || sending) return; const history = messages.filter((m) => !m.error).map(({ role, content }) => ({ role, content })); const user: ChatMessage = { role: "user", content }; setMessages((v) => [...v, user]); setInput(""); setSending(true); try { const reply = await sendChatMessage(content, history); const next = [...history, user, { role: "assistant" as const, content: reply }].slice(-20); setMessages(next); sessionStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(next)); } catch { setMessages((v) => [...v, { role: "assistant", content: "The assistant is unavailable right now. Please try again shortly.", error: true }]); } finally { setSending(false); } }
+  return <aside className="chat-widget" aria-label="Portfolio assistant">{open && <div id={id} className={`chat-panel${closing ? " is-closing" : ""}`}><header><div><strong>Ask about my work</strong><span>Portfolio-specific assistant</span></div><button type="button" className="icon-button" onClick={close} aria-label="Close assistant"><CloseIcon /></button></header><div className="chat-messages" role="log" aria-live="polite">{!messages.length && <p>Ask about my experience, projects, skills, or how this site is engineered.</p>}{messages.map((m, i) => <p key={`${i}-${m.content.slice(0, 12)}`} className={`message ${m.role}${m.error ? " error" : ""}`}>{m.content}</p>)}{sending && <p className="message assistant">Thinking…</p>}</div><form onSubmit={submit}><label htmlFor="chat-input">Your question</label><div><input ref={field} id="chat-input" name="question" value={input} onChange={(e) => setInput(e.target.value)} maxLength={500} autoComplete="off" spellCheck={false} /><button type="submit" aria-label="Send question" disabled={sending}><SendIcon /></button></div></form></div>}<button ref={trigger} type="button" className="chat-trigger" aria-expanded={open && !closing} aria-controls={id} onClick={() => open ? close() : (setClosing(false), setOpen(true))}><ChatIcon /><span>{open && !closing ? "Close assistant" : "Ask about my work"}</span></button></aside>;
 }
 
-function PrintResume() {
-  return (
-    <article className="print-resume">
-      <header>
-        <h1>Jerome Christian V. Ibon</h1>
-        <p>Cloud Support · DevOps · Cloud Engineering · Kubernetes · GitOps · Infrastructure Automation</p>
-        <p>Malolos, Bulacan, Philippines · jeysibn@gmail.com · +63 991 408 9619</p>
-        <p>linkedin.com/in/jeromeibon · github.com/Jeysibn</p>
-      </header>
-
-      <PrintSection title="Professional summary">
-        <p>{professionalSummary}</p>
-      </PrintSection>
-
-      <PrintSection title="Technical skills">
-        <dl className="print-skills">
-          {skillGroups.map((group) => (
-            <div key={group.label}>
-              <dt>{group.label}</dt>
-              <dd>{group.items.join(" · ")}</dd>
-            </div>
-          ))}
-        </dl>
-      </PrintSection>
-
-      <PrintSection title="Professional experience">
-        {experience.map((item) => (
-          <div key={`${item.organization}-print`} className="print-entry">
-            <div className="print-entry-heading">
-              <strong>{item.role}</strong>
-              <span>{item.period}</span>
-            </div>
-            <p>{item.organization} · {item.location}</p>
-            <ul>{item.highlights.map((highlight) => <li key={highlight}>{highlight}</li>)}</ul>
-          </div>
-        ))}
-      </PrintSection>
-
-      <PrintSection title="Projects / home lab">
-        <div className="print-entry">
-          <strong>Production-Style Kubernetes Home Lab</strong>
-          <ul>
-            {projects[1].highlights.slice(0, 3).map((highlight) => <li key={highlight}>{highlight}</li>)}
-          </ul>
-        </div>
-        <div className="print-entry">
-          <strong>Cloud-Backed Portfolio</strong>
-          <ul>
-            {projects[0].highlights.slice(0, 3).map((highlight) => <li key={highlight}>{highlight}</li>)}
-          </ul>
-        </div>
-      </PrintSection>
-
-      <PrintSection title="Education">
-        <div className="print-entry">
-          <div className="print-entry-heading">
-            <strong>{education.degree}</strong>
-            <span>{education.period}</span>
-          </div>
-          <p>{education.school} · {education.location}</p>
-          <p>Thesis: {education.thesis}</p>
-        </div>
-      </PrintSection>
-
-      <PrintSection title="Certifications">
-        <ul>{certifications.map((certification) => <li key={certification}>{certification}</li>)}</ul>
-      </PrintSection>
-    </article>
-  );
-}
-
-function PrintSection({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <section>
-      <h2>{title}</h2>
-      {children}
-    </section>
-  );
-}
-
-function Icon({ children, size = 18 }: { children: ReactNode; size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      {children}
-    </svg>
-  );
-}
-
-function ExternalIcon() {
-  return <Icon size={16}><path d="M14 5h5v5" /><path d="M10 14 19 5" /><path d="M19 13v6H5V5h6" /></Icon>;
-}
-
-function CloseIcon() {
-  return <Icon><path d="m6 6 12 12" /><path d="M18 6 6 18" /></Icon>;
-}
-
-function MenuIcon() {
-  return <Icon><path d="M4 7h16" /><path d="M4 12h16" /><path d="M4 17h16" /></Icon>;
-}
-
-function SunMoonIcon() {
-  return <Icon size={16}><circle cx="12" cy="12" r="3.5" /><path d="M12 2v2" /><path d="M12 20v2" /><path d="m4.93 4.93 1.42 1.42" /><path d="m17.66 17.66 1.41 1.41" /><path d="M2 12h2" /><path d="M20 12h2" /></Icon>;
-}
-
-function ThemeChevronIcon() {
-  return <Icon size={14}><path d="m7 9 5 5 5-5" /></Icon>;
-}
-
-function PrintIcon() {
-  return <Icon><path d="M6 9V3h12v6" /><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" /><path d="M6 14h12v7H6z" /></Icon>;
-}
-
-function DownloadIcon() {
-  return <Icon><path d="M12 3v12" /><path d="m7 10 5 5 5-5" /><path d="M5 21h14" /></Icon>;
-}
-
-function ChatIcon() {
-  return <Icon><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z" /><path d="M8 10h.01" /><path d="M12 10h.01" /><path d="M16 10h.01" /></Icon>;
-}
-
-function SendIcon() {
-  return <Icon><path d="m22 2-7 20-4-9-9-4Z" /><path d="M22 2 11 13" /></Icon>;
-}
-
+function Footer() { const [count, setCount] = useState("Checking"); useEffect(() => { const c = new AbortController(); fetchVisitorCount(c.signal).then((v) => setCount(v.toLocaleString())).catch(() => setCount("Unavailable")); return () => c.abort(); }, []); return <footer><div><p><strong>Jerome Ibon</strong><span>Cloud &amp; DevOps engineering portfolio</span></p><p aria-live="polite"><span>Visitors</span><strong>{count}</strong></p></div></footer>; }
+function PrintResume() { return <article className="print-resume"><h1>Jerome Christian V. Ibon</h1><p>Cloud Support | DevOps | Cloud Engineering</p><p>Malolos, Bulacan, Philippines | jeysibn@gmail.com | linkedin.com/in/jeromeibon | github.com/Jeysibn</p><h2>Professional summary</h2><p>{professionalSummary}</p><h2>Experience</h2>{experience.map((item) => <section key={item.role}><h3>{item.role} — {item.organization}</h3><p>{item.period} | {item.location}</p><ul>{item.highlights.map((point) => <li key={point}>{point}</li>)}</ul></section>)}<h2>Projects</h2>{projects.map((project) => <section key={project.id}><h3>{project.title}</h3><p>{project.summary}</p></section>)}<h2>Education &amp; credentials</h2><p>{education.degree}, {education.school}, {education.period}</p><ul>{certifications.map((item) => <li key={item}>{item}</li>)}</ul></article>; }
+function Icon({ children }: { children: ReactNode }) { return <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{children}</svg>; }
+function ExternalIcon() { return <Icon><path d="M14 5h5v5M11 13l8-8M19 13v6H5V5h6" /></Icon>; } function ArrowIcon() { return <Icon><path d="M5 12h14M14 7l5 5-5 5" /></Icon>; } function DownloadIcon() { return <Icon><path d="M12 3v12M7 10l5 5 5-5M5 20h14" /></Icon>; } function PrintIcon() { return <Icon><path d="M7 8V3h10v5M7 17H5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M7 14h10v7H7z" /></Icon>; } function MenuIcon() { return <Icon><path d="M4 7h16M4 12h16M4 17h16" /></Icon>; } function CloseIcon() { return <Icon><path d="M6 6l12 12M18 6 6 18" /></Icon>; } function SunIcon() { return <Icon><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2"/></Icon>; } function MoonIcon() { return <Icon><path d="M20 15.5A8 8 0 0 1 8.5 4 8 8 0 1 0 20 15.5z"/></Icon>; } function ChatIcon() { return <Icon><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/></Icon>; } function SendIcon() { return <Icon><path d="m22 2-7 20-4-9-9-4zM22 2 11 13"/></Icon>; }
 export default App;
