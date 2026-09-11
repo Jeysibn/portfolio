@@ -1239,15 +1239,38 @@ body:has(.inspection-dialog[open]) {
   line-height: 1.6;
 }
 .architecture-diagram-frame {
+  position: relative;
   overflow-x: auto;
-  border-block: 1px solid var(--line);
-  background: color-mix(in srgb, var(--panel) 46%, transparent);
-  scrollbar-color: var(--signal2) transparent;
+  border: 1px solid color-mix(in srgb, #171912 28%, transparent);
+  background: #eee9de;
+  color: #171912;
+  padding: 12px;
+  scrollbar-color: #766f62 #ded8ca;
+  box-shadow: inset 0 0 0 5px #eee9de;
+}
+.architecture-diagram-frame::before,
+.architecture-diagram-frame::after {
+  position: absolute;
+  z-index: 1;
+  color: #766f62;
+  font: 500 8px var(--mono);
+  letter-spacing: 0.12em;
+  pointer-events: none;
+}
+.architecture-diagram-frame::before {
+  content: "ARCHITECTURE SHEET";
+  top: 8px;
+  left: 10px;
+}
+.architecture-diagram-frame::after {
+  content: "REPOSITORY-DERIVED";
+  right: 10px;
+  bottom: 8px;
 }
 .architecture-diagram-frame img {
   display: block;
   width: 100%;
-  min-width: 760px;
+  min-width: 0;
   height: auto;
   padding: 22px 10px;
 }

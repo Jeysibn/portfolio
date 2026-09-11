@@ -76,7 +76,12 @@ export function ProjectDialog({
                   <h4>{diagram.title}</h4>
                   <p>{diagram.description}</p>
                 </figcaption>
-                <div className="architecture-diagram-frame">
+                <div
+                  className="architecture-diagram-frame"
+                  tabIndex={0}
+                  role="region"
+                  aria-label={`${diagram.title} diagram; scroll horizontally on smaller screens`}
+                >
                   <img src={diagram.svg} alt="" aria-hidden="true" />
                 </div>
                 <details className="architecture-summary">
