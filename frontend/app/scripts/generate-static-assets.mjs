@@ -1,43 +1,98 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
+import { certifications } from "../src/portfolio.ts";
+const certificationSummary = certifications
+  .map((certification) =>
+    certification.status === "in-progress"
+      ? `${certification.name} (in progress)`
+      : certification.name,
+  )
+  .join(" | ");
 
 const outputPath = resolve("public/resume.pdf");
 mkdirSync(dirname(outputPath), { recursive: true });
 
 function escapePdfText(value) {
-  return String(value).replace(/\\/g, "\\\\").replace(/\(/g, "\\(").replace(/\)/g, "\\)");
+  return String(value)
+    .replace(/\\/g, "\\\\")
+    .replace(/\(/g, "\\(")
+    .replace(/\)/g, "\\)");
 }
 
 const lines = [
   { text: "Jerome Christian V. Ibon", size: 20, bold: true },
   { text: "Cloud Support | DevOps | Cloud Engineering", size: 11 },
-  { text: "Malolos, Bulacan, Philippines | jeysibn@gmail.com | linkedin.com/in/jeromeibon | github.com/Jeysibn", size: 9 },
+  {
+    text: "Malolos, Bulacan, Philippines | jeysibn@gmail.com | linkedin.com/in/jeromeibon | github.com/Jeysibn",
+    size: 9,
+  },
   "",
   { text: "Professional Summary", size: 13, bold: true },
-  { text: "Computer Engineering graduate and OCI-certified engineer building production-style cloud and Kubernetes infrastructure from provisioning through GitOps delivery and observability. Brings enterprise SaaS technical-support experience and is pursuing entry-level Cloud Support, DevOps, and Cloud Engineering roles.", size: 9 },
+  {
+    text: "Computer Engineering graduate and OCI-certified engineer building production-style cloud and Kubernetes infrastructure from provisioning through GitOps delivery and observability. Brings enterprise SaaS technical-support experience and is pursuing entry-level Cloud Support, DevOps, and Cloud Engineering roles.",
+    size: 9,
+  },
   "",
   { text: "Technical Skills", size: 13, bold: true },
-  { text: "Cloud: Azure, AWS, Oracle Cloud Infrastructure, VMware vSphere, Proxmox", size: 9 },
+  {
+    text: "Cloud: Azure, AWS, Oracle Cloud Infrastructure, VMware vSphere, Proxmox",
+    size: 9,
+  },
   { text: "Delivery: Terraform, GitHub Actions, Argo CD, Git, YAML", size: 9 },
   { text: "Containers: Kubernetes/k3s, Docker, Helm", size: 9 },
-  { text: "Observability: Application Insights, Log Analytics, Prometheus, Grafana", size: 9 },
-  { text: "Systems: Linux, Windows Server, Active Directory, TCP/IP, DNS, VPN, SSH, RDP", size: 9 },
+  {
+    text: "Observability: Application Insights, Log Analytics, Prometheus, Grafana",
+    size: 9,
+  },
+  {
+    text: "Systems: Linux, Windows Server, Active Directory, TCP/IP, DNS, VPN, SSH, RDP",
+    size: 9,
+  },
   "",
   { text: "Experience", size: 13, bold: true },
-  { text: "Technical Support Engineer, Endpoint Security SaaS | TrendAI | Aug 2025 - Feb 2026", size: 10, bold: true },
-  { text: "Resolved 80+ enterprise technical cases across network, system, and cloud infrastructure issues while working within SLA expectations.", size: 9 },
-  { text: "Provisioned AWS environments including EC2, VPCs, security groups, subnets, and routing to reproduce customer scenarios.", size: 9 },
-  { text: "Completed 640 hours of training across enterprise networking, server administration, VMware vSphere, Azure fundamentals, and AWS fundamentals.", size: 9 },
-  { text: "IT Helpdesk Intern | Philippine Transmarine Carriers | Mar 2025 - May 2025", size: 10, bold: true },
-  { text: "Assisted with Active Directory accounts, user access controls, network connectivity, VPN troubleshooting, endpoint redeployment, and IT assets.", size: 9 },
+  {
+    text: "Technical Support Engineer, Endpoint Security SaaS | TrendAI | Aug 2025 - Feb 2026",
+    size: 10,
+    bold: true,
+  },
+  {
+    text: "Resolved 80+ enterprise technical cases across network, system, and cloud infrastructure issues while working within SLA expectations.",
+    size: 9,
+  },
+  {
+    text: "Provisioned AWS environments including EC2, VPCs, security groups, subnets, and routing to reproduce customer scenarios.",
+    size: 9,
+  },
+  {
+    text: "Completed 640 hours of training across enterprise networking, server administration, VMware vSphere, Azure fundamentals, and AWS fundamentals.",
+    size: 9,
+  },
+  {
+    text: "IT Helpdesk Intern | Philippine Transmarine Carriers | Mar 2025 - May 2025",
+    size: 10,
+    bold: true,
+  },
+  {
+    text: "Assisted with Active Directory accounts, user access controls, network connectivity, VPN troubleshooting, endpoint redeployment, and IT assets.",
+    size: 9,
+  },
   "",
   { text: "Projects", size: 13, bold: true },
-  { text: "Cloud-Backed Portfolio: React, TypeScript, Azure Functions, Cosmos DB, Terraform, GitHub Actions, Application Insights.", size: 9 },
-  { text: "Homelab GitOps Environment: k3s, Argo CD, Terraform, Proxmox, Helm, GitHub Actions, Prometheus, Grafana.", size: 9 },
+  {
+    text: "Cloud-Backed Portfolio: React, TypeScript, Azure Functions, Cosmos DB, Terraform, GitHub Actions, Application Insights.",
+    size: 9,
+  },
+  {
+    text: "Homelab GitOps Environment: k3s, Argo CD, Terraform, Proxmox, Helm, GitHub Actions, Prometheus, Grafana.",
+    size: 9,
+  },
   "",
   { text: "Education & Certifications", size: 13, bold: true },
-  { text: "Bachelor of Science in Computer Engineering | National University Baliwag | Aug 2021 - Aug 2025", size: 9 },
-  { text: "Oracle Cloud Infrastructure Foundations Associate | Trend Vision One Server and Workload Protection Professional | GitHub Foundations", size: 9 },
+  {
+    text: "Bachelor of Science in Computer Engineering | National University Baliwag | Aug 2021 - Aug 2025",
+    size: 9,
+  },
+  { text: certificationSummary, size: 9 },
 ];
 
 const wrapped = [];
@@ -68,7 +123,9 @@ for (const entry of wrapped) {
     continue;
   }
   const font = entry.bold ? "F2" : "F1";
-  commands.push(`/${font} ${entry.size} Tf 54 ${y} Td (${escapePdfText(entry.text)}) Tj`);
+  commands.push(
+    `/${font} ${entry.size} Tf 54 ${y} Td (${escapePdfText(entry.text)}) Tj`,
+  );
   commands.push(`-${54} -${y} Td`);
   y -= entry.size + 5;
 }
