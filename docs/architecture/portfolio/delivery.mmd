@@ -1,0 +1,43 @@
+%% C4 container-level delivery and infrastructure view.
+%% Audience: technical reviewers locating validation, trust, and deploy boundaries.
+flowchart LR
+  engineer(["Engineer<br/>dev → main"]):::actor
+  source["Jeysibn/portfolio<br/>source repository"]:::surface
+  gates["GitHub Actions<br/>typecheck · tests · audit<br/>Terraform plan"]:::control
+
+  subgraph delivery["PATH-SPECIFIC PRODUCTION DELIVERY"]
+    frontend["Frontend workflow<br/>Vite production build"]:::pipeline
+    backend["Backend workflow<br/>Function package + smoke tests"]:::pipeline
+    infra["Terraform workflow<br/>plan + apply"]:::pipeline
+  end
+
+  oidc["GitHub OIDC<br/>Azure federated identity"]:::trust
+  pagesRepo["jeysibn.github.io<br/>generated publication repository"]:::state
+  pages["GitHub Pages<br/>production site"]:::runtime
+  function["Azure Function App<br/>Linux Consumption Y1"]:::runtime
+  azure["Terraform-managed Azure<br/>Cosmos · storage · telemetry"]:::runtime
+  tfstate[("Azure Storage<br/>remote Terraform state")]:::state
+
+  engineer -->|"push / pull request"| source
+  source -->|"workflow triggers"| gates
+  gates --> frontend
+  gates --> backend
+  gates --> infra
+  frontend -->|"rsync dist + push token"| pagesRepo
+  pagesRepo -->|"publishes"| pages
+  backend -->|"OIDC login"| oidc
+  infra -->|"OIDC login"| oidc
+  oidc -->|"deploy package"| function
+  oidc -->|"provision / update"| azure
+  infra -->|"reads / writes"| tfstate
+  backend -.->|"GET /health + visitor smoke test"| function
+
+  classDef actor fill:#eee9de,stroke:#e0522d,color:#171912,stroke-width:2px
+  classDef surface fill:#eee9de,stroke:#171912,color:#171912,stroke-width:1.5px
+  classDef control fill:#171912,stroke:#e0522d,color:#f3eee3,stroke-width:2px
+  classDef pipeline fill:#ded8ca,stroke:#766f62,color:#171912,stroke-width:1.5px
+  classDef trust fill:#f0c8b9,stroke:#a93618,color:#171912,stroke-width:1.5px
+  classDef runtime fill:#d2ded8,stroke:#275d57,color:#171912,stroke-width:1.5px
+  classDef state fill:#eee9de,stroke:#275d57,color:#171912,stroke-width:1.5px
+  style delivery fill:transparent,stroke:#766f62,stroke-width:1px
+  linkStyle default stroke:#766f62,stroke-width:1.5px,color:#171912

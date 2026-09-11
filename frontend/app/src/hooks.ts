@@ -12,27 +12,13 @@ function getSystemTheme(): "light" | "dark" {
 
 function getInitialTheme(): ThemePreference {
   const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
-  return stored === "light" || stored === "dark" || stored === "system"
-    ? stored
-    : "system";
+  return stored === "light" || stored === "dark" ? stored : getSystemTheme();
 }
 
 export function useTheme() {
   const [preference, setPreference] =
     useState<ThemePreference>(getInitialTheme);
-  const [systemTheme, setSystemTheme] = useState<"light" | "dark">(
-    getSystemTheme,
-  );
-
-  const effectiveTheme = preference === "system" ? systemTheme : preference;
-
-  useEffect(() => {
-    const media = window.matchMedia("(prefers-color-scheme: dark)");
-    const handleChange = () => setSystemTheme(media.matches ? "dark" : "light");
-
-    media.addEventListener("change", handleChange);
-    return () => media.removeEventListener("change", handleChange);
-  }, []);
+  const effectiveTheme = preference;
 
   useEffect(() => {
     document.documentElement.dataset.theme = effectiveTheme;

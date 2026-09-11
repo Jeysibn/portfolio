@@ -44,12 +44,11 @@
         const systemDark = window.matchMedia(
           "(prefers-color-scheme: dark)",
         ).matches;
-        const theme =
-          stored === "light" || stored === "dark"
-            ? stored
-            : systemDark
-              ? "dark"
-              : "light";
+        const theme = stored === "light" || stored === "dark"
+          ? stored
+          : systemDark
+            ? "dark"
+            : "light";
         document.documentElement.dataset.theme = theme;
         document.documentElement.style.colorScheme = theme;
         document.querySelector('meta[name="theme-color"]').content =

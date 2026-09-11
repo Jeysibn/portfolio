@@ -484,8 +484,8 @@ a {
   border-top: 1px solid color-mix(in srgb, var(--system-fg) 25%, transparent);
 }
 .project-case:nth-child(2) {
-  background: var(--petrol);
-  color: var(--petrol-fg);
+  background: color-mix(in srgb, var(--system-bg) 91%, var(--petrol));
+  color: var(--system-fg);
 }
 .project-case header {
   display: grid;
@@ -599,7 +599,7 @@ a {
   transform: rotate(45deg);
 }
 .project-case:nth-child(2) .architecture-node::after {
-  background: var(--petrol);
+  background: color-mix(in srgb, var(--system-bg) 91%, var(--petrol));
 }
 .project-case:nth-child(2) .architecture-node > span,
 .project-case:nth-child(2) .architecture-flow > p {
@@ -704,6 +704,8 @@ a {
   line-height: 1.7;
 }
 .capability-system {
+  --domain-orbit-radius: clamp(280px, 28vw, 355px);
+  --domain-orbit-duration: 96s;
   position: relative;
   min-height: 900px;
   isolation: isolate;
@@ -747,35 +749,46 @@ a {
   margin: 4px 0 12px;
   font: 400 1.75rem var(--display);
 }
+.outer-orbit {
+  position: absolute;
+  inset: 0;
+  transform-origin: center;
+}
+.capability-system.is-running:not(.is-paused) .outer-orbit {
+  animation: outer-domain-orbit var(--domain-orbit-duration) linear infinite;
+}
+.domain-orbit-slot {
+  --domain-angle: 0deg;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1px;
+  height: 1px;
+  transform: rotate(var(--domain-angle)) translateX(var(--domain-orbit-radius));
+  transform-origin: 0 0;
+}
+.domain-counter-rotation {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  transform: rotate(calc(-1 * var(--domain-angle)));
+}
+.capability-system.is-running:not(.is-paused) .domain-counter-rotation {
+  animation: counter-domain-orbit var(--domain-orbit-duration) linear infinite;
+}
+.capability-system:has(.capability-domain:hover) .outer-orbit,
+.capability-system:has(.capability-domain:focus-within) .outer-orbit,
+.capability-system:has(.capability-domain:hover) .domain-counter-rotation,
+.capability-system:has(.capability-domain:focus-within) .domain-counter-rotation {
+  animation-play-state: paused !important;
+}
 .capability-domain {
   --orbit-radius: 90px;
   position: absolute;
+  left: -135px;
+  top: -120px;
   width: 270px;
   height: 240px;
-}
-.domain-1 {
-  left: 7%;
-  top: 3%;
-}
-.domain-2 {
-  right: 7%;
-  top: 3%;
-}
-.domain-3 {
-  right: 1%;
-  top: 35%;
-}
-.domain-4 {
-  right: 23%;
-  bottom: 2%;
-}
-.domain-5 {
-  left: 22%;
-  bottom: 2%;
-}
-.domain-6 {
-  left: 1%;
-  top: 35%;
 }
 .orbit-track {
   position: absolute;
@@ -843,7 +856,6 @@ a {
 }
 .skill-orbit {
   --orbit-angle: 0deg;
-  --orbit-radius: 90px;
   position: absolute;
   z-index: 5;
   left: 50%;
@@ -964,6 +976,22 @@ a {
   }
   to {
     transform: rotate(calc(-1 * (var(--orbit-angle) + 360deg)));
+  }
+}
+@keyframes outer-domain-orbit {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes counter-domain-orbit {
+  from {
+    transform: rotate(calc(-1 * var(--domain-angle)));
+  }
+  to {
+    transform: rotate(calc(-1 * (var(--domain-angle) + 360deg)));
   }
 }
 .credentials-section {
@@ -1108,17 +1136,29 @@ a {
   margin: 0;
 }
 .inspection-dialog {
+  position: fixed;
+  inset: 0;
+  margin: auto;
   width: min(1000px, calc(100% - 32px));
-  max-height: 90vh;
+  max-height: min(90dvh, 940px);
+  overflow: auto;
   border: 0;
   padding: 0;
   background: var(--paper);
   color: var(--ink);
   box-shadow: var(--shadow);
+  opacity: 0;
+  transform: scale(0.985);
+}
+.inspection-dialog[open] {
+  animation: inspection-open 220ms var(--ease) forwards;
 }
 .inspection-dialog::backdrop {
   background: rgba(10, 11, 9, 0.72);
-  backdrop-filter: blur(5px);
+  backdrop-filter: blur(2px);
+}
+body:has(.inspection-dialog[open]) {
+  overflow: hidden;
 }
 .inspection-dialog article {
   padding: clamp(25px, 5vw, 70px);
@@ -1151,6 +1191,90 @@ a {
   font-size: clamp(1.2rem, 2vw, 1.7rem);
   max-width: 55ch;
   line-height: 1.45;
+}
+.dialog-architecture {
+  margin-top: clamp(45px, 7vw, 80px);
+  border-top: 1px solid var(--ink);
+}
+.dialog-section-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: baseline;
+  padding: 18px 0 28px;
+}
+.dialog-section-heading h3,
+.dialog-section-heading p {
+  margin: 0;
+  font: 500 10px var(--mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.dialog-section-heading h3 {
+  color: var(--signal-text);
+}
+.dialog-section-heading p {
+  color: var(--muted);
+}
+.architecture-figure {
+  margin: 0 0 58px;
+}
+.architecture-figure figcaption {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.5fr) 1fr;
+  gap: 24px;
+  align-items: baseline;
+  margin-bottom: 18px;
+}
+.architecture-figure h4 {
+  margin: 0;
+  font: 400 clamp(1.8rem, 4vw, 3rem)/1 var(--display);
+  letter-spacing: -0.025em;
+}
+.architecture-figure figcaption p {
+  max-width: 62ch;
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+.architecture-diagram-frame {
+  overflow-x: auto;
+  border-block: 1px solid var(--line);
+  background: color-mix(in srgb, var(--panel) 46%, transparent);
+  scrollbar-color: var(--signal2) transparent;
+}
+.architecture-diagram-frame img {
+  display: block;
+  width: 100%;
+  min-width: 760px;
+  height: auto;
+  padding: 22px 10px;
+}
+.architecture-summary {
+  border-bottom: 1px solid var(--line);
+  padding: 14px 0;
+}
+.architecture-summary summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font: 500 10px var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.architecture-summary li {
+  margin-block: 10px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+@keyframes inspection-open {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 .dialog-grid {
   display: grid;
@@ -1333,6 +1457,18 @@ a {
     border: 0;
     border-radius: 0;
   }
+  .outer-orbit,
+  .domain-orbit-slot,
+  .domain-counter-rotation,
+  .capability-system.is-running:not(.is-paused) .outer-orbit,
+  .capability-system.is-running:not(.is-paused) .domain-counter-rotation {
+    display: contents;
+    position: static;
+    width: auto;
+    height: auto;
+    transform: none;
+    animation: none;
+  }
   .capability-domain {
     position: relative;
     inset: auto;
@@ -1408,7 +1544,8 @@ a {
     height: 66px;
   }
   .wordmark small {
-    display: none;
+    font-size: 10px;
+    letter-spacing: 0.1em;
   }
   .site-nav {
     position: absolute;
@@ -1490,6 +1627,13 @@ a {
   }
   .site-header {
     padding-inline: 16px;
+  }
+  .wordmark {
+    gap: 8px;
+  }
+  .wordmark small {
+    font-size: 9px;
+    letter-spacing: 0.08em;
   }
   .theme-switch {
     font-size: 0;
@@ -1619,6 +1763,10 @@ a {
   .resume-detail-grid {
     grid-template-columns: 1fr;
   }
+  .architecture-figure figcaption {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
   .experience-list article {
     grid-template-columns: 1fr;
     gap: 24px;
@@ -1668,6 +1816,17 @@ a {
   }
   .hero-topology .pulse {
     animation: none;
+  }
+  .outer-orbit,
+  .domain-counter-rotation,
+  .orbiting-skills,
+  .orbit-skill,
+  .inspection-dialog[open] {
+    animation: none !important;
+  }
+  .inspection-dialog[open] {
+    opacity: 1;
+    transform: scale(1);
   }
   .projects-rail {
     transform: none !important;
@@ -1751,5 +1910,24 @@ a {
   }
   .assistant {
     max-width: calc(100vw - 32px);
+  }
+  .inspection-dialog {
+    width: calc(100% - 16px);
+    max-height: calc(100dvh - 16px);
+  }
+  .inspection-dialog article {
+    padding: 24px 18px 36px;
+  }
+  .inspection-dialog h2 {
+    font-size: clamp(2.6rem, 14vw, 4.5rem);
+  }
+  .dialog-section-heading {
+    display: block;
+  }
+  .dialog-section-heading p {
+    margin-top: 8px;
+  }
+  .architecture-diagram-frame img {
+    min-width: 680px;
   }
 }
