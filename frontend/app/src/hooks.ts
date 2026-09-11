@@ -5,17 +5,24 @@ import type { ThemePreference } from "./portfolio";
 const THEME_STORAGE_KEY = "color-theme";
 
 function getSystemTheme(): "light" | "dark" {
-  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
 }
 
 function getInitialTheme(): ThemePreference {
   const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
-  return stored === "light" || stored === "dark" ? stored : getSystemTheme();
+  return stored === "light" || stored === "dark" || stored === "system"
+    ? stored
+    : "system";
 }
 
 export function useTheme() {
-  const [preference, setPreference] = useState<ThemePreference>(getInitialTheme);
-  const [systemTheme, setSystemTheme] = useState<"light" | "dark">(getSystemTheme);
+  const [preference, setPreference] =
+    useState<ThemePreference>(getInitialTheme);
+  const [systemTheme, setSystemTheme] = useState<"light" | "dark">(
+    getSystemTheme,
+  );
 
   const effectiveTheme = preference === "system" ? systemTheme : preference;
 
@@ -30,13 +37,15 @@ export function useTheme() {
   useEffect(() => {
     document.documentElement.dataset.theme = effectiveTheme;
     document.documentElement.style.colorScheme = effectiveTheme;
-    window.localStorage.setItem(THEME_STORAGE_KEY, effectiveTheme);
+    window.localStorage.setItem(THEME_STORAGE_KEY, preference);
 
-    const themeColor = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+    const themeColor = document.querySelector<HTMLMetaElement>(
+      'meta[name="theme-color"]',
+    );
     if (themeColor) {
-      themeColor.content = effectiveTheme === "dark" ? "#10160f" : "#f2f4f1";
+      themeColor.content = effectiveTheme === "dark" ? "#10130f" : "#eee9de";
     }
-  }, [effectiveTheme]);
+  }, [effectiveTheme, preference]);
 
   return { preference, effectiveTheme, setPreference };
 }
@@ -54,7 +63,9 @@ export function useActiveSection(sectionIds: readonly string[]) {
           const section = anchor?.closest<HTMLElement>("section") ?? anchor;
           return section ? { id, section } : null;
         })
-        .filter((item): item is { id: string; section: HTMLElement } => item !== null);
+        .filter(
+          (item): item is { id: string; section: HTMLElement } => item !== null,
+        );
 
     const updateActiveSection = () => {
       const sections = resolveSections();
@@ -63,7 +74,8 @@ export function useActiveSection(sectionIds: readonly string[]) {
         return;
       }
 
-      const headerHeight = document.querySelector<HTMLElement>(".site-header")?.offsetHeight ?? 0;
+      const headerHeight =
+        document.querySelector<HTMLElement>(".site-header")?.offsetHeight ?? 0;
       const probe = headerHeight + Math.min(180, window.innerHeight * 0.28);
 
       const active = sections.find(({ section }) => {

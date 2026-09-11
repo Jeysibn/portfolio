@@ -15,7 +15,7 @@ endobj
 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
 endobj
 6 0 obj
-<< /Length 3215 >>
+<< /Length 3290 >>
 stream
 BT
 /F1 10 Tf
@@ -79,9 +79,9 @@ BT
 -54 -307 Td
 /F1 9 Tf 54 289 Td (Bachelor of Science in Computer Engineering | National University Baliwag | Aug 2021 - Aug 2025) Tj
 -54 -289 Td
-/F1 9 Tf 54 275 Td (Oracle Cloud Infrastructure Foundations Associate | Trend Vision One Server and Workload Protection Professional) Tj
+/F1 9 Tf 54 275 Td (Oracle Cloud Infrastructure \(OCI\) Foundations Associate | Trend Vision One Server and Workload Protection) Tj
 -54 -275 Td
-/F1 9 Tf 54 261 Td (| GitHub Foundations) Tj
+/F1 9 Tf 54 261 Td (Professional | GitHub Foundations | HashiCorp Certified: Terraform Associate \(004\) \(in progress\)) Tj
 -54 -261 Td
 ET
 endstream
@@ -98,5 +98,5 @@ xref
 trailer
 << /Size 7 /Root 1 0 R >>
 startxref
-3663
+3738
 %%EOF
