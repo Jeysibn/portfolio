@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-11T00:00:00+08:00",
+  "title": "Design System: Jerome Ibon Portfolio",
+  "extensions": {
+    "colorMeta": {
+      "copper-signal": { "role": "primary", "displayName": "Copper Signal", "canonical": "#e0522d" },
+      "petrol": { "role": "secondary", "displayName": "Infrastructure Petrol", "canonical": "#275d57" },
+      "paper": { "role": "neutral", "displayName": "Warm Paper", "canonical": "#eee9de" },
+      "ink": { "role": "neutral", "displayName": "Infrastructure Ink", "canonical": "#171912" }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Editorial Display", "purpose": "Identity and chapter headings." },
+      "body": { "displayName": "Humanist Body", "purpose": "Narrative and technical detail." },
+      "data": { "displayName": "Operational Data", "purpose": "State, periods, counts, and metadata only." }
+    },
+    "shadows": [
+      { "name": "protected-focus", "value": "0 22px 70px rgba(32,28,18,.16)", "purpose": "Dialogs and assistant only." }
+    ],
+    "motion": [
+      { "name": "resolve", "value": "cubic-bezier(.16,1,.3,1)", "purpose": "Structural elements resolve into their final composition." },
+      { "name": "connect-transfer", "value": "scroll-linked", "purpose": "Signal and architecture relationships track continuous scroll progress." },
+      { "name": "reduced", "value": "static topology", "purpose": "All states remain visible without spatial animation." }
+    ],
+    "breakpoints": [
+      { "name": "structural", "value": "900px" },
+      { "name": "mobile", "value": "600px" }
+    ]
+  },
+  "components": [],
+  "narrative": {
+    "northStar": "The Editorial Control-Plane Atlas",
+    "overview": "An editorial, cinematic system where one signal changes meaning as it moves through infrastructure and toward a human handoff.",
+    "keyCharacteristics": ["Asymmetric editorial typography", "Diagrammatic project chapters", "Semantic signal motion", "Quiet and dense pacing"],
+    "rules": [
+      { "name": "Signal Means State", "body": "Copper is reserved for state, transfer, and focus.", "section": "colors" },
+      { "name": "Content Before Motion", "body": "Essential facts remain visible before animation initializes.", "section": "motion" }
+    ],
+    "dos": ["Use real architecture and factual project detail.", "Let typography and rules carry composition."],
+    "donts": ["Do not add terminal clichés or generic cards.", "Do not make essential content hover-only."]
+  }
+}
