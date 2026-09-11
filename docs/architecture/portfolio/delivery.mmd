@@ -1,0 +1,52 @@
+%% C4 container-level delivery and infrastructure view.
+%% Audience: technical reviewers locating validation, trust, and deploy boundaries.
+%% Shows production delivery paths; runtime request handling is out of scope.
+flowchart TB
+  subgraph sourcePhase["SOURCE"]
+    direction LR
+    engineer(["Engineer<br/>dev → main"]):::actor
+    source["Jeysibn/portfolio<br/>source repository"]:::surface
+    engineer -->|"push / pull request"| source
+  end
+  subgraph validationPhase["VALIDATION"]
+    gates["GitHub Actions<br/>typecheck · tests · audit · plan"]:::control
+  end
+  subgraph deliveryPhase["DELIVERY PATHS"]
+    direction LR
+    frontend["Frontend<br/>Vite build"]:::pipeline
+    backend["Backend<br/>Function package"]:::pipeline
+    infra["Infrastructure<br/>Terraform apply"]:::pipeline
+  end
+  subgraph productionPhase["PRODUCTION TARGETS"]
+    direction LR
+    pagesRepo["Generated Pages repo"]:::state
+    pages["GitHub Pages"]:::runtime
+    oidc["GitHub OIDC<br/>Azure identity"]:::trust
+    function["Azure Function App<br/>Linux Consumption"]:::runtime
+    azure["Terraform-managed Azure<br/>Cosmos · storage · telemetry"]:::runtime
+    tfstate[("Azure Storage<br/>remote Terraform state")]:::state
+  end
+  source -->|"workflow triggers"| gates
+  gates --> frontend
+  gates --> backend
+  gates --> infra
+  frontend -->|"publish artifact"| pagesRepo
+  pagesRepo --> pages
+  backend -->|"federated login"| oidc
+  infra -->|"federated login"| oidc
+  oidc -->|"deploy package"| function
+  oidc -->|"provision / update"| azure
+  infra -->|"read / write"| tfstate
+  backend -.->|"health + visitor smoke tests"| function
+  classDef actor fill:#eee9de,stroke:#e0522d,color:#171912,stroke-width:2px
+  classDef surface fill:#eee9de,stroke:#171912,color:#171912,stroke-width:1.5px
+  classDef control fill:#171912,stroke:#e0522d,color:#f3eee3,stroke-width:2px
+  classDef pipeline fill:#ded8ca,stroke:#766f62,color:#171912,stroke-width:1.5px
+  classDef trust fill:#f0c8b9,stroke:#a93618,color:#171912,stroke-width:1.5px
+  classDef runtime fill:#d2ded8,stroke:#275d57,color:#171912,stroke-width:1.5px
+  classDef state fill:#eee9de,stroke:#275d57,color:#171912,stroke-width:1.5px
+  style sourcePhase fill:transparent,stroke:#766f62,stroke-width:1px
+  style validationPhase fill:transparent,stroke:#766f62,stroke-width:1px
+  style deliveryPhase fill:transparent,stroke:#e0522d,stroke-width:1px
+  style productionPhase fill:transparent,stroke:#275d57,stroke-width:1px
+  linkStyle default stroke:#766f62,stroke-width:1.5px,color:#171912

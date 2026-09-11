@@ -1,4 +1,4 @@
-export type ThemePreference = "system" | "light" | "dark";
+export type ThemePreference = "light" | "dark";
 
 export type ChatRole = "user" | "assistant";
 
@@ -35,6 +35,15 @@ export interface Project {
     label: string;
     nodes: string[];
   }>;
+  architecture: {
+    diagrams: Array<{
+      id: string;
+      title: string;
+      svg: string;
+      description: string;
+      summary: string[];
+    }>;
+  };
 }
 
 export interface Certification {
@@ -185,6 +194,34 @@ export const projects: Project[] = [
         ],
       },
     ],
+    architecture: {
+      diagrams: [
+        {
+          id: "portfolio-runtime",
+          title: "Runtime architecture",
+          svg: "/architecture/portfolio/runtime.svg",
+          description:
+            "Container-level view of visitor traffic through GitHub Pages and Azure Functions, including state, the external AI provider, and Azure-native telemetry.",
+          summary: [
+            "Visitors load the React and TypeScript application from GitHub Pages, then call the Python Azure Function over CORS-enabled HTTPS.",
+            "The Function App exposes health, visitor-counter, and portfolio-assistant routes; Cosmos DB stores counter and rate-limit state.",
+            "Application Insights sends request and exception telemetry to the dedicated Log Analytics workspace.",
+          ],
+        },
+        {
+          id: "portfolio-delivery",
+          title: "Delivery & infrastructure",
+          svg: "/architecture/portfolio/delivery.svg",
+          description:
+            "Path-specific delivery view showing validation, GitHub Pages publication, Azure OIDC deployment, Terraform provisioning, and post-deployment verification.",
+          summary: [
+            "Pull requests validate the frontend, backend, dependencies, and Terraform plan before production changes are merged.",
+            "Frontend artifacts are published to the dedicated Pages repository; backend packages and Terraform changes reach Azure through federated OIDC.",
+            "Terraform state remains in a separate Azure Storage backend, while backend deployment finishes with health and visitor API smoke checks.",
+          ],
+        },
+      ],
+    },
   },
   {
     id: "homelab-gitops",
@@ -201,9 +238,9 @@ export const projects: Project[] = [
       "Prometheus and Grafana provide operational visibility across the cluster and workloads.",
     ],
     highlights: [
-      "Multi-node k3s cluster across Raspberry Pi and repurposed x86 hardware.",
+      "Single-node k3s server on a Terraform-provisioned Ubuntu VM in Proxmox.",
       "App-of-Apps GitOps structure with ordered application deployment.",
-      "Automated DNS, TLS, persistent storage, and declarative workload management.",
+      "Declarative Calico networking, MetalLB, Traefik ingress, DNS, TLS, Longhorn storage, and workloads.",
       "Repository structure separates reusable Kubernetes manifests from environment-specific configuration.",
     ],
     technologies: [
@@ -227,6 +264,34 @@ export const projects: Project[] = [
         nodes: ["Workloads", "Prometheus", "Grafana"],
       },
     ],
+    architecture: {
+      diagrams: [
+        {
+          id: "homelab-system",
+          title: "Primary system architecture",
+          svg: "/architecture/homelab/system.svg",
+          description:
+            "Container-level view of LAN traffic entering a single-node k3s cluster and the networking, storage, workload, and observability services operating inside it.",
+          summary: [
+            "Pi-hole and Unbound provide LAN and recursive DNS; MetalLB exposes service addresses and Traefik routes HTTP and HTTPS traffic.",
+            "The current cluster is one k3s server on an Ubuntu virtual machine provisioned in Proxmox, with Calico providing pod networking.",
+            "Longhorn supplies persistent volumes, while Prometheus, Loki, Alloy, and Grafana provide metrics, logs, collection, and visualization.",
+          ],
+        },
+        {
+          id: "homelab-gitops",
+          title: "GitOps & provisioning flow",
+          svg: "/architecture/homelab/gitops.svg",
+          description:
+            "Delivery view showing GitHub validation, Terraform access through Tailscale, Proxmox provisioning, host bootstrap, and Argo CD reconciliation from main.",
+          summary: [
+            "GitHub Actions validates shell, YAML, rendered Helm applications, Kubernetes schemas, and Terraform before changes progress.",
+            "Terraform uses the bpg/proxmox provider through Tailscale and keeps remote state in the HCP Terraform workspace.",
+            "Bootstrap installs k3s, Calico, network acceptance tests, and Argo CD; the root application then reconciles ordered Helm and manifest waves from main.",
+          ],
+        },
+      ],
+    },
   },
 ];
 

@@ -36,51 +36,63 @@ export function CapabilityMap({
           capabilities
         </small>
       </div>
-      {skillGroups.map((group, domainIndex) => (
-        <section
-          className={`capability-domain domain-${domainIndex + 1}`}
-          key={group.label}
-          style={
-            {
-              "--orbit-duration": `${38 + domainIndex * 2.8}s`,
-              "--orbit-direction": domainIndex % 2 ? "reverse" : "normal",
-              "--orbit-radius": `${group.items.length >= 8 ? 104 : group.items.length >= 5 ? 96 : 84}px`,
-            } as CSSProperties
-          }
-        >
-          <div className="orbit-track" aria-hidden="true" />
-          <button
-            className="domain-anchor"
-            type="button"
-            onClick={() => onOpen({ group })}
-          >
-            <span>{domainCodes[domainIndex]}</span>
-            <strong>{group.label}</strong>
-            <small>{group.items.length} capabilities</small>
-          </button>
-          <div className="orbiting-skills">
-            {group.items.map((item, itemIndex) => {
-              const count = group.items.length;
-              const style = {
-                "--orbit-angle": `${(360 / count) * itemIndex + (domainIndex % 2 ? 18 : -8)}deg`,
-              } as CSSProperties;
-              return (
-                <div className="skill-orbit" style={style} key={item}>
+      <div className="outer-orbit">
+        {skillGroups.map((group, domainIndex) => {
+          const domainAngle = (360 / skillGroups.length) * domainIndex - 90;
+          return (
+            <div
+              className="domain-orbit-slot"
+              key={group.label}
+              style={{ "--domain-angle": `${domainAngle}deg` } as CSSProperties}
+            >
+              <div className="domain-counter-rotation">
+                <section
+                  className={`capability-domain domain-${domainIndex + 1}`}
+                  style={
+                    {
+                      "--orbit-duration": `${38 + domainIndex * 2.8}s`,
+                      "--orbit-direction": domainIndex % 2 ? "reverse" : "normal",
+                      "--orbit-radius": `${group.items.length >= 8 ? 104 : group.items.length >= 5 ? 96 : 84}px`,
+                    } as CSSProperties
+                  }
+                >
+                  <div className="orbit-track" aria-hidden="true" />
                   <button
-                    className="orbit-skill"
+                    className="domain-anchor"
                     type="button"
-                    onClick={() => onOpen({ group, item })}
-                    aria-label={`${item} — inspect ${group.label}`}
+                    onClick={() => onOpen({ group })}
                   >
-                    <SkillGlyph name={item} />
-                    <span>{item}</span>
+                    <span>{domainCodes[domainIndex]}</span>
+                    <strong>{group.label}</strong>
+                    <small>{group.items.length} capabilities</small>
                   </button>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-      ))}
+                  <div className="orbiting-skills">
+                    {group.items.map((item, itemIndex) => {
+                      const count = group.items.length;
+                      const style = {
+                        "--orbit-angle": `${(360 / count) * itemIndex + (domainIndex % 2 ? 18 : -8)}deg`,
+                      } as CSSProperties;
+                      return (
+                        <div className="skill-orbit" style={style} key={item}>
+                          <button
+                            className="orbit-skill"
+                            type="button"
+                            onClick={() => onOpen({ group, item })}
+                            aria-label={`${item} — inspect ${group.label}`}
+                          >
+                            <SkillGlyph name={item} />
+                            <span>{item}</span>
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </section>
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
