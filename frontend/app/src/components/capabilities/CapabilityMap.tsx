@@ -40,6 +40,13 @@ export function CapabilityMap({
         <section
           className={`capability-domain domain-${domainIndex + 1}`}
           key={group.label}
+          style={
+            {
+              "--orbit-duration": `${38 + domainIndex * 2.8}s`,
+              "--orbit-direction": domainIndex % 2 ? "reverse" : "normal",
+              "--orbit-radius": `${group.items.length >= 8 ? 104 : group.items.length >= 5 ? 96 : 84}px`,
+            } as CSSProperties
+          }
         >
           <div className="orbit-track" aria-hidden="true" />
           <button
@@ -54,15 +61,8 @@ export function CapabilityMap({
           <div className="orbiting-skills">
             {group.items.map((item, itemIndex) => {
               const count = group.items.length;
-              const angle =
-                (360 / count) * itemIndex + (domainIndex % 2 ? 18 : -8);
-              const radius = count > 6 ? 104 : count > 4 ? 92 : 80;
               const style = {
-                "--orbit-angle": `${angle}deg`,
-                "--orbit-radius": `${radius}px`,
-                "--orbit-duration": `${34 + domainIndex * 4 + (itemIndex % 3) * 5}s`,
-                "--orbit-direction":
-                  (domainIndex + itemIndex) % 3 === 0 ? "reverse" : "normal",
+                "--orbit-angle": `${(360 / count) * itemIndex + (domainIndex % 2 ? 18 : -8)}deg`,
               } as CSSProperties;
               return (
                 <div className="skill-orbit" style={style} key={item}>

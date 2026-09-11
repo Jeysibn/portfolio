@@ -748,6 +748,7 @@ a {
   font: 400 1.75rem var(--display);
 }
 .capability-domain {
+  --orbit-radius: 90px;
   position: absolute;
   width: 270px;
   height: 240px;
@@ -778,10 +779,10 @@ a {
 }
 .orbit-track {
   position: absolute;
-  width: 184px;
-  height: 184px;
-  left: 43px;
-  top: 28px;
+  width: calc(var(--orbit-radius) * 2);
+  height: calc(var(--orbit-radius) * 2);
+  left: calc(50% - var(--orbit-radius));
+  top: calc(50% - var(--orbit-radius));
   border: 1px solid var(--line);
   border-radius: 50%;
   transition:
@@ -821,6 +822,14 @@ a {
   letter-spacing: 0.08em;
   color: var(--muted);
 }
+.domain-anchor:hover span,
+.domain-anchor:hover small,
+.domain-anchor:focus-visible span,
+.domain-anchor:focus-visible small,
+.capability-domain:focus-within .domain-anchor span,
+.capability-domain:focus-within .domain-anchor small {
+  color: currentColor;
+}
 .domain-anchor strong {
   display: block;
   margin: 7px 0;
@@ -830,6 +839,7 @@ a {
 .orbiting-skills {
   position: absolute;
   inset: 0;
+  transform-origin: center;
 }
 .skill-orbit {
   --orbit-angle: 0deg;
@@ -843,12 +853,16 @@ a {
   transform: rotate(var(--orbit-angle)) translateX(var(--orbit-radius));
   transform-origin: 0 0;
 }
-.capability-system.is-running:not(.is-paused) .skill-orbit {
-  animation: orbit var(--orbit-duration) linear infinite var(--orbit-direction);
+.capability-system.is-running:not(.is-paused) .orbiting-skills {
+  animation: orbit-layer var(--orbit-duration) linear infinite
+    var(--orbit-direction);
+}
+.capability-domain:hover .orbiting-skills,
+.capability-domain:focus-within .orbiting-skills {
+  animation-play-state: paused !important;
 }
 .skill-orbit:hover,
 .skill-orbit:focus-within {
-  animation-play-state: paused !important;
   z-index: 12;
 }
 .orbit-skill {
@@ -867,20 +881,28 @@ a {
     color 180ms;
 }
 .capability-system.is-running:not(.is-paused) .orbit-skill {
-  animation: counter-orbit var(--orbit-duration) linear infinite
+  animation: counter-orbit-layer var(--orbit-duration) linear infinite
     var(--orbit-direction);
+}
+.capability-domain:hover .orbit-skill,
+.capability-domain:focus-within .orbit-skill {
+  animation-play-state: paused !important;
 }
 .skill-orbit:hover .orbit-skill,
 .skill-orbit:focus-within .orbit-skill {
   animation-play-state: paused !important;
   color: var(--signal);
-  transform: rotate(calc(-1 * var(--orbit-angle))) scale(1.12);
+}
+.skill-orbit:hover .orbit-skill svg,
+.skill-orbit:focus-within .orbit-skill svg {
+  transform: scale(1.12);
 }
 .orbit-skill svg {
   display: block;
   width: 38px;
   height: 38px;
   overflow: visible;
+  transition: transform 180ms var(--ease);
 }
 .orbit-skill rect {
   fill: var(--paper);
@@ -890,11 +912,14 @@ a {
 .orbit-skill path {
   fill: none;
   stroke: currentColor;
-  stroke-width: 1;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
-.orbit-skill text {
+.orbit-skill .brand-mark,
+.orbit-skill .solid-mark {
   fill: currentColor;
-  font: 500 8px var(--mono);
+  stroke: none;
 }
 .orbit-skill span {
   position: absolute;
@@ -925,16 +950,15 @@ a {
   border-color: var(--signal);
   opacity: 1;
 }
-@keyframes orbit {
+@keyframes orbit-layer {
   from {
-    transform: rotate(var(--orbit-angle)) translateX(var(--orbit-radius));
+    transform: rotate(0deg);
   }
   to {
-    transform: rotate(calc(var(--orbit-angle) + 360deg))
-      translateX(var(--orbit-radius));
+    transform: rotate(360deg);
   }
 }
-@keyframes counter-orbit {
+@keyframes counter-orbit-layer {
   from {
     transform: rotate(calc(-1 * var(--orbit-angle)));
   }
@@ -983,6 +1007,17 @@ a {
 .credential-layout li span {
   font: 500 10px var(--mono);
   color: var(--signal-text);
+}
+.credential-layout li div {
+  min-width: 0;
+}
+.credential-layout li small {
+  display: block;
+  margin-top: 7px;
+  color: var(--signal-text);
+  font: 600 9px var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 .resume-band {
   display: grid;
@@ -1325,13 +1360,15 @@ a {
     gap: 14px 8px;
     margin-top: 20px;
   }
-  .skill-orbit,
-  .capability-system.is-running:not(.is-paused) .skill-orbit {
+  .orbiting-skills,
+  .capability-system.is-running:not(.is-paused) .orbiting-skills {
+    animation: none;
+  }
+  .skill-orbit {
     position: static;
     width: auto;
     height: auto;
     transform: none;
-    animation: none;
   }
   .orbit-skill,
   .capability-system.is-running:not(.is-paused) .orbit-skill {
@@ -1695,8 +1732,12 @@ a {
   max-width: 100%;
   overflow: clip;
 }
-.projects-section > .section-heading .chapter-signal { color:var(--system-signal); }
-.project-case:nth-child(2) header > span { color:var(--petrol-signal); }
+.projects-section > .section-heading .chapter-signal {
+  color: var(--system-signal);
+}
+.project-case:nth-child(2) header > span {
+  color: var(--petrol-signal);
+}
 .contact-email {
   max-width: 100%;
   overflow-wrap: anywhere;

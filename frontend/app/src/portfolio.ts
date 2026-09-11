@@ -37,6 +37,12 @@ export interface Project {
   }>;
 }
 
+export interface Certification {
+  name: string;
+  issuer?: string;
+  status: "earned" | "in-progress";
+}
+
 export const navigation = [
   { label: "About", id: "about" },
   { label: "Projects", id: "projects" },
@@ -224,11 +230,24 @@ export const projects: Project[] = [
   },
 ];
 
-export const certifications = [
-  "Oracle Cloud Infrastructure (OCI) Foundations Associate",
-  "Trend Vision One Server and Workload Protection Professional",
-  "GitHub Foundations",
-] as const;
+export const certifications: Certification[] = [
+  {
+    name: "Oracle Cloud Infrastructure (OCI) Foundations Associate",
+    issuer: "Oracle",
+    status: "earned",
+  },
+  {
+    name: "Trend Vision One Server and Workload Protection Professional",
+    issuer: "Trend Micro",
+    status: "earned",
+  },
+  { name: "GitHub Foundations", issuer: "GitHub", status: "earned" },
+  {
+    name: "HashiCorp Certified: Terraform Associate (004)",
+    issuer: "HashiCorp",
+    status: "in-progress",
+  },
+];
 
 export const education = {
   degree: "Bachelor of Science in Computer Engineering",

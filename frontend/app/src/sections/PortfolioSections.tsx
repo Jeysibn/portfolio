@@ -262,10 +262,6 @@ export function Skills({
   );
 }
 
-const credentialDetails = [
-  ...certifications,
-  "HashiCorp Certified: Terraform Associate (004) — in progress",
-];
 export function Credentials() {
   return (
     <Section
@@ -283,10 +279,15 @@ export function Credentials() {
           <p className="thesis">Thesis — {education.thesis}</p>
         </article>
         <ol>
-          {credentialDetails.map((c, i) => (
-            <li key={c}>
+          {certifications.map((certification, i) => (
+            <li key={certification.name}>
               <span>{String(i + 1).padStart(2, "0")}</span>
-              {c}
+              <div>
+                {certification.name}
+                {certification.status === "in-progress" ? (
+                  <small>In progress</small>
+                ) : null}
+              </div>
             </li>
           ))}
         </ol>
@@ -419,8 +420,11 @@ export function PrintResume() {
         {education.degree}, {education.school}, {education.period}
       </p>
       <ul>
-        {certifications.map((x) => (
-          <li key={x}>{x}</li>
+        {certifications.map((certification) => (
+          <li key={certification.name}>
+            {certification.name}
+            {certification.status === "in-progress" ? " — in progress" : ""}
+          </li>
         ))}
       </ul>
     </article>
