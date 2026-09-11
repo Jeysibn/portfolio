@@ -49,7 +49,7 @@ export default function App() {
       <SiteFooter />
       <PortfolioAssistant />
       <ProjectDialog project={project} onClose={() => setProject(null)} />
-    <SkillDialog selection={skill} onClose={() => setSkill(null)} />
+      <SkillDialog selection={skill} onClose={() => setSkill(null)} />
       <PrintResume />
     </>
   );

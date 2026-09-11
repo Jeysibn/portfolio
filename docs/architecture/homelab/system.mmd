@@ -1,0 +1,50 @@
+%% C4 container-level Homelab runtime view.
+%% Audience: recruiters and technical reviewers tracing LAN traffic and operations.
+%% Shows the single-node runtime topology; provisioning is out of scope.
+flowchart TB
+  operator(["LAN user / operator"]):::actor
+  subgraph proxmox["PROXMOX VE · 192.168.86.61"]
+    subgraph vm["UBUNTU 22.04 VM · K3S-NODE-01 · 4 VCPU · 8 GB"]
+      subgraph cluster["SINGLE-NODE K3S · CALICO CNI"]
+        subgraph entry["NETWORK / ENTRY"]
+          direction LR
+          dns["Pi-hole → Unbound<br/>LAN + recursive DNS"]:::network
+          metallb["MetalLB<br/>L2 addresses"]:::network
+          traefik["Traefik<br/>HTTP / HTTPS ingress"]:::network
+          tls["cert-manager<br/>self-signed issuer"]:::trust
+        end
+        subgraph services["WORKLOAD / DATA"]
+          direction LR
+          monikey["MoniKey<br/>web · API · worker · PostgreSQL"]:::runtime
+          storage[("Longhorn<br/>persistent volumes")]:::state
+        end
+        subgraph telemetry["OBSERVABILITY"]
+          direction LR
+          collectors["Prometheus · Loki · Alloy<br/>metrics + logs"]:::observe
+          grafana["Grafana<br/>visualization"]:::observe
+        end
+      end
+    end
+  end
+  operator -->|"*.homelab.local DNS"| dns
+  dns -->|"192.168.86.200"| metallb
+  metallb -->|"LoadBalancer"| traefik
+  traefik -->|"Ingress routes"| monikey
+  tls -.->|"TLS certificates"| traefik
+  monikey -->|"PVCs"| storage
+  monikey -.->|"workload telemetry"| collectors
+  collectors -->|"data sources"| grafana
+  operator -.->|"inspect dashboards"| grafana
+  classDef actor fill:#eee9de,stroke:#e0522d,color:#171912,stroke-width:2px
+  classDef network fill:#d2ded8,stroke:#275d57,color:#171912,stroke-width:1.5px
+  classDef runtime fill:#171912,stroke:#e0522d,color:#f3eee3,stroke-width:2px
+  classDef state fill:#eee9de,stroke:#275d57,color:#171912,stroke-width:1.5px
+  classDef observe fill:#d2ded8,stroke:#275d57,color:#171912,stroke-width:1.5px
+  classDef trust fill:#f0c8b9,stroke:#a93618,color:#171912,stroke-width:1.5px
+  style proxmox fill:transparent,stroke:#766f62,stroke-width:1px
+  style vm fill:transparent,stroke:#766f62,stroke-width:1px
+  style cluster fill:transparent,stroke:#e0522d,stroke-width:1px
+  style entry fill:transparent,stroke:#275d57,stroke-width:1px
+  style services fill:transparent,stroke:#766f62,stroke-width:1px
+  style telemetry fill:transparent,stroke:#275d57,stroke-width:1px
+  linkStyle default stroke:#766f62,stroke-width:1.5px,color:#171912

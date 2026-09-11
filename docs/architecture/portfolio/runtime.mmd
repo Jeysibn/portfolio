@@ -1,0 +1,34 @@
+%% C4 container-level runtime view.
+%% Audience: recruiters and technical reviewers tracing one production request.
+%% Shows runtime containers and telemetry; delivery is intentionally out of scope.
+flowchart TB
+  visitor(["Portfolio visitor"]):::actor
+  subgraph publicWeb["CLIENT / PUBLIC WEB"]
+    pages["GitHub Pages<br/>React + TypeScript SPA"]:::surface
+  end
+  subgraph applicationApi["APPLICATION API · AZURE FUNCTIONS"]
+    functions["Python 3.11 API<br/>health · visitors · assistant"]:::runtime
+  end
+  subgraph dependencies["STATE / EXTERNAL SERVICE / OBSERVABILITY"]
+    direction LR
+    cosmos[("Cosmos DB<br/>counter + visitor state")]:::state
+    provider["OpenCode Zen<br/>AI provider"]:::external
+    insights["Application Insights<br/>runtime telemetry"]:::observe
+    logs[("Log Analytics<br/>workspace")]:::observe
+  end
+  visitor -->|"HTTPS"| pages
+  pages -->|"CORS HTTPS · JSON"| functions
+  functions -->|"read / conditional write"| cosmos
+  functions -->|"chat completions"| provider
+  functions -.->|"requests · failures · exceptions"| insights
+  insights -->|"workspace telemetry"| logs
+  classDef actor fill:#eee9de,stroke:#e0522d,color:#171912,stroke-width:2px
+  classDef surface fill:#eee9de,stroke:#171912,color:#171912,stroke-width:1.5px
+  classDef runtime fill:#171912,stroke:#e0522d,color:#f3eee3,stroke-width:2px
+  classDef state fill:#ded8ca,stroke:#275d57,color:#171912,stroke-width:1.5px
+  classDef observe fill:#d2ded8,stroke:#275d57,color:#171912,stroke-width:1.5px
+  classDef external fill:#eee9de,stroke:#766f62,color:#171912,stroke-dasharray:5 4
+  style publicWeb fill:transparent,stroke:#766f62,stroke-width:1px
+  style applicationApi fill:transparent,stroke:#e0522d,stroke-width:1px
+  style dependencies fill:transparent,stroke:#275d57,stroke-width:1px
+  linkStyle default stroke:#766f62,stroke-width:1.5px,color:#171912

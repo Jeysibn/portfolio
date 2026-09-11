@@ -5,11 +5,20 @@ import type { SkillSelection } from "./capabilities/CapabilityMap";
 
 function useDialog(open: boolean, onClose: () => void) {
   const ref = useRef<HTMLDialogElement>(null);
+  const opener = useRef<HTMLElement | null>(null);
   useEffect(() => {
     const dialog = ref.current;
     if (!dialog) return;
-    if (open && !dialog.open) dialog.showModal();
-    if (!open && dialog.open) dialog.close();
+    if (open && !dialog.open) {
+      opener.current = document.activeElement as HTMLElement | null;
+      dialog.showModal();
+      dialog.querySelector<HTMLElement>("[data-dialog-close]")?.focus();
+    }
+    if (!open && dialog.open) {
+      dialog.close();
+      opener.current?.focus();
+      opener.current = null;
+    }
   }, [open]);
   useEffect(() => {
     const dialog = ref.current;
@@ -34,6 +43,7 @@ export function ProjectDialog({
       ref={ref}
       className="inspection-dialog"
       aria-labelledby="project-dialog-title"
+      aria-describedby="project-dialog-summary"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
@@ -47,11 +57,44 @@ export function ProjectDialog({
               type="button"
               onClick={onClose}
               aria-label="Close case study"
+              data-dialog-close
             >
               Close
             </button>
           </header>
-          <p className="dialog-lead">{project.summary}</p>
+          <p className="dialog-lead" id="project-dialog-summary">
+            {project.summary}
+          </p>
+          <section className="dialog-architecture" aria-labelledby="architecture-title">
+            <div className="dialog-section-heading">
+              <h3 id="architecture-title">System architecture</h3>
+              <p>Repository-derived · container-level views</p>
+            </div>
+            {project.architecture.diagrams.map((diagram) => (
+              <figure className="architecture-figure" key={diagram.id}>
+                <figcaption>
+                  <h4>{diagram.title}</h4>
+                  <p>{diagram.description}</p>
+                </figcaption>
+                <div
+                  className="architecture-diagram-frame"
+                  tabIndex={0}
+                  role="region"
+                  aria-label={`${diagram.title} diagram; scroll horizontally on smaller screens`}
+                >
+                  <img src={diagram.svg} alt="" aria-hidden="true" />
+                </div>
+                <details className="architecture-summary">
+                  <summary>Read architecture as text</summary>
+                  <ul>
+                    {diagram.summary.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </details>
+              </figure>
+            ))}
+          </section>
           <div className="dialog-grid">
             <section>
               <h3>Why it exists</h3>
@@ -115,6 +158,7 @@ export function SkillDialog({
       ref={ref}
       className="inspection-dialog skill-dialog"
       aria-labelledby="skill-dialog-title"
+      aria-describedby="skill-dialog-summary"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
@@ -128,11 +172,14 @@ export function SkillDialog({
               type="button"
               onClick={onClose}
               aria-label="Close skill details"
+              data-dialog-close
             >
               Close
             </button>
           </header>
-          <p className="dialog-lead">{detail.summary}</p>
+          <p className="dialog-lead" id="skill-dialog-summary">
+            {detail.summary}
+          </p>
           <p>{detail.practice}</p>
           <div className="skill-inspection-list">
             {group.items.map((item) => (

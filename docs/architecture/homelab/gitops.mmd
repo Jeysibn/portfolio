@@ -1,0 +1,52 @@
+%% C4 container-level provisioning and GitOps view.
+%% Audience: technical reviewers tracing desired state into the Homelab.
+%% Shows provisioning and reconciliation phases; workload traffic is out of scope.
+flowchart TB
+  subgraph authoring["AUTHORING / CI"]
+    direction LR
+    engineer(["Engineer<br/>dev → main"]):::actor
+    repo["homelab-gitops<br/>Terraform · bootstrap · manifests"]:::surface
+    ci["GitHub Actions<br/>YAML · shell · Helm · kubeconform"]:::control
+    engineer -->|"push / pull request"| repo -->|"validation trigger"| ci
+  end
+  subgraph provisioning["INFRASTRUCTURE PROVISIONING"]
+    direction LR
+    tailscale["Tailscale<br/>CI network path"]:::trust
+    terraform["Terraform<br/>Proxmox provider"]:::pipeline
+    hcp[("HCP Terraform<br/>remote workspace state")]:::state
+    proxmox["Proxmox VE<br/>Ubuntu VM + cloud-init"]:::runtime
+    tailscale --> terraform
+    terraform <-->|"remote state"| hcp
+    terraform -->|"API + SSH upload"| proxmox
+  end
+  subgraph bootstrapPhase["HOST BOOTSTRAP"]
+    direction LR
+    bootstrap["bootstrap.sh"]:::pipeline
+    platform["k3s + Calico<br/>network acceptance checks"]:::runtime
+    argocdInstall["Argo CD<br/>root Application install"]:::runtime
+    bootstrap --> platform --> argocdInstall
+  end
+  subgraph reconciliation["GITOPS RECONCILIATION"]
+    direction LR
+    appOfApps["Argo CD App-of-Apps<br/>watches main"]:::runtime
+    waves["Ordered sync waves"]:::pipeline
+    cluster["Cluster desired state<br/>prune + self-heal"]:::runtime
+    appOfApps --> waves --> cluster
+  end
+  ci -->|"plan / apply"| tailscale
+  engineer -.->|"fresh host bootstrap"| bootstrap
+  proxmox -->|"provisioned host"| bootstrap
+  argocdInstall --> appOfApps
+  repo -.->|"manifests on main"| appOfApps
+  classDef actor fill:#eee9de,stroke:#e0522d,color:#171912,stroke-width:2px
+  classDef surface fill:#eee9de,stroke:#171912,color:#171912,stroke-width:1.5px
+  classDef control fill:#171912,stroke:#e0522d,color:#f3eee3,stroke-width:2px
+  classDef pipeline fill:#ded8ca,stroke:#766f62,color:#171912,stroke-width:1.5px
+  classDef trust fill:#f0c8b9,stroke:#a93618,color:#171912,stroke-width:1.5px
+  classDef runtime fill:#d2ded8,stroke:#275d57,color:#171912,stroke-width:1.5px
+  classDef state fill:#eee9de,stroke:#275d57,color:#171912,stroke-width:1.5px
+  style authoring fill:transparent,stroke:#766f62,stroke-width:1px
+  style provisioning fill:transparent,stroke:#766f62,stroke-width:1px
+  style bootstrapPhase fill:transparent,stroke:#e0522d,stroke-width:1px
+  style reconciliation fill:transparent,stroke:#275d57,stroke-width:1px
+  linkStyle default stroke:#766f62,stroke-width:1.5px,color:#171912

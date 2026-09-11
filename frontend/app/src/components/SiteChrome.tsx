@@ -13,13 +13,12 @@ export function SiteHeader({
   onTheme: (t: ThemePreference) => void;
 }) {
   const [open, setOpen] = useState(false);
-  const cycle = () =>
-    onTheme(theme === "dark" ? "light" : theme === "light" ? "system" : "dark");
+  const cycle = () => onTheme(theme === "dark" ? "light" : "dark");
   return (
     <header className="site-header">
       <a className="wordmark" href="#top" aria-label="Jerome Ibon, home">
         <span>JI</span>
-        <small>Infrastructure engineer</small>
+        <small>Jeysibn</small>
       </a>
       <nav
         id="primary-nav"
@@ -42,7 +41,7 @@ export function SiteHeader({
           className="theme-switch"
           type="button"
           onClick={cycle}
-          aria-label={`Theme: ${theme}. Change theme`}
+          aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
         >
           <span aria-hidden="true" />
           {theme}

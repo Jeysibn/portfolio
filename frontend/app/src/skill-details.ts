@@ -20,7 +20,7 @@ export const skillDetails: Record<string, SkillDetail> = {
     summary: "I use containers to make workloads portable and orchestration to turn deployment, scheduling, and recovery into repeatable platform behavior.",
     practice: "My main hands-on environment is a k3s homelab where application state, Helm configuration, and cluster operations are managed declaratively.",
     itemDescriptions: {
-      "Kubernetes (k3s)": "Lightweight Kubernetes used for multi-node homelab workloads, declarative deployment, service operation, and GitOps practice.",
+      "Kubernetes (k3s)": "Lightweight Kubernetes used for a single-node homelab environment, declarative deployment, service operation, and GitOps practice.",
       Docker: "Container packaging and local runtime workflows for keeping application dependencies consistent across environments.",
       Helm: "Templating and release configuration for Kubernetes workloads, including CI rendering and validation before deployment.",
     },
