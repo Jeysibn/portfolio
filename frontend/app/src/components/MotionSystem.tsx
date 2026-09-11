@@ -7,6 +7,19 @@ export function MotionDirector() {
   useEffect(() => {
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     document.documentElement.classList.add("motion-enabled");
+    const capabilityMap =
+      document.querySelector<HTMLElement>(".capability-system");
+    const mapObserver = capabilityMap
+      ? new IntersectionObserver(
+          ([entry]) =>
+            capabilityMap.classList.toggle("is-running", entry.isIntersecting),
+          { rootMargin: "15% 0px" },
+        )
+      : null;
+    if (capabilityMap && mapObserver) mapObserver.observe(capabilityMap);
+    const handleVisibility = () =>
+      capabilityMap?.classList.toggle("is-paused", document.hidden);
+    document.addEventListener("visibilitychange", handleVisibility);
     const context = gsap.context(() => {
       gsap.from(".hero-name span", {
         yPercent: 115,
@@ -29,30 +42,26 @@ export function MotionDirector() {
         ease: "power3.inOut",
         delay: 0.25,
       });
-      gsap.utils
-        .toArray<HTMLElement>(".section-rule")
-        .forEach((el) =>
-          gsap.from(el, {
-            scaleX: 0,
-            transformOrigin: "left",
-            duration: 0.9,
-            ease: "expo.out",
-            scrollTrigger: { trigger: el, start: "top 92%", once: true },
-          }),
-        );
-      gsap.utils
-        .toArray<HTMLElement>("[data-resolve]")
-        .forEach((el, index) =>
-          gsap.from(el, {
-            x: index % 2 ? 24 : -24,
-            duration: 0.9,
-            ease: "expo.out",
-            immediateRender: false,
-            scrollTrigger: { trigger: el, start: "top 90%", once: true },
-          }),
-        );
+      gsap.utils.toArray<HTMLElement>(".section-rule").forEach((el) =>
+        gsap.from(el, {
+          scaleX: 0,
+          transformOrigin: "left",
+          duration: 0.9,
+          ease: "expo.out",
+          scrollTrigger: { trigger: el, start: "top 92%", once: true },
+        }),
+      );
+      gsap.utils.toArray<HTMLElement>("[data-resolve]").forEach((el, index) =>
+        gsap.from(el, {
+          x: index % 2 ? 24 : -24,
+          duration: 0.9,
+          ease: "expo.out",
+          immediateRender: false,
+          scrollTrigger: { trigger: el, start: "top 90%", once: true },
+        }),
+      );
       gsap.to(".signal-progress", {
-        strokeDashoffset: 0,
+        scaleY: 1,
         ease: "none",
         scrollTrigger: {
           trigger: document.body,
@@ -61,92 +70,80 @@ export function MotionDirector() {
           scrub: 0.2,
         },
       });
-      gsap.utils.toArray<SVGGElement>(".signal-phase").forEach((phase) =>
-        gsap.fromTo(
-          phase,
-          { scale: 0.55, opacity: 0.25 },
-          {
-            scale: 1,
-            opacity: 1,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: phase.dataset.target ?? document.body,
-              start: "top 72%",
-              end: "bottom 38%",
-              scrub: true,
-            },
-          },
-        ),
-      );
+      const railStages = gsap.utils.toArray<HTMLElement>(".signal-stage");
       gsap.utils
-        .toArray<HTMLElement>(".system-stage")
-        .forEach((stage) =>
-          gsap.from(stage.querySelectorAll(".architecture-node"), {
-            opacity: 0.2,
-            scale: 0.82,
-            stagger: 0.08,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: stage,
-              start: "top 70%",
-              end: "bottom 55%",
-              scrub: true,
-            },
-          }),
+        .toArray<HTMLElement>("[data-signal-stage]")
+        .forEach((section) => {
+          const stage = section.dataset.signalStage;
+          if (!stage) return;
+          const activate = () =>
+            railStages.forEach((item) =>
+              item.classList.toggle("is-active", item.dataset.stage === stage),
+            );
+          ScrollTrigger.create({
+            trigger: section,
+            start: "top 55%",
+            end: "bottom 45%",
+            onEnter: activate,
+            onEnterBack: activate,
+          });
+        });
+      gsap.utils.toArray<HTMLElement>(".architecture-flow").forEach((flow) => {
+        const nodes = gsap.utils.toArray<HTMLElement>(
+          flow.querySelectorAll(".architecture-node"),
         );
-      gsap.to(".projects-rail", {
-        xPercent: -5,
-        ease: "none",
-        scrollTrigger: {
-          trigger: "#projects",
-          start: "top bottom",
-          end: "bottom top",
-          scrub: true,
-        },
+        const timeline = gsap.timeline({
+          scrollTrigger: {
+            trigger: flow,
+            start: "top 78%",
+            end: "bottom 40%",
+            scrub: 0.35,
+          },
+        });
+        timeline.to(
+          flow.querySelector(".architecture-signal"),
+          { scaleX: 1, ease: "none" },
+          0,
+        );
+        nodes.forEach((node, index) =>
+          timeline.to(
+            node,
+            {
+              opacity: 1,
+              scale: 1,
+              color: "var(--system-fg)",
+              duration: 0.18,
+              ease: "power2.out",
+            },
+            index / Math.max(1, nodes.length - 1),
+          ),
+        );
       });
     });
     document.fonts?.ready.then(() => ScrollTrigger.refresh());
     return () => {
       context.revert();
+      mapObserver?.disconnect();
+      document.removeEventListener("visibilitychange", handleVisibility);
       document.documentElement.classList.remove("motion-enabled");
     };
   }, []);
   return null;
 }
 export function SignalPath() {
-  const d =
-    "M50 0 C18 70 84 115 50 190 S18 310 50 390 S82 510 50 600 S18 720 50 800 S80 920 50 1000";
+  const stages = ["SIGNAL", "PROVISION", "DEPLOY", "RUN", "OBSERVE", "IMPROVE"];
   return (
-    <svg
-      className="signal-map"
-      viewBox="0 0 100 1000"
-      preserveAspectRatio="none"
-      aria-hidden="true"
-    >
-      <path className="signal-base" d={d} />
-      <path className="signal-progress" pathLength="1000" d={d} />
-      {[
-        ["signal", "#top", 50, 42, "circle"],
-        ["provision", "#about", 61, 210, "square"],
-        ["deploy", "#projects", 36, 405, "arrow"],
-        ["run", "#experience", 58, 590, "core"],
-        ["observe", "#skills", 41, 770, "eye"],
-        ["improve", "#contact", 50, 958, "handoff"],
-      ].map(([label, target, x, y, shape]) => (
-        <g
-          key={label}
-          className={`signal-phase phase-${label}`}
-          data-target={target}
-          transform={`translate(${x} ${y})`}
-        >
-          {shape === "square" ? <rect x="-6" y="-6" width="12" height="12" /> : null}
-          {shape === "arrow" ? <polygon points="-7,-6 8,0 -7,6" /> : null}
-          {shape === "eye" ? <><ellipse rx="10" ry="6" /><circle r="2.5" /></> : null}
-          {shape === "handoff" ? <path d="M-9 5 L-3-5 L2 2 L8-7" /> : null}
-          {shape === "circle" || shape === "core" ? <circle r={shape === "core" ? "6" : "4"} /> : null}
-          {shape === "circle" || shape === "core" ? <circle className="phase-ring" r={shape === "core" ? "11" : "9"} /> : null}
-        </g>
-      ))}
-    </svg>
+    <aside className="signal-rail" aria-hidden="true">
+      <span className="signal-base" />
+      <span className="signal-progress" />
+      <ol>
+        {stages.map((stage) => (
+          <li key={stage} className="signal-stage" data-stage={stage}>
+            <i />
+            <span>{stage}</span>
+          </li>
+        ))}
+      </ol>
+    </aside>
   );
 }

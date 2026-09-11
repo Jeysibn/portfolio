@@ -9,7 +9,10 @@ import {
   projects,
   skillGroups,
 } from "../portfolio";
-import type { Project, SkillGroup } from "../portfolio";
+import type { Project } from "../portfolio";
+import { CapabilityMap } from "../components/capabilities/CapabilityMap";
+import type { SkillSelection } from "../components/capabilities/CapabilityMap";
+import { SystemArchitecture } from "../components/systems/SystemArchitecture";
 
 const principles = [
   [
@@ -41,15 +44,29 @@ function Section({
   children: ReactNode;
   className?: string;
 }) {
+  const signalStages: Record<string, string> = {
+    about: "PROVISION",
+    projects: "DEPLOY",
+    experience: "RUN",
+    skills: "OBSERVE",
+    contact: "IMPROVE",
+  };
+  const signalStage = signalStages[id];
   return (
     <section
       id={id}
       className={`section ${className}`}
       aria-labelledby={`${id}-title`}
+      data-signal-stage={signalStage}
     >
       <header className="section-heading">
         <h2 id={`${id}-title`}>{title}</h2>
         <span className="section-rule" aria-hidden="true" />
+        {signalStage ? (
+          <span className="chapter-signal" aria-hidden="true">
+            {signalStage}
+          </span>
+        ) : null}
       </header>
       {children}
     </section>
@@ -78,17 +95,22 @@ function SystemStatus() {
 
 export function Hero() {
   return (
-    <section id="top" className="hero" aria-labelledby="hero-title">
+    <section
+      id="top"
+      className="hero"
+      aria-labelledby="hero-title"
+      data-signal-stage="SIGNAL"
+    >
       <div className="hero-meta">
         <span>Malolos · Philippines</span>
         <SystemStatus />
         <span>Open to opportunities</span>
       </div>
-      <div className="hero-name" id="hero-title" role="heading" aria-level={1}>
+      <h1 className="hero-name" id="hero-title">
         <span>Jerome</span>
         <span>Christian</span>
         <span>Ibon</span>
-      </div>
+      </h1>
       <div className="hero-foot">
         <p>Cloud Support · DevOps · Cloud Engineering</p>
         <p>
@@ -143,25 +165,6 @@ export function Principles() {
   );
 }
 
-const nodes: Record<string, string[]> = {
-  "cloud-portfolio": [
-    "Browser",
-    "React",
-    "Functions",
-    "Cosmos DB",
-    "AI",
-    "Insights",
-  ],
-  "homelab-gitops": [
-    "Terraform",
-    "Proxmox",
-    "k3s",
-    "Argo CD",
-    "Workloads",
-    "Grafana",
-  ],
-};
-
 export function Projects({ onOpen }: { onOpen: (p: Project) => void }) {
   return (
     <Section
@@ -185,18 +188,7 @@ export function Projects({ onOpen }: { onOpen: (p: Project) => void }) {
               <h3>{project.title}</h3>
               <p>{project.summary}</p>
             </header>
-            <div
-              className="architecture-strip"
-              aria-label={`${project.title} architecture flow`}
-            >
-              {nodes[project.id].map((node, i) => (
-                <div className="architecture-node" key={node}>
-                  <span>{String(i + 1).padStart(2, "0")}</span>
-                  <strong>{node}</strong>
-                  {i < nodes[project.id].length - 1 && <i aria-hidden="true" />}
-                </div>
-              ))}
-            </div>
+            <SystemArchitecture project={project} />
             <div className="case-columns">
               <div>
                 <h4>Why it exists</h4>
@@ -254,30 +246,18 @@ export function Experience() {
   );
 }
 
-export function Skills({ onOpen }: { onOpen: (g: SkillGroup) => void }) {
+export function Skills({
+  onOpen,
+}: {
+  onOpen: (selection: SkillSelection) => void;
+}) {
   return (
     <Section id="skills" title="Capability map" className="skills-section">
       <p className="skills-copy">
         Select a domain to inspect how each tool connects to practical work.
         Every detail remains keyboard accessible.
       </p>
-      <div className="capability-map">
-        {skillGroups.map((group, i) => (
-          <button
-            type="button"
-            key={group.label}
-            className={`capability-node node-${i + 1}`}
-            onClick={() => onOpen(group)}
-          >
-            <span>{String(i + 1).padStart(2, "0")}</span>
-            <strong>{group.label}</strong>
-            <small>{group.items.length} capabilities</small>
-          </button>
-        ))}
-        <span className="map-core" aria-hidden="true">
-          OPERATE
-        </span>
-      </div>
+      <CapabilityMap onOpen={onOpen} />
     </Section>
   );
 }

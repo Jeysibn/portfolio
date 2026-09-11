@@ -31,6 +31,10 @@ export interface Project {
   highlights: string[];
   technologies: string[];
   repositoryUrl: string;
+  architectureFlows: Array<{
+    label: string;
+    nodes: string[];
+  }>;
 }
 
 export const navigation = [
@@ -46,7 +50,13 @@ export const navigation = [
 export const skillGroups: SkillGroup[] = [
   {
     label: "Cloud & virtualization",
-    items: ["Azure", "AWS", "Oracle Cloud Infrastructure", "VMware vSphere", "Proxmox"],
+    items: [
+      "Azure",
+      "AWS",
+      "Oracle Cloud Infrastructure",
+      "VMware vSphere",
+      "Proxmox",
+    ],
   },
   {
     label: "Containers & orchestration",
@@ -58,11 +68,25 @@ export const skillGroups: SkillGroup[] = [
   },
   {
     label: "Observability",
-    items: ["Azure Application Insights", "Log Analytics", "Prometheus", "Grafana"],
+    items: [
+      "Azure Application Insights",
+      "Log Analytics",
+      "Prometheus",
+      "Grafana",
+    ],
   },
   {
     label: "Systems & networking",
-    items: ["Linux", "Windows Server", "Active Directory", "TCP/IP", "DNS", "VPN", "SSH", "RDP"],
+    items: [
+      "Linux",
+      "Windows Server",
+      "Active Directory",
+      "TCP/IP",
+      "DNS",
+      "VPN",
+      "SSH",
+      "RDP",
+    ],
   },
   {
     label: "Scripting, security & tools",
@@ -132,6 +156,29 @@ export const projects: Project[] = [
       "Application Insights",
     ],
     repositoryUrl: "https://github.com/Jeysibn/portfolio",
+    architectureFlows: [
+      {
+        label: "Runtime request",
+        nodes: [
+          "Visitor",
+          "React / Vite",
+          "Azure Functions",
+          "Cosmos DB",
+          "AI provider",
+          "Application Insights",
+        ],
+      },
+      {
+        label: "Delivery path",
+        nodes: [
+          "Git",
+          "GitHub Actions",
+          "OIDC",
+          "Azure infrastructure",
+          "GitHub Pages",
+        ],
+      },
+    ],
   },
   {
     id: "homelab-gitops",
@@ -153,8 +200,27 @@ export const projects: Project[] = [
       "Automated DNS, TLS, persistent storage, and declarative workload management.",
       "Repository structure separates reusable Kubernetes manifests from environment-specific configuration.",
     ],
-    technologies: ["K3s", "Argo CD", "Terraform", "Proxmox", "Helm", "GitHub Actions", "Prometheus", "Grafana"],
+    technologies: [
+      "K3s",
+      "Argo CD",
+      "Terraform",
+      "Proxmox",
+      "Helm",
+      "GitHub Actions",
+      "Prometheus",
+      "Grafana",
+    ],
     repositoryUrl: "https://github.com/Jeysibn/homelab-gitops",
+    architectureFlows: [
+      {
+        label: "Provision & reconcile",
+        nodes: ["Terraform", "Proxmox", "k3s", "Argo CD", "Workloads"],
+      },
+      {
+        label: "Observe",
+        nodes: ["Workloads", "Prometheus", "Grafana"],
+      },
+    ],
   },
 ];
 
@@ -169,7 +235,8 @@ export const education = {
   school: "National University Baliwag",
   location: "Baliwag, Bulacan",
   period: "August 2021 – August 2025",
-  thesis: "IoT Integrated Consultation System for Enhanced Student-Faculty Interaction",
+  thesis:
+    "IoT Integrated Consultation System for Enhanced Student-Faculty Interaction",
 } as const;
 
 export const professionalSummary =

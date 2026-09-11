@@ -5,6 +5,7 @@
   "extensions": {
     "colorMeta": {
       "copper-signal": { "role": "primary", "displayName": "Copper Signal", "canonical": "#e0522d" },
+      "copper-text": { "role": "primary", "displayName": "Accessible Copper Text", "canonical": "#a93618" },
       "petrol": { "role": "secondary", "displayName": "Infrastructure Petrol", "canonical": "#275d57" },
       "paper": { "role": "neutral", "displayName": "Warm Paper", "canonical": "#eee9de" },
       "ink": { "role": "neutral", "displayName": "Infrastructure Ink", "canonical": "#171912" }

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
-import type { Project, SkillGroup } from "../portfolio";
+import type { Project } from "../portfolio";
 import { skillDetails } from "../skill-details";
+import type { SkillSelection } from "./capabilities/CapabilityMap";
 
 function useDialog(open: boolean, onClose: () => void) {
   const ref = useRef<HTMLDialogElement>(null);
@@ -44,7 +45,7 @@ export function ProjectDialog({
             <h2 id="project-dialog-title">{project.title}</h2>
             <button
               type="button"
-            onClick={onClose}
+              onClick={onClose}
               aria-label="Close case study"
             >
               Close
@@ -92,14 +93,23 @@ export function ProjectDialog({
 }
 
 export function SkillDialog({
-  group,
+  selection,
   onClose,
 }: {
-  group: SkillGroup | null;
+  selection: SkillSelection | null;
   onClose: () => void;
 }) {
-  const ref = useDialog(Boolean(group), onClose);
+  const group = selection?.group ?? null;
+  const ref = useDialog(Boolean(selection), onClose);
   const detail = group ? skillDetails[group.label] : null;
+  useEffect(() => {
+    if (!selection?.item) return;
+    window.requestAnimationFrame(() =>
+      ref.current
+        ?.querySelector(".is-emphasized")
+        ?.scrollIntoView({ block: "center" }),
+    );
+  }, [ref, selection]);
   return (
     <dialog
       ref={ref}
@@ -116,7 +126,7 @@ export function SkillDialog({
             <h2 id="skill-dialog-title">{group.label}</h2>
             <button
               type="button"
-            onClick={onClose}
+              onClick={onClose}
               aria-label="Close skill details"
             >
               Close
@@ -126,7 +136,13 @@ export function SkillDialog({
           <p>{detail.practice}</p>
           <div className="skill-inspection-list">
             {group.items.map((item) => (
-              <section key={item}>
+              <section
+                key={item}
+                className={
+                  selection?.item === item ? "is-emphasized" : undefined
+                }
+                aria-current={selection?.item === item ? "true" : undefined}
+              >
                 <h3>{item}</h3>
                 <p>{detail.itemDescriptions[item]}</p>
               </section>

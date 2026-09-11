@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Project, SkillGroup } from "./portfolio";
+import type { Project } from "./portfolio";
 import { navigation } from "./portfolio";
 import { useActiveSection, useTheme } from "./hooks";
 import { SiteHeader, SiteFooter } from "./components/SiteChrome";
@@ -17,12 +17,13 @@ import {
 } from "./sections/PortfolioSections";
 import { ProjectDialog, SkillDialog } from "./components/Dialogs";
 import { PortfolioAssistant } from "./components/PortfolioAssistant";
+import type { SkillSelection } from "./components/capabilities/CapabilityMap";
 
 export default function App() {
   const activeSection = useActiveSection(navigation.map((item) => item.id));
   const { preference, setPreference } = useTheme();
   const [project, setProject] = useState<Project | null>(null);
-  const [skill, setSkill] = useState<SkillGroup | null>(null);
+  const [skill, setSkill] = useState<SkillSelection | null>(null);
   return (
     <>
       <a className="skip-link" href="#main-content">
@@ -48,7 +49,7 @@ export default function App() {
       <SiteFooter />
       <PortfolioAssistant />
       <ProjectDialog project={project} onClose={() => setProject(null)} />
-      <SkillDialog group={skill} onClose={() => setSkill(null)} />
+    <SkillDialog selection={skill} onClose={() => setSkill(null)} />
       <PrintResume />
     </>
   );

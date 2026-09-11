@@ -64,16 +64,17 @@ export function PortfolioAssistant() {
     const text = value.trim();
     if (!text || sending) return;
     const user: ChatMessage = { role: "user", content: text };
-    const history = [...messages.filter((m) => !m.error), user];
-    setMessages(history);
+    const previousHistory = messages.filter((m) => !m.error);
+    const nextMessages = [...previousHistory, user];
+    setMessages(nextMessages);
     setValue("");
     setSending(true);
     try {
-      const reply = await sendChatMessage(text, history.slice(-8));
-      setMessages([...history, { role: "assistant", content: reply }]);
+      const reply = await sendChatMessage(text, previousHistory.slice(-8));
+      setMessages([...nextMessages, { role: "assistant", content: reply }]);
     } catch (err) {
       setMessages([
-        ...history,
+        ...nextMessages,
         {
           role: "assistant",
           content:
@@ -137,10 +138,10 @@ export function PortfolioAssistant() {
         <form onSubmit={submit}>
           <label htmlFor="assistant-input">Your question</label>
           <div>
-          <input
-            id="assistant-input"
-            name="portfolio-question"
-            value={value}
+            <input
+              id="assistant-input"
+              name="portfolio-question"
+              value={value}
               onChange={(e) => setValue(e.target.value)}
               maxLength={500}
               autoComplete="off"

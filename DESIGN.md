@@ -6,13 +6,14 @@ colors:
   ink: "#171912"
   panel: "#ded8ca"
   copper-signal: "#e0522d"
+  copper-text: "#a93618"
   petrol: "#275d57"
   paper-dark: "#10130f"
   ink-dark: "#e8e6da"
 typography:
   display:
     fontFamily: "Bodoni Moda, Georgia, serif"
-    fontSize: "clamp(3.5rem, 8vw, 8rem)"
+    fontSize: "clamp(3.25rem, 6.6vw, 6.25rem)"
     fontWeight: 400
     lineHeight: 0.82
     letterSpacing: "-0.03em"
@@ -60,7 +61,7 @@ Bodoni Moda carries identity and chapter scale; Manrope carries readable detail;
 
 ## Layout
 
-Content uses a fluid maximum-width atlas with strongly asymmetric offsets. Project case studies intentionally become near-full-viewport chapters. At 900px, wide structures collapse; at 600px, the narrative becomes a vertical stack, architecture becomes a two-column sequence, and interactive topology becomes a one-column domain list.
+Content uses a fluid maximum-width atlas with strongly asymmetric offsets. Project case studies intentionally become near-full-viewport chapters. The capability map is an orbital control plane on large screens and becomes a complete static grouped system on tablets and phones. At 900px, wide structures collapse; at 600px, the narrative becomes a vertical stack, architecture becomes a two-column sequence, and interactive topology becomes a one-column domain list.
 
 ## Elevation & Depth
 
