@@ -68,7 +68,7 @@ jobs:
             --resource-group rg-jeysibn-portfolio \
             --name "$AZURE_FUNCTIONAPP_NAME" \
             --output json \
-            | python -c 'import json,sys; settings={item["name"]: item.get("value", "") for item in json.load(sys.stdin)}; package_url=settings.get("WEBSITE_RUN_FROM_PACKAGE", ""); assert package_url.startswith("https://"), "WEBSITE_RUN_FROM_PACKAGE is missing or invalid"; print("Run-from-package configuration validated")'
+            | python -c 'import json,sys; settings={item["name"]: item.get("value", "") for item in json.load(sys.stdin)}; package_value=str(settings.get("WEBSITE_RUN_FROM_PACKAGE", "")).strip().lower(); valid=package_value in {"1", "true"} or package_value.startswith("https://"); assert valid, "WEBSITE_RUN_FROM_PACKAGE is missing or invalid"; print("Run-from-package configuration validated:", package_value if package_value in {"1", "true"} else "https URL")'
 
       - name: Verify production health
         env:
