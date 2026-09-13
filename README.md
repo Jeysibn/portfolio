@@ -7,7 +7,7 @@
 
 A production-oriented Cloud and DevOps portfolio built as an end-to-end engineering project. The deployed system combines a React + TypeScript single-page frontend, Python Azure Functions APIs, Azure Cosmos DB, Terraform-managed infrastructure, Azure-native observability, a provider-neutral AI portfolio assistant, and GitHub Actions CI/CD using OpenID Connect (OIDC) authentication to Azure.
 
-The current frontend uses a terminal-inspired engineering visual system while keeping the site portfolio-first rather than dashboard-first. It includes live production health, release metadata, interactive project details, detailed skill inspection, certification cards, a fully visible resume, and an opportunity-focused contact experience.
+The current frontend uses an infrastructure control-surface visual system while keeping the site portfolio-first rather than dashboard-first. It includes live production health, release metadata, interactive project details, detailed skill inspection, certification cards, a fully visible resume, and an opportunity-focused contact experience.
 
 ## Live Project
 
@@ -141,7 +141,7 @@ Use Node.js **22.12+**. Node 18 is unsupported by the current Vite toolchain.
 
 ```bash
 cd frontend/app
-npm install
+npm ci
 npm run dev
 ```
 

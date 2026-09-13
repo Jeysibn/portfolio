@@ -118,7 +118,7 @@ export function Hero() {
           delivery pipelines, Kubernetes environments, and observable systems.
         </p>
         <a href="#projects">
-          Enter the systems <i aria-hidden="true">↓</i>
+          View engineering projects <i aria-hidden="true">↓</i>
         </a>
       </div>
       <svg className="hero-topology" viewBox="0 0 700 600" aria-hidden="true">

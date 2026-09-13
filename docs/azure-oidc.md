@@ -130,6 +130,17 @@ Azure Function App application setting
 
 Because Terraform manages this application setting, the secret value is present in Terraform state. The remote state backend must therefore be protected as sensitive infrastructure data.
 
+The visitor pseudonymization key follows the same deployment boundary as a temporary compatibility measure:
+
+```text
+GitHub Actions Secret: VISITOR_HASH_SECRET
+        |
+        v
+Terraform sensitive variable -> Function App setting
+```
+
+It must be at least 32 characters, must not be committed, and should be rotated deliberately because rotation changes visitor pseudonyms. A future Key Vault reference can remove both application secrets from Terraform-managed app settings.
+
 ## Troubleshooting
 
 ### `AADSTS700213: No matching federated identity record found`

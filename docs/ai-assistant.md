@@ -16,7 +16,9 @@ Browser chat widget
         v
 Azure Function: AiChatAssistant
         |
-        +--> rate limiting / request validation
+        +--> request validation
+        |
+        +--> rate limiting (only after valid input)
         |
         +--> deterministic generic-use guard
         |      |
@@ -44,7 +46,8 @@ JSON response to frontend
 
 - exposes the HTTP routes;
 - validates chat requests;
-- applies the existing per-visitor Cosmos DB rate limit;
+- validates request size, message shape, roles, and bounded conversation history before applying quota;
+- applies the existing per-visitor Cosmos DB rate limit and fails closed if its optimistic-concurrency commit cannot succeed;
 - rejects obvious general-purpose requests before calling the external AI provider;
 - creates the provider client lazily;
 - invokes the AI provider for requests that require model interpretation;
@@ -119,6 +122,12 @@ Model-level settings use Function App environment variables with safe defaults:
 - `OPENCODE_API_KEY`
 
 The provider API key remains server-side and is not included in the frontend bundle.
+
+## Abuse and privacy boundaries
+
+The backend is authoritative for request limits: 32 KiB request bodies, 2,000-character user messages, at most 10 history entries, 2,000 characters per history item, and 8,000 total history characters. Invalid requests return before Cosmos quota work, so malformed traffic does not consume a chat allowance.
+
+Visitor and chat identities use HMAC-SHA256 with `VISITOR_HASH_SECRET`; plaintext IP addresses are never stored. Rotate the secret deliberately because rotation changes pseudonyms and therefore resets deduplication/rate-limit continuity unless an overlap migration is designed.
 
 ## Design boundaries
 

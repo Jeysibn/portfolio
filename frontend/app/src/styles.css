@@ -476,7 +476,7 @@ a {
   width: 100%;
 }
 .project-case {
-  min-height: 118vh;
+  min-height: 100vh;
   display: grid;
   align-content: center;
   gap: 55px;

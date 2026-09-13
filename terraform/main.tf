@@ -101,6 +101,7 @@ resource "azurerm_linux_function_app" "function" {
     "CosmosDbConnectionString"              = azurerm_cosmosdb_account.db.primary_sql_connection_string
     "AzureWebJobsFeatureFlags"              = "EnableWorkerIndexing"
     "OPENCODE_API_KEY"                      = var.opencode_api_key
+    "VISITOR_HASH_SECRET"                   = var.visitor_hash_secret
     "APPLICATIONINSIGHTS_CONNECTION_STRING" = azurerm_application_insights.portfolio.connection_string
     # Mirrors the platform-level CORS origin above so the Function code's own
     # Access-Control-Allow-Origin header (see backend/function_app.py) can never

@@ -165,7 +165,7 @@ Lazy AI-client initialization is a reliability boundary: optional AI configurati
 
 ## Application Secret Flow
 
-The AI provider key is not stored in source control or bundled into the React frontend.
+The AI provider key and visitor HMAC pseudonymization key are not stored in source control or bundled into the React frontend. Both are injected through deployment secrets; the visitor key is required for privacy-preserving deduplication.
 
 ```text
 GitHub Actions Secret: OPENCODE_API_KEY

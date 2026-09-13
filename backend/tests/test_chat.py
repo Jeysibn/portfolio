@@ -1,4 +1,7 @@
+import json
+
 import pytest
+from azure.cosmos import exceptions
 
 import function_app
 from assistant.response_sanitizer import sanitize_ai_response
@@ -129,3 +132,84 @@ def test_get_ai_client_requires_runtime_key(monkeypatch):
 
     with pytest.raises(RuntimeError, match="OPENCODE_API_KEY"):
         function_app.get_ai_client()
+
+
+class Request:
+    method = "POST"
+    headers = {"content-type": "application/json"}
+
+    def __init__(self, body):
+        self.body = body
+
+    def get_body(self):
+        return self.body.encode()
+
+    def get_json(self):
+        return json.loads(self.body)
+
+
+def test_chat_validation_happens_before_quota_and_accepts_maximum_valid_request():
+    message = "x" * function_app.MAX_MESSAGE_CHARS
+    history = [
+        {"role": "user", "content": "x" * function_app.MAX_HISTORY_ITEM_CHARS}
+    ] * (function_app.MAX_HISTORY_TOTAL_CHARS // function_app.MAX_HISTORY_ITEM_CHARS)
+
+    parsed, error = function_app.parse_chat_request(
+        Request(json.dumps({"message": message, "history": history})), "test"
+    )
+
+    assert error is None
+    assert parsed[0] == message
+    assert len(parsed[1]) == function_app.MAX_HISTORY_TOTAL_CHARS // function_app.MAX_HISTORY_ITEM_CHARS
+
+
+@pytest.mark.parametrize(
+    "body, status",
+    [
+        ("not json", 400),
+        (json.dumps({"message": ""}), 400),
+        (json.dumps({"message": "x" * (function_app.MAX_MESSAGE_CHARS + 1)}), 413),
+        (json.dumps({"message": "x", "history": "invalid"}), 400),
+        (json.dumps({"message": "x", "history": [{"role": "system", "content": "x"}]}), 400),
+        (json.dumps({"message": "x", "history": [{"role": "user", "content": "x" * (function_app.MAX_HISTORY_ITEM_CHARS + 1)}]}), 413),
+    ],
+)
+def test_invalid_chat_requests_are_rejected_before_quota(body, status):
+    _, error = function_app.parse_chat_request(Request(body), "test")
+
+    assert error is not None
+    assert error.status_code == status
+
+
+def test_rate_limit_concurrency_failure_fails_closed_without_provider_call(monkeypatch):
+    class RateContainer:
+        def read_item(self, **kwargs):
+            return {"id": kwargs["item"], "count": 0, "last_updated": 0, "_etag": "stale"}
+
+        def replace_item(self, **kwargs):
+            raise exceptions.CosmosAccessConditionFailedError(
+                status_code=412, message="stale etag"
+            )
+
+    class Database:
+        def get_container_client(self, name):
+            return RateContainer()
+
+    class Cosmos:
+        def get_database_client(self, name):
+            return Database()
+
+    provider_called = False
+
+    def fail_if_called():
+        nonlocal provider_called
+        provider_called = True
+        raise AssertionError("provider must not be called")
+
+    monkeypatch.setattr(function_app, "get_cosmos_client", lambda: Cosmos())
+    monkeypatch.setattr(function_app, "get_ai_client", fail_if_called)
+
+    response = function_app.AiChatAssistant(Request(json.dumps({"message": "What does Jerome use Terraform for?"})))
+
+    assert response.status_code == 503
+    assert provider_called is False
