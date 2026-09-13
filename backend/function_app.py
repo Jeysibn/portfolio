@@ -1,4 +1,5 @@
 import hashlib
+import hmac
 import json
 import logging
 import os
@@ -41,6 +42,12 @@ SERVICE_VERSION = os.environ.get("APP_VERSION", "development")
 MAX_MESSAGES = 10
 RESET_PERIOD_SECONDS = 3600
 CONCURRENCY_RETRY_ATTEMPTS = 3
+MAX_REQUEST_BODY_BYTES = 32 * 1024
+MAX_MESSAGE_CHARS = 2000
+MAX_HISTORY_ENTRIES = 10
+MAX_HISTORY_ITEM_CHARS = 2000
+MAX_HISTORY_TOTAL_CHARS = 8000
+VISITOR_HASH_SECRET_ENV = "VISITOR_HASH_SECRET"
 
 RATE_LIMIT_MESSAGE = (
     "You've reached the maximum limit of 10 messages for this chat session. "
@@ -158,8 +165,75 @@ def get_client_ip(req: func.HttpRequest) -> str:
 
 
 def hash_ip(client_ip: str) -> str:
-    """Hash an IP before storing it to avoid retaining the raw address."""
-    return hashlib.sha256(client_ip.encode("utf-8")).hexdigest()
+    """Return a keyed pseudonym; plaintext IP addresses are never persisted."""
+    secret = os.environ.get(VISITOR_HASH_SECRET_ENV)
+    if not secret:
+        raise RuntimeError(f"{VISITOR_HASH_SECRET_ENV} is not configured.")
+    return hmac.new(
+        secret.encode("utf-8"),
+        client_ip.strip().encode("utf-8"),
+        hashlib.sha256,
+    ).hexdigest()
+
+
+def json_response(body: dict, status_code: int, headers: dict, request_id: str):
+    return func.HttpResponse(
+        body=json.dumps(body),
+        mimetype="application/json",
+        status_code=status_code,
+        headers={**headers, "X-Correlation-ID": request_id},
+    )
+
+
+def parse_chat_request(req: func.HttpRequest, request_id: str):
+    """Validate the complete public chat contract before touching Cosmos DB."""
+    content_length = req.headers.get("content-length")
+    if content_length and content_length.isdigit() and int(content_length) > MAX_REQUEST_BODY_BYTES:
+        return None, json_response({"error": "Request body is too large."}, 413, AI_HEADERS, request_id)
+
+    try:
+        raw_body = req.get_body()
+    except (AttributeError, ValueError):
+        raw_body = b""
+    if len(raw_body) > MAX_REQUEST_BODY_BYTES:
+        return None, json_response({"error": "Request body is too large."}, 413, AI_HEADERS, request_id)
+
+    try:
+        req_body = req.get_json()
+    except (TypeError, ValueError):
+        return None, json_response({"error": "Request body must contain valid JSON."}, 400, AI_HEADERS, request_id)
+
+    if not isinstance(req_body, dict):
+        return None, json_response({"error": "Request body must be a JSON object."}, 400, AI_HEADERS, request_id)
+
+    message = req_body.get("message")
+    history = req_body.get("history", [])
+    if not isinstance(message, str) or not message.strip():
+        return None, json_response({"error": "Message body cannot be empty."}, 400, AI_HEADERS, request_id)
+    message = message.strip()
+    if len(message) > MAX_MESSAGE_CHARS:
+        return None, json_response({"error": "Message exceeds the maximum allowed length."}, 413, AI_HEADERS, request_id)
+    if not isinstance(history, list):
+        return None, json_response({"error": "History must be an array."}, 400, AI_HEADERS, request_id)
+    if len(history) > MAX_HISTORY_ENTRIES:
+        return None, json_response({"error": "Conversation history is too long."}, 413, AI_HEADERS, request_id)
+
+    normalized_history = []
+    total_chars = 0
+    for item in history:
+        if not isinstance(item, dict) or item.get("role") not in {"user", "assistant"}:
+            return None, json_response({"error": "History contains an invalid message."}, 400, AI_HEADERS, request_id)
+        content = item.get("content")
+        if not isinstance(content, str) or not content.strip():
+            return None, json_response({"error": "History contains an invalid message."}, 400, AI_HEADERS, request_id)
+        content = content.strip()
+        if len(content) > MAX_HISTORY_ITEM_CHARS:
+            return None, json_response({"error": "A history message is too long."}, 413, AI_HEADERS, request_id)
+        total_chars += len(content)
+        normalized_history.append({"role": item["role"], "content": content})
+    if total_chars > MAX_HISTORY_TOTAL_CHARS:
+        return None, json_response({"error": "Conversation history exceeds the maximum size."}, 413, AI_HEADERS, request_id)
+    return (message, normalized_history), None
 
 
 def get_request_id(req: func.HttpRequest) -> str:
@@ -228,7 +302,7 @@ def Health(req: func.HttpRequest) -> func.HttpResponse:
     methods=["GET", "POST", "OPTIONS"],
 )
 def GetVisitorCount(req: func.HttpRequest) -> func.HttpResponse:
-    """Return the portfolio visitor count and record unique visitors."""
+    """Return the portfolio count and record approximately 24-hour unique visits."""
     request_id = get_request_id(req)
     log_event("visitor_counter_request", request_id, method=req.method)
 
@@ -245,11 +319,17 @@ def GetVisitorCount(req: func.HttpRequest) -> func.HttpResponse:
         client_ip = get_client_ip(req)
         ip_hash = hash_ip(client_ip)
         has_visited = True
-
         try:
             ips_container.read_item(item=ip_hash, partition_key=ip_hash)
         except exceptions.CosmosResourceNotFoundError:
             has_visited = False
+            try:
+                # Claim the visitor identity first. Cosmos item creation is
+                # atomic for this id, so concurrent first requests have one
+                # creator and only that creator increments the counter.
+                ips_container.create_item(body={"id": ip_hash})
+            except exceptions.CosmosResourceExistsError:
+                has_visited = True
 
         # `read_item` -> mutate -> `replace_item` is not atomic. Two concurrent
         # first-time visitors could both read the same count and overwrite each
@@ -277,7 +357,6 @@ def GetVisitorCount(req: func.HttpRequest) -> func.HttpResponse:
                         etag=item.get("_etag"),
                         match_condition=MatchConditions.IfNotModified,
                     )
-                    ips_container.create_item(body={"id": ip_hash})
                     break
                 except exceptions.CosmosAccessConditionFailedError:
                     continue
@@ -294,7 +373,7 @@ def GetVisitorCount(req: func.HttpRequest) -> func.HttpResponse:
         log_event(
             "visitor_counter_success",
             request_id,
-            unique_visitor=not has_visited,
+            unique_visit_24h=not has_visited,
         )
 
         return func.HttpResponse(
@@ -329,6 +408,11 @@ def AiChatAssistant(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse(status_code=200, headers=AI_HEADERS)
 
     try:
+        parsed, validation_error = parse_chat_request(req, request_id)
+        if validation_error:
+            return validation_error
+        user_message, chat_history = parsed
+
         client_ip = get_client_ip(req)
         ip_hash = hash_ip(client_ip)
         rate_limit_id = f"chat_limit_{ip_hash}"
@@ -342,6 +426,7 @@ def AiChatAssistant(req: func.HttpRequest) -> func.HttpResponse:
         # replace with the document's `_etag` and retry on conflict, so two
         # near-simultaneous requests from the same visitor can't both read the
         # count before either write lands and slip past the limit.
+        rate_limit_committed = False
         for _ in range(CONCURRENCY_RETRY_ATTEMPTS):
             try:
                 rate_doc = ips_container.read_item(
@@ -372,6 +457,7 @@ def AiChatAssistant(req: func.HttpRequest) -> func.HttpResponse:
                     etag=rate_doc.get("_etag"),
                     match_condition=MatchConditions.IfNotModified,
                 )
+                rate_limit_committed = True
                 break
 
             except exceptions.CosmosAccessConditionFailedError:
@@ -386,29 +472,18 @@ def AiChatAssistant(req: func.HttpRequest) -> func.HttpResponse:
                             "last_updated": current_time,
                         }
                     )
+                    rate_limit_committed = True
                     break
                 except exceptions.CosmosResourceExistsError:
                     continue
 
-        try:
-            req_body = req.get_json()
-        except ValueError:
-            return func.HttpResponse(
-                body=json.dumps({"error": "Request body must contain valid JSON."}),
-                mimetype="application/json",
-                status_code=400,
-                headers={**AI_HEADERS, "X-Correlation-ID": request_id},
-            )
-
-        user_message = req_body.get("message", "").strip()
-        chat_history = req_body.get("history", [])
-
-        if not user_message:
-            return func.HttpResponse(
-                body=json.dumps({"error": "Message body cannot be empty."}),
-                mimetype="application/json",
-                status_code=400,
-                headers={**AI_HEADERS, "X-Correlation-ID": request_id},
+        if not rate_limit_committed:
+            log_event("ai_chat_rate_limit_commit_failed", request_id)
+            return json_response(
+                {"error": "The AI assistant is temporarily unavailable."},
+                503,
+                AI_HEADERS,
+                request_id,
             )
 
         if is_obviously_out_of_scope(user_message):
@@ -419,9 +494,6 @@ def AiChatAssistant(req: func.HttpRequest) -> func.HttpResponse:
                 status_code=200,
                 headers={**AI_HEADERS, "X-Correlation-ID": request_id},
             )
-
-        if not isinstance(chat_history, list):
-            chat_history = []
 
         messages = build_chat_messages(user_message, chat_history)
 

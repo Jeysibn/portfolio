@@ -26,7 +26,7 @@ Triggers:
 Working directory: `frontend/app`
 
 ```text
-npm install
+npm ci
 -> strict TypeScript typecheck
 -> Vite production build
 -> dist artifact verification
@@ -146,7 +146,7 @@ Deployment flow:
 ```text
 checkout Jeysibn/portfolio
 -> Node.js 22
--> npm install
+-> npm ci
 -> TypeScript typecheck
 -> Vite build
 -> verify frontend/app/dist/

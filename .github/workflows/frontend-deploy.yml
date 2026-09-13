@@ -31,11 +31,19 @@ jobs:
 
       - name: Install frontend dependencies
         working-directory: frontend/app
-        run: npm install --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
 
       - name: Typecheck frontend
         working-directory: frontend/app
         run: npm run typecheck
+
+      - name: Lint frontend
+        working-directory: frontend/app
+        run: npm run lint
+
+      - name: Run frontend unit tests
+        working-directory: frontend/app
+        run: npm test -- --run
 
       - name: Build frontend
         working-directory: frontend/app

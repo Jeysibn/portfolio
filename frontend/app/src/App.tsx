@@ -38,11 +38,11 @@ export default function App() {
       />
       <main id="main-content">
         <Hero />
-        <Principles />
         <Projects onOpen={setProject} />
         <Experience />
         <Skills onOpen={setSkill} />
         <Credentials />
+        <Principles />
         <Resume />
         <Contact />
       </main>

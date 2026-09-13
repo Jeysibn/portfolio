@@ -1,5 +1,7 @@
 from types import SimpleNamespace
 
+import pytest
+
 import function_app
 
 
@@ -12,6 +14,20 @@ def test_hash_ip_is_deterministic_and_does_not_store_raw_ip():
     assert first == second
     assert first != client_ip
     assert len(first) == 64
+
+
+def test_hash_ip_is_keyed_and_changes_with_secret(monkeypatch):
+    first = function_app.hash_ip("203.0.113.10")
+    monkeypatch.setenv("VISITOR_HASH_SECRET", "a-different-secret")
+
+    assert function_app.hash_ip("203.0.113.10") != first
+
+
+def test_hash_ip_requires_secret(monkeypatch):
+    monkeypatch.delenv("VISITOR_HASH_SECRET", raising=False)
+
+    with pytest.raises(RuntimeError, match="VISITOR_HASH_SECRET"):
+        function_app.hash_ip("203.0.113.10")
 
 
 def test_get_client_ip_trusts_the_last_forwarded_hop():

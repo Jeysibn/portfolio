@@ -53,11 +53,11 @@ export interface Certification {
 }
 
 export const navigation = [
-  { label: "About", id: "about" },
   { label: "Projects", id: "projects" },
   { label: "Experience", id: "experience" },
   { label: "Skills", id: "skills" },
   { label: "Certifications", id: "credentials-title" },
+  { label: "Principles", id: "about" },
   { label: "Resume", id: "resume" },
   { label: "Contact", id: "contact" },
 ] as const;
@@ -158,7 +158,7 @@ export const projects: Project[] = [
       "Azure Functions Python v2 API with dedicated health, visitor-counter, and AI-assistant routes.",
       "Cosmos DB persistence with hashed visitor identifiers and TTL-based cleanup for rate-limit records.",
       "Remote Terraform state, protected production workflow, dependency auditing, and secret-safe OIDC deployment.",
-      "Milestone 6 adds a typed React + TypeScript experience without changing the backend contracts.",
+      "React + TypeScript provides the recruiter-facing control surface without changing the backend contracts.",
     ],
     technologies: [
       "React",

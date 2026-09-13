@@ -41,10 +41,16 @@ jobs:
           node-version: "22"
 
       - name: Install frontend dependencies
-        run: npm install --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
 
       - name: Typecheck React frontend
         run: npm run typecheck
+
+      - name: Lint React frontend
+        run: npm run lint
+
+      - name: Run frontend unit tests
+        run: npm test -- --run
 
       - name: Build React frontend
         run: npm run build
@@ -211,6 +217,7 @@ jobs:
         if: github.actor != 'dependabot[bot]'
         env:
           TF_VAR_opencode_api_key: ${{ secrets.OPENCODE_API_KEY }}
+          TF_VAR_visitor_hash_secret: ${{ secrets.VISITOR_HASH_SECRET }}
         run: |
           terraform plan \
             -input=false \

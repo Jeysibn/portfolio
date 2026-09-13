@@ -83,6 +83,7 @@ jobs:
       - name: Terraform Plan
         env:
           TF_VAR_opencode_api_key: ${{ secrets.OPENCODE_API_KEY }}
+          TF_VAR_visitor_hash_secret: ${{ secrets.VISITOR_HASH_SECRET }}
         run: |
           terraform plan \
             -input=false \

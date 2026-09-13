@@ -32,3 +32,14 @@ variable "opencode_api_key" {
     error_message = "The OpenCode API key must not be empty."
   }
 }
+
+variable "visitor_hash_secret" {
+  type        = string
+  description = "Secret used for HMAC-SHA256 visitor pseudonyms. Store only in the deployment secret manager."
+  sensitive   = true
+
+  validation {
+    condition     = length(trimspace(var.visitor_hash_secret)) >= 32
+    error_message = "The visitor HMAC secret must be at least 32 characters."
+  }
+}

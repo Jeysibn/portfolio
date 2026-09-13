@@ -16,7 +16,7 @@ This document outlines the architectural upgrade to the portfolio's visitor trac
 ## Key Technical Implementations
 
 ### 1. Robust IP Extraction & Hashing
-To reliably identify unique users without storing personally identifiable information (PII), the Azure Function extracts the client IP from the `x-client-ip` or `x-forwarded-for` headers. 
+To reliably identify approximately 24-hour unique visits without storing personally identifiable information (PII), the Azure Function extracts the client IP from the trusted proxy hop and derives a keyed HMAC-SHA256 pseudonym. The `VISITOR_HASH_SECRET` is runtime configuration, never source-controlled.
 * **Sanitization:** The logic actively strips mutated proxy chains (comma-separated lists) and ephemeral port numbers injected by Azure's networking stack.
 * **Privacy:** The sanitized IP is immediately subjected to a one-way `SHA-256` hash. The raw IP is never stored, ensuring GDPR compliance.
 
