@@ -10,6 +10,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and 
 
 ### Added
 
+- **Cursor-following ambient glow**: Added a subtle, theme-aware viewport glow that tracks fine-pointer movement without intercepting interactions and disables for touch devices or reduced-motion preferences.
 - **Dedicated GitHub Pages deployment repository**: Frontend production publishing now targets `Jeysibn/jeysibn.github.io`, allowing the portfolio to use the root URL `https://jeysibn.github.io/` while keeping application source and CI/CD in `Jeysibn/portfolio`.
 - **Pages publish credential**: Added the `PAGES_DEPLOY_TOKEN` workflow secret boundary for authenticated checkout/push to the dedicated Pages repository.
 - **Optimized architecture previews**: Project cards and normal project-detail views now request resized WebP previews instead of immediately downloading the original multi-megabyte PNG diagrams.
