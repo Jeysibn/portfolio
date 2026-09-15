@@ -216,9 +216,9 @@ A fresh plan is generated on `main` even when PR validation previously generated
 
 ## Frontend Asset Delivery
 
-The Vite build contains the application JavaScript/CSS and static public assets. Large project architecture PNGs are not bundled into the application artifact because they are referenced as public external assets.
+The Vite build contains the application JavaScript/CSS and static public assets. The System Deck uses compact data-driven topology previews; full repository-derived project architecture remains in the SVG sheets under `frontend/app/public/architecture/` and is loaded by the inspection dialog.
 
-Normal project rendering uses resized WebP preview URLs so users do not download the full-resolution PNGs during ordinary browsing. The original PNG is requested only when the user explicitly opens architecture zoom.
+Normal project rendering does not load the full SVG set. The selected project's architecture sheets are requested only when the user explicitly opens system inspection, while the adjacent text summaries keep the interaction understandable without image rendering.
 
 This behavior is application-level optimization rather than a separate deployment job. CI still validates the frontend through the normal TypeScript and Vite build pipeline.
 

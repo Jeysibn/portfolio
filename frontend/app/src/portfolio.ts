@@ -28,6 +28,7 @@ export interface Project {
   shortTitle: string;
   category: string;
   status: string;
+  statusLabel: string;
   repositoryUrl: string;
   liveUrl?: string;
   preview: {
@@ -36,6 +37,7 @@ export interface Project {
     flow: {
       label: string;
       nodes: string[];
+      accessible: string;
     };
     technologies: string[];
   };
@@ -162,6 +164,7 @@ export const projects: Project[] = [
     shortTitle: "Cloud Portfolio",
     category: "Serverless cloud platform",
     status: "Live system · source-controlled",
+    statusLabel: "LIVE",
     repositoryUrl: "https://github.com/Jeysibn/portfolio",
     liveUrl: "https://jeysibn.github.io/",
     preview: {
@@ -170,8 +173,10 @@ export const projects: Project[] = [
       primaryOutcome:
         "Path-specific GitHub Actions publish the frontend and deploy Azure changes through OIDC, with post-deployment smoke checks.",
       flow: {
-        label: "Runtime path",
-        nodes: ["Visitor", "GitHub Pages", "Azure Functions", "Cosmos DB", "Telemetry"],
+        label: "GitHub Pages → Azure Functions → Cosmos DB → App Insights",
+        nodes: ["WEB", "API", "STATE", "OBSERVE"],
+        accessible:
+          "React and Vite on GitHub Pages, Python Azure Functions, Cosmos DB, and Application Insights telemetry.",
       },
       technologies: ["React", "TypeScript", "Azure Functions", "Terraform", "GitHub Actions"],
     },
@@ -250,6 +255,7 @@ export const projects: Project[] = [
     shortTitle: "Homelab GitOps",
     category: "Kubernetes & GitOps",
     status: "Single-node topology · active lab",
+    statusLabel: "ACTIVE LAB",
     repositoryUrl: "https://github.com/Jeysibn/homelab-gitops",
     preview: {
       summary:
@@ -257,8 +263,10 @@ export const projects: Project[] = [
       primaryOutcome:
         "Bootstrap gates Argo CD on working Calico and cluster-network acceptance checks before App-of-Apps reconciliation from main.",
       flow: {
-        label: "Provision → converge",
-        nodes: ["Terraform", "Proxmox VM", "k3s + Calico", "Argo CD", "Platform services"],
+        label: "Terraform → bootstrap → Argo CD → workloads",
+        nodes: ["PROVISION", "BOOTSTRAP", "RECONCILE", "RUN"],
+        accessible:
+          "Terraform provisions Proxmox, bootstrap establishes k3s and Calico, Argo CD reconciles the platform, and workloads run on the single-node cluster.",
       },
       technologies: ["Terraform", "Proxmox", "k3s", "Calico", "Argo CD"],
     },
@@ -339,6 +347,7 @@ export const projects: Project[] = [
     shortTitle: "MoniKey",
     category: "Privacy-first personal finance",
     status: "Active engineering · deployment gaps documented",
+    statusLabel: "ACTIVE DEVELOPMENT",
     repositoryUrl: "https://github.com/Jeysibn/monikey",
     preview: {
       summary:
@@ -346,8 +355,10 @@ export const projects: Project[] = [
       primaryOutcome:
         "Authoritative money stays exact across the boundary: PostgreSQL BIGINT backs decimal minor-unit strings, while worker jobs use durable PostgreSQL scheduling.",
       flow: {
-        label: "Application runtime",
-        nodes: ["Browser", "nginx / React", "Fastify API", "PostgreSQL", "Worker"],
+        label: "nginx / React → Fastify → PostgreSQL → worker",
+        nodes: ["CLIENT", "API", "LEDGER", "WORKER"],
+        accessible:
+          "The browser reaches nginx and React, then the Fastify API, PostgreSQL authoritative ledger, and separate PostgreSQL-backed worker.",
       },
       technologies: ["React 19", "TypeScript", "Fastify 5", "Prisma 6", "PostgreSQL"],
     },
@@ -426,6 +437,7 @@ export const projects: Project[] = [
     shortTitle: "NOC Report",
     category: "Operations evidence & AI workflow",
     status: "Active development",
+    statusLabel: "ACTIVE DEVELOPMENT",
     repositoryUrl: "https://github.com/Jeysibn/noc-report",
     preview: {
       summary:
@@ -433,8 +445,10 @@ export const projects: Project[] = [
       primaryOutcome:
         "Claude supplies narrative reasoning; application-owned composition derives mandatory evidence coverage and report order from a frozen ReportSnapshot.",
       flow: {
-        label: "Daily report path",
-        nodes: ["Operator", "React web", "FastAPI", "Job / RabbitMQ", "Bridge / sandbox", "ReportDocument"],
+        label: "frozen evidence → queue → analysis → composition",
+        nodes: ["EVIDENCE", "QUEUE", "ANALYZE", "COMPOSE"],
+        accessible:
+          "Frozen evidence enters the job and RabbitMQ path, the bridge and sandbox run validated analysis, and application-owned composition creates the ReportDocument.",
       },
       technologies: ["React", "FastAPI", "PostgreSQL", "MinIO", "RabbitMQ"],
     },

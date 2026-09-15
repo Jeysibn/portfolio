@@ -4,14 +4,14 @@ import gsap from "gsap";
 import type { Project } from "../../portfolio";
 import { ProjectSelector } from "./ProjectSelector";
 import { SystemDossier } from "./SystemDossier";
-import { useSystemDeck } from "./useSystemDeck";
+import { rotateDeck, useSystemDeck } from "./useSystemDeck";
 
 const positionForDepth = (depth: number) => ({
-  x: depth === 0 ? 0 : depth % 2 === 0 ? -10 : 12,
-  y: depth === 0 ? 0 : depth * -28,
-  rotation: depth === 0 ? 0 : (depth % 2 === 0 ? -1 : 1) * Math.min(4, depth * 0.8),
+  x: depth === 0 ? 0 : depth % 2 === 0 ? -30 - depth * 2 : 34 + depth * 4,
+  y: depth === 0 ? 0 : depth * -38,
+  rotation: depth === 0 ? 0 : (depth % 2 === 0 ? -1 : 1) * Math.min(3.2, depth * 0.85),
   scale: 1 - depth * 0.025,
-  opacity: Math.max(0.72, 1 - depth * 0.065),
+  opacity: Math.max(0.76, 1 - depth * 0.06),
 });
 
 function prefersReducedMotion() {
@@ -32,9 +32,8 @@ export function SystemDeck({
   const timelineRef = useRef<gsap.core.Timeline | null>(null);
   const contextRef = useRef<gsap.Context | null>(null);
   const pointerStart = useRef<number | null>(null);
-  const initialLayout = useRef(true);
   const [reducedMotion, setReducedMotion] = useState(prefersReducedMotion);
-  const { activeId, activeIndex, order, orderedProjects, selectProject } = useSystemDeck(projects);
+  const { activeId, activeIndex, order, selectProject } = useSystemDeck(projects);
 
   useLayoutEffect(() => {
     const context = gsap.context(() => undefined, deckRef);
@@ -54,22 +53,22 @@ export function SystemDeck({
     return () => media.removeEventListener?.("change", onChange);
   }, []);
 
+  // Keep the stable card DOM aligned after a state change or a project-list change.
+  // The shuffle itself owns the transition; this effect only establishes a safe rest state.
   useLayoutEffect(() => {
     if (!contextRef.current) return;
     timelineRef.current?.kill();
     contextRef.current.add(() => {
-      const timeline = gsap.timeline({
-        defaults: { duration: reducedMotion || initialLayout.current ? 0 : 0.56, ease: "expo.out" },
-      });
       order.forEach((id, depth) => {
         const element = cardRefs.current.get(id);
         if (!element) return;
-        timeline.to(element, positionForDepth(depth), 0);
+        gsap.set(element, {
+          ...positionForDepth(depth),
+          zIndex: projects.length - depth,
+        });
       });
-      timelineRef.current = timeline;
     });
-    initialLayout.current = false;
-  }, [order, reducedMotion]);
+  }, [order, projects.length, reducedMotion]);
 
   const setCardRef = useCallback(
     (id: string) => (element: HTMLElement | null) => {
@@ -82,29 +81,68 @@ export function SystemDeck({
   const handleSelect = useCallback(
     (selectedId: string) => {
       if (selectedId === activeId || !projects.some((project) => project.id === selectedId)) return;
-      timelineRef.current?.kill();
-      const currentOrder = order;
-      const currentCards = currentOrder
-        .map((id) => cardRefs.current.get(id))
-        .filter((element): element is HTMLElement => Boolean(element));
 
+      const nextOrder = rotateDeck(order, selectedId);
+      const currentActive = cardRefs.current.get(activeId);
+
+      // Rapid input starts from a deterministic logical layout, preventing stale GSAP
+      // transforms or z-index values from surviving into the next shuffle.
+      timelineRef.current?.kill();
       contextRef.current?.add(() => {
-        currentCards.forEach((element, depth) => gsap.set(element, positionForDepth(depth)));
+        order.forEach((id, depth) => {
+          const element = cardRefs.current.get(id);
+          if (!element) return;
+          gsap.set(element, {
+            ...positionForDepth(depth),
+            zIndex: projects.length - depth,
+          });
+        });
+
         if (reducedMotion) {
+          nextOrder.forEach((id, depth) => {
+            const element = cardRefs.current.get(id);
+            if (!element) return;
+            gsap.set(element, {
+              ...positionForDepth(depth),
+              zIndex: projects.length - depth,
+            });
+          });
           selectProject(selectedId);
           return;
         }
-        const currentActive = cardRefs.current.get(activeId);
-        const timeline = gsap.timeline({
-          defaults: { ease: "expo.out" },
-          onComplete: () => selectProject(selectedId),
-        });
+
+        const timeline = gsap.timeline({ defaults: { ease: "expo.out" } });
         if (currentActive) {
-          timeline.to(currentActive, { y: -18, x: 16, rotation: 2.4, scale: 1.01, opacity: 0.88, duration: 0.18 });
+          timeline.to(currentActive, {
+            x: 28,
+            y: -24,
+            rotation: 2.5,
+            scale: 1.015,
+            duration: 0.16,
+          }, 0);
         }
-        timeline.to(currentCards, { y: "+=5", duration: 0.18, stagger: 0.018 }, "<");
+
+        timeline.add(() => {
+          nextOrder.forEach((id, depth) => {
+            const element = cardRefs.current.get(id);
+            if (element) gsap.set(element, { zIndex: projects.length - depth });
+          });
+        }, 0.16);
+
+        nextOrder.forEach((id, depth) => {
+          const element = cardRefs.current.get(id);
+          if (!element) return;
+          timeline.to(element, {
+            ...positionForDepth(depth),
+            duration: 0.52,
+          }, 0.16);
+        });
+
+        // Keep the full card mounted throughout; only its depth and transform change.
+        timeline.eventCallback("onComplete", () => selectProject(selectedId));
         timelineRef.current = timeline;
       });
+
     },
     [activeId, order, projects, reducedMotion, selectProject],
   );
@@ -145,13 +183,13 @@ export function SystemDeck({
           pointerStart.current = null;
         }}
       >
-        {orderedProjects.map((project, depth) => {
-          const projectIndex = projects.findIndex((item) => item.id === project.id);
+        {projects.map((project) => {
+          const depth = order.indexOf(project.id);
           return (
             <SystemDossier
               key={project.id}
               project={project}
-              index={projectIndex}
+              index={projects.indexOf(project)}
               total={projects.length}
               depth={depth}
               isActive={project.id === activeId}

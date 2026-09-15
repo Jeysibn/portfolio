@@ -79,7 +79,7 @@ Buttons are square-edged, text-forward, and high contrast. Project dossiers use 
 
 The Projects chapter uses one interactive System Deck. A circular logical order keeps the active dossier at depth zero and exposes the remaining dossiers behind it with useful system number, title, and category labels. Selecting a dossier is a deliberate reorder: the active sheet lifts and moves toward the back while the selected sheet settles into the front plane. GSAP owns this state-change motion; idle dossiers remain still.
 
-The deck preview uses a compact repository-derived flow and one engineering outcome. Full architecture evidence stays in the native inspection dialog, with a text equivalent beside every SVG. Reduced-motion users receive immediate deck reordering without translation, rotation, parallax, or dramatic scaling. On phones, exposed dossiers become top-edge sheets and the preview flow becomes a readable two-column sequence rather than a shrunken desktop diagram.
+The deck preview uses a compact repository-derived topology, short summary, and primary technology line. Full outcomes and architecture evidence stay in the native inspection dialog, with a text equivalent beside every SVG. Reduced-motion users receive immediate deck reordering without translation, rotation, parallax, or dramatic scaling. On phones, exposed dossiers become top-edge sheets and the preview flow becomes a readable two-column sequence rather than a shrunken desktop diagram.
 
 ## Do's and Don'ts
 

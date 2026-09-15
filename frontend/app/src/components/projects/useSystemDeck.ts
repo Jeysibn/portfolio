@@ -35,18 +35,10 @@ export function useSystemDeck(projects: Project[]) {
   }, [projectIds]);
 
   const activeIndex = Math.max(0, projectIds.indexOf(resolvedActiveId));
-  const orderedProjects = useMemo(() => {
-    const projectById = new Map(projects.map((project) => [project.id, project]));
-    return reconciledOrder
-      .map((id) => projectById.get(id))
-      .filter((project): project is Project => Boolean(project));
-  }, [reconciledOrder, projects]);
-
   return {
     activeId: resolvedActiveId,
     activeIndex,
     order: reconciledOrder,
-    orderedProjects,
     selectProject,
   };
 }
