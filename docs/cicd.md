@@ -132,6 +132,7 @@ Path trigger:
 
 ```text
 frontend/**
+content/**
 .github/workflows/frontend-deploy.yml
 ```
 
@@ -146,6 +147,7 @@ Deployment flow:
 ```text
 checkout Jeysibn/portfolio
 -> Node.js 22
+-> canonical content is bundled from content/portfolio.json
 -> npm ci
 -> TypeScript typecheck
 -> Vite build
@@ -175,6 +177,7 @@ Path trigger:
 
 ```text
 backend/**
+content/**
 .github/workflows/backend-deploy.yml
 ```
 
@@ -189,6 +192,11 @@ After package deployment, the workflow:
 3. calls `GetVisitorCount`;
 4. verifies that the response contains an integer count;
 5. fails the deployment if runtime verification fails.
+
+The deployment package includes the generated allow-listed assistant projection.
+The workflow checks it with `python backend/tools/build_knowledge.py --check`
+before installing the Function dependencies, so a content change cannot deploy
+an out-of-date assistant artifact.
 
 ### Terraform
 

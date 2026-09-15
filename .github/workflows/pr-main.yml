@@ -111,6 +111,11 @@ jobs:
         run: |
           python -m compileall function_app.py
 
+      - name: Validate approved knowledge artifact
+        run: |
+          python tools/build_knowledge.py --check
+          python -m evals.run_evals
+
       - name: Ruff lint
         run: |
           ruff check .

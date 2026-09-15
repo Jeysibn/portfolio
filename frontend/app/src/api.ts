@@ -1,4 +1,4 @@
-import type { ChatMessage } from "./portfolio";
+import type { ChatMessage, ChatSource } from "./portfolio";
 
 const DEFAULT_API_BASE_URL = "https://func-jeysibn-portfolio.azurewebsites.net/api";
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || DEFAULT_API_BASE_URL).replace(/\/$/, "");
@@ -16,6 +16,11 @@ export interface VisitorCountResponse {
 export interface ChatResponse {
   reply?: string;
   error?: string;
+  sources?: ChatSource[];
+  usage?: {
+    limit: number;
+    remaining: number;
+  };
 }
 
 async function requestJson<T>(url: string, init?: RequestInit): Promise<T> {
@@ -69,7 +74,7 @@ export async function sendChatMessage(
   history: ChatMessage[],
   sessionId: string,
   signal?: AbortSignal,
-): Promise<string> {
+): Promise<ChatResponse> {
   const payload = await requestJson<ChatResponse>(`${API_BASE_URL}/AiChatAssistant`, {
     method: "POST",
     headers: {
@@ -84,5 +89,17 @@ export async function sendChatMessage(
     throw new Error(payload.error || "The AI assistant returned an empty response");
   }
 
-  return payload.reply.trim();
+  return {
+    ...payload,
+    reply: payload.reply.trim(),
+    sources: Array.isArray(payload.sources)
+      ? payload.sources.filter(
+          (source): source is ChatSource =>
+            typeof source?.id === "string" &&
+            typeof source.label === "string" &&
+            typeof source.url === "string" &&
+            /^https:\/\//.test(source.url),
+        )
+      : [],
+  };
 }

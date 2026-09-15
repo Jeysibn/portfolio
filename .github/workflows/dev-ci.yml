@@ -100,6 +100,11 @@ jobs:
         run: |
           python -m compileall function_app.py
 
+      - name: Validate approved knowledge artifact
+        run: |
+          python tools/build_knowledge.py --check
+          python -m evals.run_evals
+
       - name: Run Ruff
         run: |
           ruff check .
@@ -149,6 +154,6 @@ jobs:
       - name: CI Summary
         run: |
           echo "React + TypeScript frontend checks passed."
-          echo "Backend checks and tests passed."
+          echo "Backend, knowledge consistency, and assistant retrieval evaluations passed."
           echo "Terraform checks passed."
           echo "Development validation passed."

@@ -33,6 +33,21 @@ Application source, CI/CD, backend code, and Terraform remain in `Jeysibn/portfo
 
 Infrastructure is managed with Terraform and delivery is automated with GitHub Actions.
 
+The assistant's factual content is built before deployment rather than fetched
+from a runtime repository crawler:
+
+```text
+content/portfolio.json
+        |
+        | explicit allow-list + validation in CI
+        v
+backend/data/approved_knowledge.json
+        |
+        | deterministic project/technology retrieval
+        v
+AiChatAssistant → provider → { reply, sources, usage }
+```
+
 ## Frontend
 
 The frontend is a Vite-built React + TypeScript single-page application. Source lives under `frontend/app`; Vite emits the static production artifact to `frontend/app/dist`.
@@ -56,7 +71,7 @@ Navigation scrolls the selected section to the start of the viewport beneath the
 - live Manila time in the monitoring panel;
 - responsive monitoring-card geometry, including single-column phone metrics;
 - visitor-counter display;
-- AI assistant conversation state and session history;
+- AI assistant conversation state, starter questions, source links, and session history;
 - a four-project System Deck with explicit circular deck ordering;
 - stacked dossier selection with GSAP state-change motion;
 - compact typed architecture-flow previews;
@@ -150,15 +165,22 @@ Raw IP addresses are not intentionally persisted.
 
 `AiChatAssistant`:
 
-1. identifies a visitor with a hashed IP-derived key;
-2. applies a per-visitor rate limit using Cosmos DB records;
-3. loads the portfolio knowledge base from `backend/data/knowledge_base.json`;
-4. builds a constrained system prompt;
+1. validates the request and rejects clearly unrelated requests before the accepted-AI question quota;
+2. identifies a visitor with a hashed IP-derived key and applies the authoritative hourly Cosmos DB quota;
+3. retrieves a small project/profile context from the allow-listed `approved_knowledge.json` projection;
+4. builds separate behavior and factual-context messages and records prompt/knowledge versions;
 5. lazily creates the OpenAI-compatible AI client at request time;
-6. sends the request to the configured AI provider;
-7. returns a portfolio-specific response.
+6. sends the bounded request to the configured AI provider;
+7. sanitizes the answer and returns curated source links plus remaining hourly usage;
+8. records privacy-conscious retrieval, latency, quota, provider, and failure telemetry.
 
 Lazy AI-client initialization is a reliability boundary: optional AI configuration failures can produce a controlled AI-route error without preventing unrelated Function routes from being indexed.
+
+The assistant does not use embeddings, a vector database, LangChain, Pinecone,
+or an autonomous agent. The corpus is currently small enough for deterministic
+exact matching. The canonical content and generated artifact are checked in CI
+so the frontend cannot silently advertise a project the assistant does not
+know.
 
 ## Application Secret Flow
 

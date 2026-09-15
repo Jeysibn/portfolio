@@ -207,6 +207,23 @@ Recovery steps:
 6. Apply the change through the normal `dev -> main` workflow rather than relying on an untracked manual portal edit.
 7. Retest the AI assistant after Terraform production deployment completes.
 
+### Assistant answers appear stale or cite the wrong project
+
+Check the canonical content and generated projection before investigating the
+provider:
+
+```bash
+python backend/tools/build_knowledge.py --check
+python -m pytest -q backend/tests
+cd backend && python -m evals.run_evals
+```
+
+Review `content/portfolio.json` first, then inspect the generated
+`backend/data/approved_knowledge.json`. Do not add facts directly to a runtime
+prompt or crawl a project repository. If the source metadata or project
+boundary is wrong, correct the canonical record and redeploy through the normal
+content-triggered frontend/backend workflows.
+
 ### No Functions Are Indexed
 
 A package deployment can succeed even when the Python worker cannot import the application module and therefore cannot discover routes.

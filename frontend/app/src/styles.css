@@ -1211,6 +1211,28 @@ body:has(.inspection-dialog[open]) {
   background: none;
   cursor: pointer;
 }
+.portfolio-assistant-panel .assistant-actions {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.portfolio-assistant-panel .assistant-actions button {
+  color: var(--muted);
+  font: 500 10px var(--mono);
+  text-transform: uppercase;
+}
+.portfolio-assistant-panel .assistant-actions button:hover,
+.portfolio-assistant-panel .assistant-actions button:focus-visible {
+  color: var(--ink);
+  text-decoration: underline;
+}
+.portfolio-assistant .assistant-subtitle {
+  max-width: 230px;
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.4;
+}
 .portfolio-assistant .messages {
   overflow: auto;
   padding: 18px;
@@ -1235,6 +1257,53 @@ body:has(.inspection-dialog[open]) {
 }
 .portfolio-assistant .message.error {
   color: var(--danger);
+}
+.portfolio-assistant .assistant-empty > p {
+  margin-top: 0;
+}
+.portfolio-assistant .assistant-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 14px;
+}
+.portfolio-assistant .assistant-suggestions button {
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink);
+  padding: 8px 9px;
+  text-align: left;
+  font: 400 10px/1.35 var(--mono);
+  cursor: pointer;
+}
+.portfolio-assistant .assistant-suggestions button:hover,
+.portfolio-assistant .assistant-suggestions button:focus-visible {
+  border-color: var(--signal);
+  color: var(--signal);
+}
+.portfolio-assistant .assistant-loading {
+  color: var(--muted);
+  font-size: 12px;
+}
+.portfolio-assistant .message-sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin-top: 8px;
+  font: 500 10px var(--mono);
+}
+.portfolio-assistant .message-sources a {
+  color: var(--signal);
+  text-decoration: none;
+}
+.portfolio-assistant .message-sources a:hover,
+.portfolio-assistant .message-sources a:focus-visible {
+  text-decoration: underline;
+}
+.portfolio-assistant .assistant-usage {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font: 400 10px var(--mono);
 }
 .portfolio-assistant-panel form {
   padding: 16px;

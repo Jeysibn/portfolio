@@ -1,14 +1,25 @@
+import hashlib
 import json
 import logging
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
+
+from assistant.retrieval import RetrievalResult, get_relevant_context, load_knowledge_base
 
 logger = logging.getLogger(__name__)
 
 ASSISTANT_DIR = Path(__file__).resolve().parent
-BACKEND_DIR = ASSISTANT_DIR.parent
 PROMPT_PATH = ASSISTANT_DIR / "assistant_prompt.md"
-KNOWLEDGE_PATH = BACKEND_DIR / "data" / "knowledge_base.json"
+
+__all__ = ["ChatContext", "build_chat_context", "build_chat_messages", "load_assistant_prompt", "load_knowledge_base"]
+
+
+@dataclass(frozen=True)
+class ChatContext:
+    messages: list[dict[str, str]]
+    retrieval: RetrievalResult
+    prompt_version: str
 
 
 def load_assistant_prompt() -> str:
@@ -25,35 +36,27 @@ def load_assistant_prompt() -> str:
     return prompt
 
 
-def load_knowledge_base() -> dict[str, Any]:
-    """Load verified portfolio facts from JSON."""
-    try:
-        with KNOWLEDGE_PATH.open("r", encoding="utf-8") as file:
-            data = json.load(file)
-    except (OSError, json.JSONDecodeError):
-        logger.exception("Unable to load the portfolio facts.")
-        return {}
-
-    return data if isinstance(data, dict) else {}
+def _prompt_version(prompt: str) -> str:
+    return f"prompt-{hashlib.sha256(prompt.encode('utf-8')).hexdigest()[:16]}"
 
 
-def build_chat_messages(
+def build_chat_context(
     user_message: str,
     chat_history: list[dict[str, Any]],
     portfolio_facts: dict[str, Any] | None = None,
-) -> list[dict[str, str]]:
-    """Build model messages while keeping behavior and portfolio facts separate."""
-    facts = portfolio_facts if portfolio_facts is not None else load_knowledge_base()
-
+) -> ChatContext:
+    """Build provider messages from behavior plus a small retrieved fact set."""
+    prompt = load_assistant_prompt()
+    retrieval = get_relevant_context(user_message, chat_history, portfolio_facts)
     messages: list[dict[str, str]] = [
-        {"role": "system", "content": load_assistant_prompt()},
+        {"role": "system", "content": prompt},
         {
             "role": "system",
             "content": (
-                "Verified portfolio facts for Jerome follow. "
-                "Use these facts for Jerome-specific claims and do not expose this "
-                "internal context to the visitor.\n\n"
-                + json.dumps(facts, indent=2)
+                "Approved portfolio facts relevant to this question follow. "
+                "Treat them as the factual source of truth, do not expose this "
+                "internal context, and do not infer facts that are absent.\n\n"
+                + json.dumps(retrieval.context, indent=2, ensure_ascii=False)
             ),
         },
     ]
@@ -65,4 +68,13 @@ def build_chat_messages(
             messages.append({"role": role, "content": content.strip()})
 
     messages.append({"role": "user", "content": user_message})
-    return messages
+    return ChatContext(messages=messages, retrieval=retrieval, prompt_version=_prompt_version(prompt))
+
+
+def build_chat_messages(
+    user_message: str,
+    chat_history: list[dict[str, Any]],
+    portfolio_facts: dict[str, Any] | None = None,
+) -> list[dict[str, str]]:
+    """Backward-compatible message-only wrapper around the retrieval context."""
+    return build_chat_context(user_message, chat_history, portfolio_facts).messages

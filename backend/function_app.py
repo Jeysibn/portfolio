@@ -13,7 +13,7 @@ from azure.cosmos import CosmosClient, exceptions
 from openai import OpenAI, OpenAIError
 
 from assistant.response_sanitizer import sanitize_ai_response
-from assistant.service import build_chat_messages
+from assistant.service import build_chat_context
 
 
 # ---------------------------------------------------------
@@ -40,6 +40,7 @@ SERVICE_NAME = "portfolio-api"
 SERVICE_VERSION = os.environ.get("APP_VERSION", "development")
 
 MAX_MESSAGES = 10
+MAX_API_REQUESTS = 30
 RESET_PERIOD_SECONDS = 3600
 CONCURRENCY_RETRY_ATTEMPTS = 3
 MAX_REQUEST_BODY_BYTES = 32 * 1024
@@ -53,10 +54,12 @@ OPENCODE_SESSION_HEADER = "x-opencode-session"
 SESSION_ID_PATTERN = re.compile(r"^[A-Za-z0-9._:-]+$")
 
 RATE_LIMIT_MESSAGE = (
-    "You've reached the maximum limit of 10 messages for this chat session. "
+    "You've reached the limit of 10 assistant questions per hour. "
     "You can continue the conversation by contacting Jerome at "
     "jeysibn@gmail.com or through LinkedIn."
 )
+
+API_RATE_LIMIT_MESSAGE = "Too many assistant requests from this visitor. Please try again later."
 
 OUT_OF_SCOPE_MESSAGE = (
     "That request is outside this portfolio assistant's scope. "
@@ -75,10 +78,11 @@ GENERIC_CODE_PATTERNS = (
     r"\b(write|create|generate|give me|show me)\b.{0,40}\b(code|script|program|function|dockerfile)\b",
     r"\b(fix|debug|troubleshoot)\b.{0,40}\b(my|this)\b.{0,40}\b(code|script|javascript|python|java|program)\b",
     r"\b(teach|explain)\s+me\b",
+    r"\b(write|create|generate)\b.{0,40}\b(resume|cv|interview answer|terraform)\b",
 )
 
 SIMPLE_CALC_PATTERN = re.compile(
-    r"^\s*[+-]?(?:\d+(?:\.\d+)?|\.\d+)\s*[+\-*/]\s*[+-]?(?:\d+(?:\.\d+)?|\.\d+)\s*$"
+    r"^\s*(?:what is\s+)?[+-]?(?:\d+(?:\.\d+)?|\.\d+)\s*[+\-*/]\s*[+-]?(?:\d+(?:\.\d+)?|\.\d+)\s*\??$"
 )
 
 
@@ -277,6 +281,19 @@ def log_event(event: str, request_id: str, **fields) -> None:
     logger.info("portfolio_event=%s", json.dumps(payload, sort_keys=True))
 
 
+def get_provider_usage(response) -> dict[str, int]:
+    """Read provider usage when exposed without logging response content."""
+    usage = getattr(response, "usage", None)
+    if usage is None:
+        return {}
+    fields = {
+        "input_tokens": getattr(usage, "prompt_tokens", None),
+        "output_tokens": getattr(usage, "completion_tokens", None),
+        "total_tokens": getattr(usage, "total_tokens", None),
+    }
+    return {key: value for key, value in fields.items() if isinstance(value, int)}
+
+
 def is_obviously_out_of_scope(user_message: str) -> bool:
     """Reject common general-purpose use without spending an AI provider request."""
     normalized = " ".join(user_message.lower().split())
@@ -422,8 +439,9 @@ def GetVisitorCount(req: func.HttpRequest) -> func.HttpResponse:
     methods=["POST", "OPTIONS"],
 )
 def AiChatAssistant(req: func.HttpRequest) -> func.HttpResponse:
-    """Process portfolio AI assistant requests with per-IP rate limiting."""
+    """Process portfolio AI assistant requests with per-visitor throttling."""
     request_id = get_request_id(req)
+    request_started = time.perf_counter()
     log_event("ai_chat_request", request_id, method=req.method)
 
     if req.method == "OPTIONS":
@@ -434,6 +452,8 @@ def AiChatAssistant(req: func.HttpRequest) -> func.HttpResponse:
         if validation_error:
             return validation_error
         user_message, chat_history = parsed
+
+        scope_rejected = is_obviously_out_of_scope(user_message)
 
         client_ip = get_client_ip(req)
         ip_hash = hash_ip(client_ip)
@@ -450,6 +470,8 @@ def AiChatAssistant(req: func.HttpRequest) -> func.HttpResponse:
         # near-simultaneous requests from the same visitor can't both read the
         # count before either write lands and slip past the limit.
         rate_limit_committed = False
+        quota_count = 0
+        quota_exhausted = False
         for _ in range(CONCURRENCY_RETRY_ATTEMPTS):
             try:
                 rate_doc = ips_container.read_item(
@@ -460,19 +482,29 @@ def AiChatAssistant(req: func.HttpRequest) -> func.HttpResponse:
                 window_expired = current_time - last_updated > RESET_PERIOD_SECONDS
 
                 if window_expired:
-                    rate_doc["count"] = 1
+                    rate_doc["api_count"] = 1
+                    rate_doc["count"] = 0 if scope_rejected else 1
                     rate_doc["last_updated"] = current_time
                 else:
-                    current_count = rate_doc.get("count", 0)
-                    if current_count >= MAX_MESSAGES:
-                        log_event("ai_chat_rate_limited", request_id)
-                        return func.HttpResponse(
-                            body=json.dumps({"reply": RATE_LIMIT_MESSAGE}),
-                            mimetype="application/json",
-                            status_code=200,
-                            headers={**AI_HEADERS, "X-Correlation-ID": request_id},
+                    api_count = rate_doc.get("api_count", 0)
+                    if api_count >= MAX_API_REQUESTS:
+                        log_event(
+                            "ai_chat_api_rate_limited",
+                            request_id,
+                            api_limit=MAX_API_REQUESTS,
+                            api_remaining=0,
                         )
-                    rate_doc["count"] = current_count + 1
+                        return json_response(
+                            {"error": API_RATE_LIMIT_MESSAGE},
+                            429,
+                            AI_HEADERS,
+                            request_id,
+                        )
+                    rate_doc["api_count"] = api_count + 1
+                    current_count = rate_doc.get("count", 0)
+                    if not scope_rejected and current_count < MAX_MESSAGES:
+                        rate_doc["count"] = current_count + 1
+                    quota_exhausted = not scope_rejected and current_count >= MAX_MESSAGES
 
                 ips_container.replace_item(
                     item=rate_limit_id,
@@ -480,6 +512,7 @@ def AiChatAssistant(req: func.HttpRequest) -> func.HttpResponse:
                     etag=rate_doc.get("_etag"),
                     match_condition=MatchConditions.IfNotModified,
                 )
+                quota_count = rate_doc["count"]
                 rate_limit_committed = True
                 break
 
@@ -491,10 +524,12 @@ def AiChatAssistant(req: func.HttpRequest) -> func.HttpResponse:
                     ips_container.create_item(
                         body={
                             "id": rate_limit_id,
-                            "count": 1,
+                            "count": 0 if scope_rejected else 1,
+                            "api_count": 1,
                             "last_updated": current_time,
                         }
                     )
+                    quota_count = 1
                     rate_limit_committed = True
                     break
                 except exceptions.CosmosResourceExistsError:
@@ -509,21 +544,42 @@ def AiChatAssistant(req: func.HttpRequest) -> func.HttpResponse:
                 request_id,
             )
 
-        if is_obviously_out_of_scope(user_message):
-            log_event("ai_chat_scope_rejected", request_id)
-            return func.HttpResponse(
-                body=json.dumps({"reply": OUT_OF_SCOPE_MESSAGE}),
-                mimetype="application/json",
-                status_code=200,
-                headers={**AI_HEADERS, "X-Correlation-ID": request_id},
+        if scope_rejected:
+            log_event("ai_chat_scope_rejected", request_id, quota_charged=False, api_throttled=True)
+            return json_response(
+                {"reply": OUT_OF_SCOPE_MESSAGE, "sources": []},
+                200,
+                AI_HEADERS,
+                request_id,
             )
 
-        messages = build_chat_messages(user_message, chat_history)
+        if quota_exhausted:
+            log_event(
+                "ai_chat_rate_limited",
+                request_id,
+                quota_limit=MAX_MESSAGES,
+                quota_remaining=0,
+            )
+            return json_response(
+                {
+                    "reply": RATE_LIMIT_MESSAGE,
+                    "sources": [],
+                    "usage": {"limit": MAX_MESSAGES, "remaining": 0},
+                },
+                200,
+                AI_HEADERS,
+                request_id,
+            )
+
+        retrieval_started = time.perf_counter()
+        chat_context = build_chat_context(user_message, chat_history)
+        retrieval_latency_ms = round((time.perf_counter() - retrieval_started) * 1000)
 
         client = get_ai_client()
+        provider_started = time.perf_counter()
         response = client.chat.completions.create(
             model=AI_MODEL,
-            messages=messages,
+            messages=chat_context.messages,
             temperature=AI_TEMPERATURE,
             max_tokens=AI_MAX_TOKENS,
             extra_headers={
@@ -532,34 +588,66 @@ def AiChatAssistant(req: func.HttpRequest) -> func.HttpResponse:
                 "User-Agent": "jeysibn-portfolio-assistant/1.0",
             },
         )
+        provider_latency_ms = round((time.perf_counter() - provider_started) * 1000)
         response_content = response.choices[0].message.content
 
         if not response_content:
-            logger.error("AI provider returned an empty response. request_id=%s", request_id)
-            return func.HttpResponse(
-                body=json.dumps({"error": "The AI assistant did not return a response."}),
-                mimetype="application/json",
-                status_code=502,
-                headers={**AI_HEADERS, "X-Correlation-ID": request_id},
+            log_event(
+                "ai_chat_empty_response",
+                request_id,
+                provider_latency_ms=provider_latency_ms,
+                knowledge_version=chat_context.retrieval.knowledge_version,
+            )
+            return json_response(
+                {"error": "The AI assistant did not return a response."},
+                502,
+                AI_HEADERS,
+                request_id,
             )
 
         sanitized_response = sanitize_ai_response(response_content)
 
         if not sanitized_response:
-            logger.error("AI response was empty after sanitization. request_id=%s", request_id)
-            return func.HttpResponse(
-                body=json.dumps({"error": "The AI assistant did not return a usable response."}),
-                mimetype="application/json",
-                status_code=502,
-                headers={**AI_HEADERS, "X-Correlation-ID": request_id},
+            log_event("ai_chat_sanitizer_failure", request_id)
+            return json_response(
+                {"error": "The AI assistant did not return a usable response."},
+                502,
+                AI_HEADERS,
+                request_id,
             )
 
-        log_event("ai_chat_success", request_id)
-        return func.HttpResponse(
-            body=json.dumps({"reply": sanitized_response}),
-            mimetype="application/json",
-            status_code=200,
-            headers={**AI_HEADERS, "X-Correlation-ID": request_id},
+        provider_usage = get_provider_usage(response)
+        sources = [source.as_dict() for source in chat_context.retrieval.sources]
+        log_event(
+            "ai_chat_success",
+            request_id,
+            provider="openai-compatible",
+            model=AI_MODEL,
+            prompt_version=chat_context.prompt_version,
+            knowledge_version=chat_context.retrieval.knowledge_version,
+            retrieval_latency_ms=retrieval_latency_ms,
+            provider_latency_ms=provider_latency_ms,
+            total_latency_ms=round((time.perf_counter() - request_started) * 1000),
+            retrieved_sections=chat_context.retrieval.retrieved_sections,
+            retrieved_source_ids=[source["id"] for source in sources],
+            retrieved_source_count=len(sources),
+            retrieval_miss=chat_context.retrieval.retrieval_miss,
+            quota_count=quota_count,
+            quota_remaining=max(0, MAX_MESSAGES - quota_count),
+            **provider_usage,
+        )
+        return json_response(
+            {
+                "reply": sanitized_response,
+                "sources": sources,
+                "usage": {
+                    "limit": MAX_MESSAGES,
+                    "remaining": max(0, MAX_MESSAGES - quota_count),
+                },
+            },
+            200,
+            AI_HEADERS,
+            request_id,
         )
 
     except RuntimeError:
@@ -581,6 +669,12 @@ def AiChatAssistant(req: func.HttpRequest) -> func.HttpResponse:
         )
 
     except OpenAIError:
+        log_event(
+            "ai_chat_provider_failure",
+            request_id=request_id,
+            provider="openai-compatible",
+            model=AI_MODEL,
+        )
         logger.exception("AI provider request failed. request_id=%s", request_id)
         return func.HttpResponse(
             body=json.dumps(

@@ -10,6 +10,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and 
 
 ### Added
 
+- **Canonical assistant knowledge**: Added `content/portfolio.json` as the shared source for visible portfolio facts and generated an explicit allow-listed `backend/data/approved_knowledge.json` projection covering Cloud-Backed Portfolio, Homelab GitOps Environment, MoniKey, and NOC Report Builder.
+- **Lightweight retrieval and provenance**: Added deterministic project/technology retrieval, knowledge hashing, prompt hashing, curated source metadata, usage metadata, and 49 offline assistant evaluation cases.
+- **Assistant UX**: Added visitor-controlled suggestion chips, source links, reset behavior, accessible loading/error states, and accurate hourly quota wording.
+
 - **Dedicated GitHub Pages deployment repository**: Frontend production publishing now targets `Jeysibn/jeysibn.github.io`, allowing the portfolio to use the root URL `https://jeysibn.github.io/` while keeping application source and CI/CD in `Jeysibn/portfolio`.
 - **Pages publish credential**: Added the `PAGES_DEPLOY_TOKEN` workflow secret boundary for authenticated checkout/push to the dedicated Pages repository.
 - **Optimized architecture previews**: Project cards and normal project-detail views now request resized WebP previews instead of immediately downloading the original multi-megabyte PNG diagrams.
@@ -19,6 +23,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and 
 - **Certification-state AI guardrail**: Added structured `certifications_in_progress` knowledge, recruiter-facing FAQ coverage, and tests so the portfolio assistant can discuss the Terraform Associate study accurately without presenting it as an earned certification.
 
 ### Changed
+
+- **Assistant grounding**: Reworked the behavior prompt, project boundaries, missing-fact handling, prompt-injection resistance, and restrained formatting policy.
+- **CI synchronization gate**: Content changes now trigger both frontend and backend deployment paths; CI fails when the approved assistant artifact drifts from canonical content.
 
 - **Hero information hierarchy**: The primary hero headline is now **Jerome Christian Ibon**. Cloud Support, DevOps, and Cloud Engineering are supporting positioning rather than replacing the portfolio owner’s identity.
 - **Hero copy**: Removed the large “Aspiring Cloud & DevOps Engineer” headline and moved entry-level context into the opportunity/status copy instead of making seniority the dominant message.
