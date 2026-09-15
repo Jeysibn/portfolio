@@ -16,6 +16,8 @@
   --signal: #e0522d;
   --signal-text: #a93618;
   --accent-petrol: #275d57;
+  --cursor-glow-strong: color-mix(in srgb, var(--accent-petrol) 7%, transparent);
+  --cursor-glow-soft: color-mix(in srgb, var(--accent-petrol) 3%, transparent);
   --danger: #a02e25;
   --display: "Bodoni Moda", Georgia, serif;
   --body: "Manrope", Arial, sans-serif;
@@ -48,6 +50,8 @@
   --signal: #ff6841;
   --signal-text: #ff9a7d;
   --accent-petrol: #79a69c;
+  --cursor-glow-strong: color-mix(in srgb, var(--accent-petrol) 11%, transparent);
+  --cursor-glow-soft: color-mix(in srgb, var(--accent-petrol) 4.5%, transparent);
   --danger: #ff8e83;
   --shadow: 0 24px 80px rgba(0, 0, 0, 0.42);
   color-scheme: dark;
@@ -69,6 +73,23 @@ body {
     background 0.35s,
     color 0.35s;
   overflow-x: hidden;
+}
+.cursor-glow {
+  position: fixed;
+  z-index: 2;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    600px circle at var(--cursor-x, 50vw) var(--cursor-y, 50vh),
+    var(--cursor-glow-strong),
+    var(--cursor-glow-soft) 35%,
+    transparent 72%
+  );
+  transition: opacity 280ms ease;
+}
+.cursor-glow.is-visible {
+  opacity: 1;
 }
 button,
 input {
@@ -1616,6 +1637,14 @@ body:has(.inspection-dialog[open]) {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+  .cursor-glow {
+    display: none;
+  }
+}
+@media (pointer: coarse) {
+  .cursor-glow {
+    display: none;
   }
 }
 @media print {
