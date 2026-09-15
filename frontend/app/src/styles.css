@@ -227,7 +227,7 @@ a {
   z-index: 20;
   top: 104px;
   bottom: 32px;
-  left: max(22px, calc((100vw - var(--atlas-max)) / 2 - 92px));
+  left: max(22px, calc((100vw - var(--atlas-max)) / 2 - 120px));
   width: 78px;
   pointer-events: none;
 }
@@ -772,6 +772,12 @@ a {
   background: var(--surface-raised);
   width: 100%;
   padding-inline: clamp(20px, 7vw, 120px);
+}
+.credentials-section > .section-heading,
+.credentials-section > .credential-layout {
+  width: 100%;
+  max-width: var(--atlas-max);
+  margin-inline: auto;
 }
 .credential-layout {
   display: grid;
