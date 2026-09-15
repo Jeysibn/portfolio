@@ -67,11 +67,15 @@ export async function fetchVisitorCount(signal?: AbortSignal): Promise<number> {
 export async function sendChatMessage(
   message: string,
   history: ChatMessage[],
+  sessionId: string,
   signal?: AbortSignal,
 ): Promise<string> {
   const payload = await requestJson<ChatResponse>(`${API_BASE_URL}/AiChatAssistant`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      "X-OpenCode-Session": sessionId,
+    },
     body: JSON.stringify({ message, history }),
     signal,
   });
