@@ -115,7 +115,7 @@ Current frontend features include:
 - static-host-safe project inspection links using `?project=<slug>` and browser history synchronization;
 - clickable skill capability cards with detailed modal explanations;
 - provider-styled certification cards with hover/focus descriptions;
-- a concise on-page resume with direct PDF download;
+- a concise on-page resume with direct PDF download and a form-less recruiter handoff;
 - restrained one-time reveal motion and `prefers-reduced-motion` support.
 
 The primary page flow is:

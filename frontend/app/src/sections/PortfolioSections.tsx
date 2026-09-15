@@ -1,10 +1,12 @@
 import type { ReactNode } from "react";
 import { fetchHealth } from "../api";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
+  career,
   certifications,
   education,
   experience,
+  profile,
   professionalSummary,
   projects,
   skillGroups,
@@ -275,9 +277,6 @@ export function Resume() {
           >
             Download PDF
           </a>
-          <button type="button" onClick={() => window.print()}>
-            Print / save
-          </button>
         </div>
         <details>
           <summary>Review resume details</summary>
@@ -309,32 +308,154 @@ export function Resume() {
   );
 }
 
+type CopyState = "idle" | "copying" | "copied" | "error";
+
+function copyTextFallback(value: string) {
+  const textArea = document.createElement("textarea");
+  textArea.value = value;
+  textArea.setAttribute("readonly", "");
+  textArea.style.position = "fixed";
+  textArea.style.opacity = "0";
+  document.body.appendChild(textArea);
+  textArea.select();
+
+  let copied = false;
+  try {
+    copied =
+      typeof document.execCommand === "function" &&
+      document.execCommand("copy");
+  } catch {
+    // The email remains visible and selectable when the legacy fallback fails.
+  }
+  document.body.removeChild(textArea);
+  return copied;
+}
+
 export function Contact() {
+  const [copyState, setCopyState] = useState<CopyState>("idle");
+  const copyResetTimer = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (copyResetTimer.current !== null) {
+        window.clearTimeout(copyResetTimer.current);
+      }
+    };
+  }, []);
+
+  const copyEmail = async () => {
+    if (copyResetTimer.current !== null) {
+      window.clearTimeout(copyResetTimer.current);
+      copyResetTimer.current = null;
+    }
+
+    setCopyState("copying");
+    let copied = false;
+    try {
+      if (typeof navigator.clipboard?.writeText === "function") {
+        await navigator.clipboard.writeText(profile.email);
+        copied = true;
+      }
+    } catch {
+      // Try the local DOM fallback when Clipboard API permission is unavailable.
+    }
+
+    if (!copied) {
+      copied = copyTextFallback(profile.email);
+    }
+
+    setCopyState(copied ? "copied" : "error");
+    if (copied) {
+      copyResetTimer.current = window.setTimeout(() => {
+        setCopyState("idle");
+        copyResetTimer.current = null;
+      }, 2200);
+    }
+  };
+
+  const copyStatus = {
+    idle: "",
+    copying: "Copying email.",
+    copied: "Email copied.",
+    error: "Copy unavailable. Select the email address to copy it manually.",
+  }[copyState];
+
   return (
     <Section id="contact" title="System handoff" className="contact-section">
-      <div className="contact-statement">
-        <span className="status-light online" />
-        Open to entry-level Cloud Support, DevOps, and Cloud Engineering roles.
+      <div className="contact-handoff">
+        <div className="contact-intent">
+          <p className="contact-kicker">Final interaction / recruiter handoff</p>
+          <h3>Interested in working together?</h3>
+          <p>
+            I&apos;m open to entry-level Cloud Engineering, DevOps and Cloud
+            Support opportunities where I can work on infrastructure, delivery
+            automation, Kubernetes and observable systems.
+          </p>
+          <p className="contact-availability">
+            <span className="status-light online" aria-hidden="true" />
+            <span>Open to opportunities</span>
+            <small>{career.availability}</small>
+          </p>
+        </div>
+        <div className="contact-primary-channel">
+          <span className="contact-label">Primary channel</span>
+          <a
+            href={`mailto:${profile.email}`}
+            className="contact-email"
+            aria-label={`Email ${profile.email}`}
+          >
+            {profile.email}
+          </a>
+          <div className="contact-actions">
+            <a className="action-primary" href={`mailto:${profile.email}`}>
+              Send email <span aria-hidden="true">→</span>
+            </a>
+            <button
+              className="action-secondary"
+              type="button"
+              onClick={copyEmail}
+              disabled={copyState === "copying"}
+              aria-label={
+                copyState === "copied" ? "Email copied" : "Copy email"
+              }
+            >
+              {copyState === "copied" ? (
+                <>Copied <span aria-hidden="true">✓</span></>
+              ) : copyState === "copying" ? (
+                "Copying…"
+              ) : (
+                "Copy email"
+              )}
+            </button>
+          </div>
+          <p className="contact-copy-status" aria-live="polite" aria-atomic="true">
+            {copyStatus}
+          </p>
+        </div>
       </div>
-      <a href="mailto:jeysibn@gmail.com" className="contact-email">
-        jeysibn
-        <wbr />
-        @gmail.com
-      </a>
-      <nav aria-label="Contact links">
-        <a
-          href="https://linkedin.com/in/jeromeibon"
-          target="_blank"
-          rel="noreferrer"
-        >
-          LinkedIn ↗
-        </a>
-        <a href="https://github.com/Jeysibn" target="_blank" rel="noreferrer">
-          GitHub ↗
-        </a>
-        <a href="./resume.pdf" download="Jerome-Ibon-Resume.pdf">
-          Resume ↓
-        </a>
+      <nav className="contact-links" aria-label="Engineering presence">
+        <span className="contact-links-label">Engineering presence</span>
+        <div className="contact-links-list">
+          <a
+            href={profile.linkedin}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="LinkedIn (opens in a new tab)"
+          >
+            LinkedIn <span aria-hidden="true">↗</span>
+          </a>
+          <a href="./resume.pdf" download="Jerome-Ibon-Resume.pdf">
+            Resume <span aria-hidden="true">↓</span>
+          </a>
+          <a
+            href={profile.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="GitHub (opens in a new tab)"
+          >
+            GitHub <span aria-hidden="true">↗</span>
+          </a>
+        </div>
       </nav>
     </Section>
   );
@@ -346,8 +467,7 @@ export function PrintResume() {
       <h1>Jerome Christian V. Ibon</h1>
       <p>Cloud Support · DevOps · Cloud Engineering</p>
       <p>
-        Malolos, Bulacan, Philippines · jeysibn@gmail.com ·
-        linkedin.com/in/jeromeibon
+        {profile.location} · {profile.email} · {profile.linkedin}
       </p>
       <h2>Professional summary</h2>
       <p>{professionalSummary}</p>
