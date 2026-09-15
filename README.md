@@ -117,11 +117,12 @@ Current frontend features include:
 - provider-styled certification cards with hover/focus descriptions;
 - a concise on-page resume with direct PDF download and a form-less recruiter handoff;
 - restrained one-time reveal motion and `prefers-reduced-motion` support.
+- height-aware desktop density for 1920×1080 workstations, with static large-screen capability relationships and restrained operational motion.
 
 The primary page flow is:
 
 ```text
-Hero → Projects → Experience → Skills → Certifications → Resume → Contact
+Hero → Projects → Experience → Capabilities → Credentials → Resume → Contact
 ```
 
 Navigation scrolls the requested section to the top of the content viewport beneath the sticky header, and no navigation entry is forced active while the user remains in the hero.

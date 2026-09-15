@@ -55,7 +55,17 @@ export function SystemDossier({
               <span className="visually-hidden"> — {project.status}</span>
             </span>
           </div>
-          <h3 id={`${project.id}-title`}>{project.title}</h3>
+          <div className="system-dossier-title-row">
+            <h3 id={`${project.id}-title`}>{project.title}</h3>
+            <button
+              className="system-dossier-case-study"
+              type="button"
+              onClick={() => onInspect(project)}
+              tabIndex={interactiveTabIndex}
+            >
+              Open case study <span aria-hidden="true">↗</span>
+            </button>
+          </div>
         </header>
         <p className="system-dossier-summary">{project.preview.summary}</p>
         <div className="system-dossier-body">

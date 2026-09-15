@@ -142,7 +142,7 @@ export function Principles() {
       title="Operating principles"
       className="principles-section"
     >
-      <div className="about-lead" data-resolve>
+      <div className="about-lead">
         <p>
           Supporting real users taught me that infrastructure diagrams only
           matter when the system still makes sense under pressure. Manual fixes
@@ -156,7 +156,7 @@ export function Principles() {
       </div>
       <ol className="principle-list">
         {principles.map(([title, text], i) => (
-          <li key={title} data-resolve>
+          <li key={title}>
             <span>{String(i + 1).padStart(2, "0")}</span>
             <h3>{title}</h3>
             <p>{text}</p>
@@ -171,7 +171,7 @@ export function Projects({ onOpen }: { onOpen: (p: Project) => void }) {
   return (
     <Section
       id="projects"
-      title="Featured systems"
+      title="Projects"
       className="projects-section"
     >
       <p className="projects-intro">
@@ -184,10 +184,10 @@ export function Projects({ onOpen }: { onOpen: (p: Project) => void }) {
 
 export function Experience() {
   return (
-    <Section id="experience" title="Operational exposure">
+    <Section id="experience" title="Experience">
       <div className="experience-list">
         {experience.map((item, i) => (
-          <article key={item.role} data-resolve>
+          <article key={item.role}>
             <aside>
               <span>{String(i + 1).padStart(2, "0")}</span>
               <time>{item.period}</time>
@@ -217,10 +217,11 @@ export function Skills({
   onOpen: (selection: SkillSelection) => void;
 }) {
   return (
-    <Section id="skills" title="Capability map" className="skills-section">
+    <Section id="skills" title="Capabilities" className="skills-section">
       <p className="skills-copy">
-        Select a domain to inspect how each tool connects to practical work.
-        Every detail remains keyboard accessible.
+        Select a domain, then a tool, to connect each capability to practical
+        project and operational evidence. Every detail remains keyboard
+        accessible.
       </p>
       <CapabilityMap onOpen={onOpen} />
     </Section>
@@ -264,7 +265,7 @@ export function Credentials() {
 export function Resume() {
   return (
     <Section id="resume" title="Resume">
-      <div className="resume-band" data-resolve>
+      <div className="resume-band">
         <div>
           <h3>Everything important, ready to take with you.</h3>
           <p>{professionalSummary}</p>
@@ -381,10 +382,10 @@ export function Contact() {
   }[copyState];
 
   return (
-    <Section id="contact" title="System handoff" className="contact-section">
+    <Section id="contact" title="Contact" className="contact-section">
       <div className="contact-handoff">
         <div className="contact-intent">
-          <p className="contact-kicker">Final interaction / recruiter handoff</p>
+          <p className="contact-kicker">IMPROVE / SYSTEM HANDOFF</p>
           <h3>Interested in working together?</h3>
           <p>
             I&apos;m open to entry-level Cloud Engineering, DevOps and Cloud

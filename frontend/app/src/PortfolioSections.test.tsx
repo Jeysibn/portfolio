@@ -9,7 +9,7 @@ describe("Contact handoff", () => {
   it("renders the primary email actions and engineering presence links", () => {
     render(<Contact />);
 
-    expect(screen.getByRole("heading", { name: "System handoff" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Contact" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Interested in working together?" })).toBeInTheDocument();
     expect(screen.getByText("Open to opportunities")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Email jeysibn@gmail.com" })).toHaveAttribute(

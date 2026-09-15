@@ -55,7 +55,7 @@ The frontend is a Vite-built React + TypeScript single-page application. Source 
 The application uses document-anchor navigation instead of client-side routes. The visible flow is:
 
 ```text
-Hero → Projects → Experience → Skills → Education & Certifications → Resume → Contact
+  Hero → Projects → Experience → Capabilities → Credentials → Resume → Contact
 ```
 
 Navigation scrolls the selected section to the start of the viewport beneath the sticky header. The hero intentionally has no active navigation item; active-section indication begins when a content section is reached.
@@ -81,6 +81,7 @@ Navigation scrolls the selected section to the start of the viewport beneath the
 - provider-styled certification cards;
 - fully visible on-page resume plus direct PDF download;
 - form-less System Handoff with direct email, copy-email, LinkedIn, resume, and GitHub paths;
+- height-aware desktop density and a mostly static large-screen capability control plane, reducing decorative motion while keeping capability evidence interactive;
 - keyboard focus behavior and reduced-motion support.
 
 The AI interface remains provider-neutral so backend model/provider changes do not require frontend branding changes.

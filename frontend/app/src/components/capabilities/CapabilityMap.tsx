@@ -50,8 +50,6 @@ export function CapabilityMap({
                   className={`capability-domain domain-${domainIndex + 1}`}
                   style={
                     {
-                      "--orbit-duration": `${38 + domainIndex * 2.8}s`,
-                      "--orbit-direction": domainIndex % 2 ? "reverse" : "normal",
                       "--orbit-radius": `${group.items.length >= 8 ? 104 : group.items.length >= 5 ? 96 : 84}px`,
                     } as CSSProperties
                   }
