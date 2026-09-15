@@ -82,6 +82,7 @@ Navigation scrolls the selected section to the start of the viewport beneath the
 - fully visible on-page resume plus direct PDF download;
 - form-less System Handoff with direct email, copy-email, LinkedIn, resume, and GitHub paths;
 - height-aware desktop density and a mostly static large-screen capability control plane, reducing decorative motion while keeping capability evidence interactive;
+- an ambient Signal Rail whose progress line and active/completed lifecycle nodes share monotonic document-scroll state rather than section-specific stage ownership;
 - keyboard focus behavior and reduced-motion support.
 
 The AI interface remains provider-neutral so backend model/provider changes do not require frontend branding changes.

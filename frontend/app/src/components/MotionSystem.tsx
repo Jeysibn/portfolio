@@ -1,11 +1,45 @@
 import { useEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { signalStageIndex } from "./signalProgress";
 gsap.registerPlugin(ScrollTrigger);
 
 export function MotionDirector() {
   useEffect(() => {
-    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const railStages = Array.from(
+      document.querySelectorAll<HTMLElement>(".signal-stage"),
+    );
+    const progressLine = document.querySelector<HTMLElement>(".signal-progress");
+    let frame = 0;
+    const updateSignalState = () => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(() => {
+        frame = 0;
+        const scrollRange = document.documentElement.scrollHeight - window.innerHeight;
+        const progress = scrollRange > 0
+          ? Math.min(1, Math.max(0, window.scrollY / scrollRange))
+          : 0;
+        const activeIndex = signalStageIndex(progress);
+        if (progressLine) progressLine.style.transform = `scaleY(${progress})`;
+        railStages.forEach((item, index) => {
+          item.classList.toggle("is-active", index === activeIndex);
+          item.classList.toggle("is-complete", index < activeIndex);
+        });
+      });
+    };
+    updateSignalState();
+    window.addEventListener("scroll", updateSignalState, { passive: true });
+    window.addEventListener("resize", updateSignalState);
+
+    const teardownSignal = () => {
+      window.removeEventListener("scroll", updateSignalState);
+      window.removeEventListener("resize", updateSignalState);
+      if (frame) window.cancelAnimationFrame(frame);
+    };
+
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      return teardownSignal;
+    }
     document.documentElement.classList.add("motion-enabled");
     const context = gsap.context(() => {
       gsap.from(".hero-name span", {
@@ -38,39 +72,15 @@ export function MotionDirector() {
           scrollTrigger: { trigger: el, start: "top 92%", once: true },
         }),
       );
-      gsap.to(".signal-progress", {
-        scaleY: 1,
-        ease: "none",
-        scrollTrigger: {
-          trigger: document.body,
-          start: "top top",
-          end: "bottom bottom",
-          scrub: 0.2,
-        },
-      });
-      const railStages = gsap.utils.toArray<HTMLElement>(".signal-stage");
-      gsap.utils
-        .toArray<HTMLElement>("[data-signal-stage]")
-        .forEach((section) => {
-          const stage = section.dataset.signalStage;
-          if (!stage) return;
-          const activate = () =>
-            railStages.forEach((item) =>
-              item.classList.toggle("is-active", item.dataset.stage === stage),
-            );
-          ScrollTrigger.create({
-            trigger: section,
-            start: "top 55%",
-            end: "bottom 45%",
-            onEnter: activate,
-            onEnterBack: activate,
-          });
-        });
     });
-    document.fonts?.ready.then(() => ScrollTrigger.refresh());
+    document.fonts?.ready.then(() => {
+      ScrollTrigger.refresh();
+      updateSignalState();
+    });
     return () => {
       context.revert();
       document.documentElement.classList.remove("motion-enabled");
+      teardownSignal();
     };
   }, []);
   return null;
@@ -83,7 +93,10 @@ export function SignalPath() {
       <span className="signal-progress" />
       <ol>
         {stages.map((stage) => (
-          <li key={stage} className="signal-stage" data-stage={stage}>
+          <li
+            key={stage}
+            className={`signal-stage ${stage === "SIGNAL" ? "is-active" : ""}`}
+          >
             <i />
             <span>{stage}</span>
           </li>

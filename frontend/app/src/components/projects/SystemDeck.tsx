@@ -7,11 +7,11 @@ import { SystemDossier } from "./SystemDossier";
 import { rotateDeck, useSystemDeck } from "./useSystemDeck";
 
 const positionForDepth = (depth: number) => ({
-  x: depth === 0 ? 0 : depth % 2 === 0 ? -30 - depth * 2 : 34 + depth * 4,
-  y: depth === 0 ? 0 : depth * -38,
-  rotation: depth === 0 ? 0 : (depth % 2 === 0 ? -1 : 1) * Math.min(3.2, depth * 0.85),
-  scale: 1 - depth * 0.025,
-  opacity: Math.max(0.76, 1 - depth * 0.06),
+  x: depth === 0 ? 0 : depth % 2 === 0 ? -22 - depth * 1.5 : 24 + depth * 2.5,
+  y: depth === 0 ? 0 : depth * -28,
+  rotation: depth === 0 ? 0 : (depth % 2 === 0 ? -1 : 1) * Math.min(2.2, depth * 0.55),
+  scale: 1 - depth * 0.02,
+  opacity: Math.max(0.8, 1 - depth * 0.05),
 });
 
 function prefersReducedMotion() {
@@ -114,9 +114,9 @@ export function SystemDeck({
         const timeline = gsap.timeline({ defaults: { ease: "expo.out" } });
         if (currentActive) {
           timeline.to(currentActive, {
-            x: 28,
-            y: -24,
-            rotation: 2.5,
+            x: 20,
+            y: -18,
+            rotation: 1.8,
             scale: 1.015,
             duration: 0.16,
           }, 0);

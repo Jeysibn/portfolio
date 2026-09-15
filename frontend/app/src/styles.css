@@ -300,12 +300,9 @@ a {
   opacity: 1;
   transform: translateX(3px);
 }
-.chapter-signal {
-  grid-column: 2;
-  justify-self: end;
+.signal-stage.is-complete {
   color: var(--signal-text);
-  font: 500 10px var(--mono);
-  letter-spacing: 0.12em;
+  opacity: 0.72;
 }
 .section,
 .hero,
@@ -494,8 +491,7 @@ a {
   background: var(--line);
 }
 .projects-intro {
-  margin-top: -42px;
-  margin-bottom: 54px;
+  margin: 0 auto 36px;
   max-width: 38ch;
   color: var(--muted);
   font-size: 14px;
@@ -579,7 +575,7 @@ a {
 }
 .control-plane span,
 .control-plane small {
-  font: 500 9px var(--mono);
+  font: 500 10px var(--mono);
   letter-spacing: 0.12em;
   color: var(--muted);
 }
@@ -657,7 +653,7 @@ a {
 .domain-anchor span,
 .domain-anchor small {
   display: block;
-  font: 500 9px var(--mono);
+  font: 500 10px var(--mono);
   letter-spacing: 0.08em;
   color: var(--muted);
 }
@@ -754,7 +750,7 @@ a {
   border: 1px solid var(--ink);
   background: var(--paper);
   color: var(--ink);
-  font: 500 9px var(--mono);
+  font: 500 10px var(--mono);
   line-height: 1.2;
   opacity: 0;
   pointer-events: none;
@@ -822,6 +818,17 @@ a {
   margin-top: 7px;
   color: var(--signal-text);
   font: 600 10px var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.credential-layout li small.credential-meta {
+  color: var(--muted);
+  letter-spacing: 0;
+  text-transform: none;
+}
+.credential-layout li small.credential-meta .credential-in-progress {
+  color: var(--signal-text);
+  font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -1101,7 +1108,7 @@ body:has(.inspection-dialog[open]) {
   position: absolute;
   z-index: 1;
   color: var(--rule-technical-sheet);
-  font: 500 8px var(--mono);
+  font: 500 10px var(--mono);
   letter-spacing: 0.12em;
   pointer-events: none;
 }
@@ -1230,7 +1237,7 @@ body:has(.inspection-dialog[open]) {
   margin: 3px 0;
 }
 .portfolio-assistant-panel small {
-  font: 500 9px var(--mono);
+  font: 500 10px var(--mono);
   text-transform: uppercase;
   color: var(--signal);
 }
@@ -1270,7 +1277,7 @@ body:has(.inspection-dialog[open]) {
   border-bottom: 1px solid var(--line);
 }
 .portfolio-assistant .message .message-label {
-  font: 500 9px var(--mono);
+  font: 500 10px var(--mono);
   text-transform: uppercase;
   color: var(--signal);
 }
@@ -1381,7 +1388,7 @@ body:has(.inspection-dialog[open]) {
 }
 .portfolio-assistant .message-sources .message-repository-link {
   color: var(--muted);
-  font-size: 9px;
+  font-size: 10px;
 }
 .portfolio-assistant .assistant-usage {
   margin: 8px 0 0;
@@ -1394,7 +1401,7 @@ body:has(.inspection-dialog[open]) {
 }
 .portfolio-assistant-panel label {
   display: block;
-  font: 500 9px var(--mono);
+  font: 500 10px var(--mono);
   text-transform: uppercase;
   margin-bottom: 8px;
 }
@@ -1420,13 +1427,19 @@ body:has(.inspection-dialog[open]) {
 .print-resume {
   display: none;
 }
-@media (max-width: 1280px) {
+@media (max-width: 1560px) {
   .signal-rail {
     width: 12px;
-    left: 8px;
+    left: max(8px, calc((100vw - var(--atlas-max)) / 2 - 32px));
   }
   .signal-stage span {
     display: none;
+  }
+  .signal-stage {
+    gap: 0;
+  }
+  .signal-stage.is-active {
+    transform: none;
   }
 }
 @media (max-width: 1050px) {
@@ -1523,7 +1536,7 @@ body:has(.inspection-dialog[open]) {
     transform: none;
     border: 0;
     background: transparent;
-    font-size: 8px;
+    font-size: 10px;
     text-align: center;
     white-space: normal;
     opacity: 1;
@@ -1761,9 +1774,6 @@ body:has(.inspection-dialog[open]) {
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
-  }
-  .signal-progress {
-    transform: scaleY(1);
   }
   .hero-topology .pulse {
     animation: none;
@@ -2250,7 +2260,7 @@ body:has(.inspection-dialog[open]) {
     display: flex;
     flex-wrap: wrap;
     gap: 9px 14px;
-    font-size: 9px;
+    font-size: 10px;
   }
 
   .system-dossier-status {
@@ -2338,7 +2348,7 @@ body:has(.inspection-dialog[open]) {
 
   .system-dossier-exposed {
     padding-inline: 18px;
-    font-size: 9px;
+    font-size: 10px;
   }
 
   .system-selector {
@@ -2396,9 +2406,6 @@ a {
 #root {
   max-width: 100%;
   overflow: clip;
-}
-.projects-section > .section-heading .chapter-signal {
-  color: var(--signal-text);
 }
 .contact-email {
   max-width: 100%;
