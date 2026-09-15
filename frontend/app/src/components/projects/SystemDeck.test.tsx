@@ -37,6 +37,15 @@ describe("system deck", () => {
     const onInspect = vi.fn();
     render(<SystemDeck projects={projects} onInspect={onInspect} />);
 
+    expect(document.querySelectorAll(".system-dossier")).toHaveLength(4);
+    expect(document.querySelectorAll(".system-dossier.is-active")).toHaveLength(1);
+    expect(document.querySelectorAll(".system-dossier.is-background .system-dossier-content a")).toHaveLength(3);
+    expect(
+      [...document.querySelectorAll(".system-dossier.is-background .system-dossier-content a")].every(
+        (link) => link.getAttribute("tabindex") === "-1",
+      ),
+    ).toBe(true);
+
     expect(screen.getByRole("heading", { name: "Cloud-Backed Portfolio" })).toBeInTheDocument();
     const selector = screen.getByRole("navigation", { name: "System selector" });
     expect(within(selector).getAllByRole("button", { name: /Select system/ })).toHaveLength(4);
@@ -58,6 +67,16 @@ describe("system deck", () => {
     );
 
     fireEvent.keyDown(screen.getByLabelText(/System deck/), { key: "ArrowRight" });
+    await waitFor(() =>
+      expect(screen.getByRole("heading", { name: "MoniKey" })).toBeInTheDocument(),
+    );
+
+    fireEvent.click(within(selector).getByRole("button", { name: /Select system 04/ }));
+    await waitFor(() =>
+      expect(screen.getByRole("heading", { name: "NOC Report Builder" })).toBeInTheDocument(),
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Select previous system" }));
     await waitFor(() =>
       expect(screen.getByRole("heading", { name: "MoniKey" })).toBeInTheDocument(),
     );

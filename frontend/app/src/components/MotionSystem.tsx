@@ -88,37 +88,6 @@ export function MotionDirector() {
             onEnterBack: activate,
           });
         });
-      gsap.utils.toArray<HTMLElement>(".architecture-flow").forEach((flow) => {
-        const nodes = gsap.utils.toArray<HTMLElement>(
-          flow.querySelectorAll(".architecture-node"),
-        );
-        const timeline = gsap.timeline({
-          scrollTrigger: {
-            trigger: flow,
-            start: "top 78%",
-            end: "bottom 40%",
-            scrub: 0.35,
-          },
-        });
-        timeline.to(
-          flow.querySelector(".architecture-signal"),
-          { scaleX: 1, ease: "none" },
-          0,
-        );
-        nodes.forEach((node, index) =>
-          timeline.to(
-            node,
-            {
-              opacity: 1,
-              scale: 1,
-              color: "var(--ink)",
-              duration: 0.18,
-              ease: "power2.out",
-            },
-            index / Math.max(1, nodes.length - 1),
-          ),
-        );
-      });
     });
     document.fonts?.ready.then(() => ScrollTrigger.refresh());
     return () => {

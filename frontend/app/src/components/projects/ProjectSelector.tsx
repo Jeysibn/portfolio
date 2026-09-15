@@ -11,29 +11,11 @@ export function ProjectSelector({
 }) {
   const activeIndex = projects.findIndex((project) => project.id === activeId);
   const total = String(projects.length).padStart(2, "0");
+  const previousIndex = (activeIndex - 1 + projects.length) % projects.length;
+  const nextIndex = (activeIndex + 1) % projects.length;
+
   return (
     <nav className="system-selector" aria-label="System selector">
-      <div className="system-selector-stepper">
-        <button
-          type="button"
-          onClick={() =>
-            onSelect(projects[(activeIndex - 1 + projects.length) % projects.length].id)
-          }
-          aria-label="Select previous system"
-        >
-          <span aria-hidden="true">←</span> Previous
-        </button>
-        <span aria-live="polite">
-          {String(activeIndex + 1).padStart(2, "0")} / {total}
-        </span>
-        <button
-          type="button"
-          onClick={() => onSelect(projects[(activeIndex + 1) % projects.length].id)}
-          aria-label="Select next system"
-        >
-          Next <span aria-hidden="true">→</span>
-        </button>
-      </div>
       <ol>
         {projects.map((project, index) => {
           const isActive = project.id === activeId;
@@ -52,6 +34,25 @@ export function ProjectSelector({
           );
         })}
       </ol>
+      <div className="system-selector-arrows">
+        <button
+          type="button"
+          onClick={() => onSelect(projects[previousIndex].id)}
+          aria-label="Select previous system"
+        >
+          <span aria-hidden="true">←</span>
+        </button>
+        <span aria-live="polite">
+          {String(activeIndex + 1).padStart(2, "0")} / {total}
+        </span>
+        <button
+          type="button"
+          onClick={() => onSelect(projects[nextIndex].id)}
+          aria-label="Select next system"
+        >
+          <span aria-hidden="true">→</span>
+        </button>
+      </div>
     </nav>
   );
 }
