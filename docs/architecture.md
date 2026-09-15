@@ -80,6 +80,7 @@ Navigation scrolls the selected section to the start of the viewport beneath the
 - clickable skill-detail dialogs;
 - provider-styled certification cards;
 - fully visible on-page resume plus direct PDF download;
+- form-less System Handoff with direct email, copy-email, LinkedIn, resume, and GitHub paths;
 - keyboard focus behavior and reduced-motion support.
 
 The AI interface remains provider-neutral so backend model/provider changes do not require frontend branding changes.
@@ -138,6 +139,18 @@ Architecture assets live under `frontend/app/public/architecture/`:
 Each SVG contains a meaningful `<title>` and `<desc>`. The dialog also renders a text summary so architecture understanding does not depend on image rendering or motion.
 
 Project inspection is static-host safe: opening a dossier updates `?project=<slug>`, while closing removes the query and back/forward events resynchronize the selected project.
+
+### Contact handoff
+
+The final Contact section is intentionally form-less. Its recruiter-focused
+System Handoff leads with working-together intent and canonical availability,
+then exposes the canonical email as separate Send email and Copy email actions.
+LinkedIn, the downloadable resume, and GitHub remain visible as secondary
+engineering-presence paths. Copy feedback is announced through a local live
+region and falls back to a DOM copy attempt when the Clipboard API is
+unavailable. The header wordmark uses the relative `#top` anchor, which is
+owned by the hero section and works across local, Pages, and custom-domain
+deployments.
 
 ## Backend
 

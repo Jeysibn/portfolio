@@ -10,6 +10,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and 
 
 ### Added
 
+- **System Handoff contact path**: Added a recruiter-focused, form-less final section with canonical email actions, accessible Copy email feedback, availability context, and secondary LinkedIn, resume, and GitHub links.
 - **Canonical assistant knowledge**: Added `content/portfolio.json` as the shared source for visible portfolio facts and generated an explicit allow-listed `backend/data/approved_knowledge.json` projection covering Cloud-Backed Portfolio, Homelab GitOps Environment, MoniKey, and NOC Report Builder.
 - **Lightweight retrieval and provenance**: Added deterministic project/technology retrieval, knowledge hashing, prompt hashing, curated source metadata, usage metadata, and 49 offline assistant evaluation cases.
 - **Assistant UX**: Added visitor-controlled suggestion chips, source links, reset behavior, accessible loading/error states, and accurate hourly quota wording.
@@ -24,6 +25,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and 
 
 ### Changed
 
+- **Contact hierarchy**: Shifted the dominant Contact statement from the raw email address to working-together intent while preserving the existing editorial system handoff language and relative `#top` wordmark navigation.
 - **Assistant grounding**: Reworked the behavior prompt, project boundaries, missing-fact handling, prompt-injection resistance, and restrained formatting policy.
 - **CI synchronization gate**: Content changes now trigger both frontend and backend deployment paths; CI fails when the approved assistant artifact drifts from canonical content.
 
@@ -52,6 +54,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and 
 
 ### Removed
 
+- **Resume Print / save action**: Removed the portfolio UI action while retaining the custom print-only resume render path for native browser printing, the downloadable PDF, and the on-page resume.
 - **Obsolete `ui-adjustments.ts` module**: Consolidated its small runtime behavior into the active frontend entrypoint and removed the extra development module request.
 - **Tracked TypeScript build cache**: Removed `frontend/app/tsconfig.tsbuildinfo` from source control and added `*.tsbuildinfo` to `.gitignore`.
 
