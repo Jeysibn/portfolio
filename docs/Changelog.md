@@ -10,7 +10,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and 
 
 ### Added
 
-- **Visual restraint pass**: Added height-aware desktop density, a more compact project case-study entry point, clearer conventional section headings, and a static large-screen capability topology so the engineering evidence scans more comfortably at 1920×1080.
+- **Visual restraint pass**: Added height-aware desktop density, a more compact project case-study entry point, clearer conventional section headings, and a restrained large-screen capability topology so the engineering evidence scans more comfortably at 1920×1080.
 
 - **System Handoff contact path**: Added a recruiter-focused, form-less final section with canonical email actions, accessible Copy email feedback, availability context, and secondary LinkedIn, resume, and GitHub links.
 - **Canonical assistant knowledge**: Added `content/portfolio.json` as the shared source for visible portfolio facts and generated an explicit allow-listed `backend/data/approved_knowledge.json` projection covering Cloud-Backed Portfolio, Homelab GitOps Environment, MoniKey, and NOC Report Builder.
@@ -26,6 +26,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and 
 - **Certification-state AI guardrail**: Added structured `certifications_in_progress` knowledge, recruiter-facing FAQ coverage, and tests so the portfolio assistant can discuss the Terraform Associate study accurately without presenting it as an earned certification.
 
 ### Changed
+
+- **Control Plane orbital topology**: Reintroduced purposeful large-screen capability motion as a slow, in-view outer domain orbit with independently paced inner technology orbits. Counter-rotating wrappers keep labels upright, hover/focus pauses the system for inspection, and reduced-motion or constrained layouts remain static.
 
 - **Signal lifecycle coherence**: Decoupled the ambient Signal Rail from portfolio section ownership, deriving its line and active/completed stages from one monotonic document-progress model. Removed redundant inline chapter stages, added a quieter medium-desktop rail mode, raised functional technical labels, restrained System Deck offsets, and surfaced canonical credential issuer/status metadata.
 

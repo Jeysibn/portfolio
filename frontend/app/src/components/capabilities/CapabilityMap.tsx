@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import type { SkillGroup } from "../../portfolio";
 import { skillGroups } from "../../portfolio";
@@ -17,15 +18,41 @@ const domainCodes = [
   "TOOLS",
 ];
 
+const skillOrbitMotion = [
+  { duration: "32s", direction: "normal" },
+  { duration: "37s", direction: "reverse" },
+  { duration: "29s", direction: "normal" },
+  { duration: "40s", direction: "reverse" },
+  { duration: "27s", direction: "normal" },
+  { duration: "35s", direction: "reverse" },
+] as const;
+
 export function CapabilityMap({
   onOpen,
 }: {
   onOpen: (selection: SkillSelection) => void;
 }) {
+  const systemRef = useRef<HTMLDivElement>(null);
+  const [isInView, setIsInView] = useState(false);
+
+  useEffect(() => {
+    const element = systemRef.current;
+    if (!element || typeof IntersectionObserver === "undefined") return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsInView(entry.isIntersecting),
+      { rootMargin: "180px 0px", threshold: 0.15 },
+    );
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <div
-      className="capability-system"
+      ref={systemRef}
+      className={`capability-system ${isInView ? "is-in-view" : ""}`}
       aria-label="Interactive technical capability map"
+      style={{ "--domain-orbit-duration": "88s" } as CSSProperties}
     >
       <div className="control-plane" aria-hidden="true">
         <span>CONTROL</span>
@@ -39,6 +66,7 @@ export function CapabilityMap({
       <div className="outer-orbit">
         {skillGroups.map((group, domainIndex) => {
           const domainAngle = (360 / skillGroups.length) * domainIndex - 90;
+          const motion = skillOrbitMotion[domainIndex % skillOrbitMotion.length];
           return (
             <div
               className="domain-orbit-slot"
@@ -51,6 +79,8 @@ export function CapabilityMap({
                   style={
                     {
                       "--orbit-radius": `${group.items.length >= 8 ? 104 : group.items.length >= 5 ? 96 : 84}px`,
+                      "--skill-orbit-duration": motion.duration,
+                      "--skill-orbit-direction": motion.direction,
                     } as CSSProperties
                   }
                 >
