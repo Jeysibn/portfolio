@@ -1331,13 +1331,13 @@ body:has(.inspection-dialog[open]) {
   background: color-mix(in srgb, var(--signal) 10%, transparent);
   box-shadow: inset 3px 0 0 var(--signal);
 }
-.assistant {
+.portfolio-assistant {
   position: fixed;
   z-index: 70;
   right: 24px;
   bottom: 24px;
 }
-.assistant-trigger {
+.portfolio-assistant-trigger {
   border: 1px solid var(--ink);
   background: var(--paper);
   padding: 13px 18px;
@@ -1346,7 +1346,7 @@ body:has(.inspection-dialog[open]) {
   text-transform: uppercase;
   cursor: pointer;
 }
-.assistant-trigger span {
+.portfolio-assistant-trigger span {
   display: inline-grid;
   place-items: center;
   width: 22px;
@@ -1356,7 +1356,7 @@ body:has(.inspection-dialog[open]) {
   color: var(--ink);
   border-radius: 50%;
 }
-.assistant-panel {
+.portfolio-assistant-panel {
   position: absolute;
   right: 0;
   bottom: 55px;
@@ -1368,81 +1368,81 @@ body:has(.inspection-dialog[open]) {
   display: grid;
   grid-template-rows: auto 1fr auto;
 }
-.assistant-panel[hidden] {
+.portfolio-assistant-panel[hidden] {
   display: none;
 }
-.assistant-panel header {
+.portfolio-assistant-panel header {
   display: flex;
   justify-content: space-between;
   padding: 18px;
   border-bottom: 1px solid var(--line);
 }
-.assistant-panel h2 {
+.portfolio-assistant-panel h2 {
   font: 400 2rem var(--display);
   margin: 3px 0;
 }
-.assistant-panel small {
+.portfolio-assistant-panel small {
   font: 500 9px var(--mono);
   text-transform: uppercase;
   color: var(--signal);
 }
-.assistant-panel header button {
+.portfolio-assistant-panel header button {
   border: 0;
   background: none;
   cursor: pointer;
 }
-.messages {
+.portfolio-assistant .messages {
   overflow: auto;
   padding: 18px;
 }
-.message {
+.portfolio-assistant .message {
   padding: 12px 0;
   border-bottom: 1px solid var(--line);
 }
-.message strong {
+.portfolio-assistant .message strong {
   font: 500 9px var(--mono);
   text-transform: uppercase;
   color: var(--signal);
 }
-.message p,
-.assistant-empty,
-.messages > p {
+.portfolio-assistant .message p,
+.portfolio-assistant .assistant-empty,
+.portfolio-assistant .messages > p {
   font-size: 13px;
   line-height: 1.55;
 }
-.message.user {
+.portfolio-assistant .message.user {
   margin-left: 15%;
 }
-.message.error {
+.portfolio-assistant .message.error {
   color: var(--danger);
 }
-.assistant-panel form {
+.portfolio-assistant-panel form {
   padding: 16px;
   border-top: 1px solid var(--line);
 }
-.assistant-panel label {
+.portfolio-assistant-panel label {
   display: block;
   font: 500 9px var(--mono);
   text-transform: uppercase;
   margin-bottom: 8px;
 }
-.assistant-panel form > div {
+.portfolio-assistant-panel form > div {
   display: grid;
   grid-template-columns: 1fr auto;
 }
-.assistant-panel input {
+.portfolio-assistant-panel input {
   min-width: 0;
   border: 1px solid var(--ink);
   background: transparent;
   padding: 12px;
 }
-.assistant-panel form button {
+.portfolio-assistant-panel form button {
   border: 0;
   background: var(--ink);
   color: var(--paper);
   padding: 0 18px;
 }
-.assistant-panel form button:disabled {
+.portfolio-assistant-panel form button:disabled {
   opacity: 0.45;
 }
 .print-resume {
@@ -1822,11 +1822,11 @@ body:has(.inspection-dialog[open]) {
   .site-footer {
     grid-template-columns: 1fr;
   }
-  .assistant {
+  .portfolio-assistant {
     right: 16px;
     bottom: 16px;
   }
-  .assistant-trigger {
+  .portfolio-assistant-trigger {
     padding: 11px 14px;
   }
 }
@@ -1931,7 +1931,7 @@ a {
   .contact-email {
     font-size: 13.5vw;
   }
-  .assistant {
+  .portfolio-assistant {
     max-width: calc(100vw - 32px);
   }
   .inspection-dialog {
