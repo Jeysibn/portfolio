@@ -40,7 +40,7 @@ The frontend is a Vite-built React + TypeScript single-page application. Source 
 The application uses document-anchor navigation instead of client-side routes. The visible flow is:
 
 ```text
-Hero → About → Projects → Experience → Skills → Education & Certifications → Resume → Contact
+Hero → Projects → Experience → Skills → Education & Certifications → Resume → Contact
 ```
 
 Navigation scrolls the selected section to the start of the viewport beneath the sticky header. The hero intentionally has no active navigation item; active-section indication begins when a content section is reached.
@@ -57,10 +57,11 @@ Navigation scrolls the selected section to the start of the viewport beneath the
 - responsive monitoring-card geometry, including single-column phone metrics;
 - visitor-counter display;
 - AI assistant conversation state and session history;
-- whole-card project-detail interaction;
-- centered project-detail dialogs;
-- lightweight project architecture previews;
-- in-page full-resolution architecture zoom;
+- a four-project System Deck with explicit circular deck ordering;
+- stacked dossier selection with GSAP state-change motion;
+- compact typed architecture-flow previews;
+- static-host-safe `?project=<slug>` inspection deep links;
+- native project-detail dialogs with full SVG architecture sheets and text equivalents;
 - clickable skill-detail dialogs;
 - provider-styled certification cards;
 - fully visible on-page resume plus direct PDF download;
@@ -97,35 +98,31 @@ The frontend build injects a compile-time timestamp through Vite. The UI calcula
 
 Release age is **not server uptime**. Azure Functions is serverless and may scale or recycle instances independently of the frontend release lifecycle.
 
-## Architecture Image Delivery
+## Project Architecture Delivery
 
-The project showcase contains large architecture diagrams. The original PNG files remain the full-resolution source assets, but normal portfolio browsing does not fetch those originals immediately.
+The System Deck keeps the homepage preview intentionally small and data-driven:
 
 ```text
-Project card
+Project preview data
    |
    v
-lazy-loaded resized WebP preview
+compact flow in the System Deck
    |
+   | Inspect system
    v
-Project details
-   |
-   v
-same lightweight preview
-   |
-   | explicit "open architecture" action
-   v
-original full-resolution PNG
+native dialog -> repository-derived SVG sheets -> text equivalents
 ```
 
-Preview transformation uses `wsrv.nl` with width, WebP, quality, and no-upscale parameters. Only public diagram URLs are passed to that service; no credentials or application data are involved.
+Architecture assets live under `frontend/app/public/architecture/`:
 
-The original diagram locations remain the source of truth:
+- `portfolio/runtime.svg` and `portfolio/delivery.svg`;
+- `homelab/system.svg` and `homelab/gitops.svg`;
+- `monikey/system.svg` and `monikey/delivery.svg`;
+- `noc-report/system.svg` and `noc-report/ai-report-pipeline.svg`.
 
-- Cloud-Backed Portfolio architecture: public GitHub-hosted PNG in `Jeysibn/portfolio`;
-- Homelab GitOps architecture: public GitHub-hosted PNG in `Jeysibn/homelab-gitops`.
+Each SVG contains a meaningful `<title>` and `<desc>`. The dialog also renders a text summary so architecture understanding does not depend on image rendering or motion.
 
-This split keeps normal page-transfer cost low while preserving a full-resolution inspection path for visitors who request it.
+Project inspection is static-host safe: opening a dossier updates `?project=<slug>`, while closing removes the query and back/forward events resynchronize the selected project.
 
 ## Backend
 

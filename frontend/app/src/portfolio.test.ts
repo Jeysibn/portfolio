@@ -15,10 +15,13 @@ describe("portfolio content contract", () => {
   });
 
   it("keeps every project linked to a real repository and architecture evidence", () => {
+    expect(projects).toHaveLength(4);
     for (const project of projects) {
+      expect(project.slug).toBeTruthy();
       expect(project.repositoryUrl).toMatch(/^https:\/\/github\.com\//);
       expect(project.architecture.diagrams.length).toBeGreaterThan(0);
-      expect(project.outcomes.length).toBeGreaterThan(0);
+      expect(project.details.outcomes.length).toBeGreaterThan(0);
+      expect(project.preview.flow.nodes.length).toBeGreaterThan(1);
     }
   });
 });

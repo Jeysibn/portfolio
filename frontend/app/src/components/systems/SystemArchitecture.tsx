@@ -12,7 +12,7 @@ export function SystemArchitecture({ project }: { project: Project }) {
           <i />
           <span>OBSERVE</span>
         </div>
-        {project.architectureFlows.map((flow, flowIndex) => (
+        {project.details.architectureFlows.map((flow, flowIndex) => (
           <div
             className="architecture-flow"
             key={flow.label}
