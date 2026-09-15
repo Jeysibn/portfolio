@@ -68,66 +68,55 @@ Possible later extension:
 
 ## AI Assistant
 
-### Future: repository-driven retrieval
+### Completed: canonical approved content and deterministic retrieval
 
-Replace the manually maintained `backend/data/knowledge_base.json` as the primary retrieval source with portfolio documentation that is indexed automatically.
+The website and assistant now share `content/portfolio.json`. CI validates its
+four project records and builds the explicit allow-listed
+`backend/data/approved_knowledge.json` projection. The assistant uses a small
+`PortfolioRetriever` for exact project and technology matching, bounded
+follow-up context, source provenance, knowledge versioning, and safe fallback
+for missing facts.
 
-Target direction:
+The repository is not automatically crawled. Secrets, Terraform state,
+environment files, workflow credentials, logs, and unrelated project files
+remain outside the approved knowledge boundary.
 
-```text
-Portfolio documentation
-        |
-        v
-ingestion / chunking
-        |
-        v
-semantic or hybrid retrieval
-        |
-        v
-assistant/service.py
-        |
-        v
-AI provider
-```
+### Completed: evaluations and diagnostics
 
-Goals:
+`backend/evals/assistant_evals.json` contains 49 deterministic cases spanning
+the four projects, recruiter questions, project isolation, follow-ups,
+certification and professional-experience boundaries, missing information,
+out-of-scope use, and prompt injection. CI runs dataset, consistency, and
+retrieval checks without paid model calls. Application Insights records
+retrieval, source, prompt/knowledge version, latency, quota, provider, and
+failure metadata without raw conversations or secrets.
 
-- make repository documentation the long-term source of truth;
-- reduce duplicate portfolio information across frontend content, README files, project documentation, resume content, and chatbot data;
-- retrieve only the most relevant context for a visitor's question;
-- improve scalability as project documentation grows.
-
-### Future: Cosmos DB vector search
+### Future: measured semantic or vector retrieval
 
 Evaluate Cosmos DB vector search before introducing a separate search service because the portfolio already operates Cosmos DB.
 
-Potential scope:
+Do not implement this until deterministic retrieval shows a quality or corpus
+size problem. If needed, evaluate:
 
-- generate embeddings for approved portfolio documents;
-- store document chunks and vector representations;
-- retrieve a small set of relevant chunks for each question;
-- preserve exact Jerome-specific factual grounding;
-- measure latency and cost before enabling it in production.
+- exact/keyword retrieval combined with semantic retrieval;
+- Cosmos DB vector search first because Cosmos already exists;
+- Azure for Students feature compatibility, free-tier, storage, query, and
+  embedding costs;
+- local/testability, Terraform support, latency, and explainable provenance;
+- an alternative only if Cosmos cannot satisfy the measured requirements.
 
-### Future: hybrid retrieval
+### Future: repository-driven ingestion
 
-If portfolio content becomes large enough to justify it, evaluate hybrid keyword + vector retrieval so exact identifiers such as certification names, technologies, dates, and project names remain easy to retrieve while semantic questions still work naturally.
+If project documentation becomes too large for the canonical projection, add a
+CI-controlled ingestion path:
 
-Azure AI Search should only be introduced if the retrieval requirements outgrow the simpler Cosmos-backed approach.
+```text
+approved source allow-list → validation → chunking + metadata → optional embeddings → retrieval
+```
 
-### Future: automated knowledge ingestion
-
-Add a CI/CD-controlled indexing process so approved documentation changes can refresh assistant knowledge without manually editing a chatbot-specific dataset.
-
-Possible sources include:
-
-- project documentation;
-- portfolio profile and experience documents;
-- certification records;
-- selected repository README files;
-- resume-derived structured content.
-
-The ingestion pipeline must avoid indexing secrets, private operational data, Terraform state, workflow credentials, or unrelated repository content.
+The allow-list, redaction rules, content hashes, source URLs, verification
+dates, and knowledge version must remain reviewable. Full repository ingestion
+is not an acceptable default.
 
 ### Future: externalized prompt configuration
 
@@ -144,6 +133,13 @@ Evaluate narrowly scoped read-only tools for questions that benefit from live da
 - release information.
 
 Live tools should not turn the portfolio chatbot into an unrestricted general-purpose agent.
+
+### Future: streaming
+
+Consider SSE only after grounding and evaluation quality are stable. Any
+streaming implementation must support cancellation, interruption recovery,
+accessible partial-state handling, and separate provider/full-completion
+latency telemetry.
 
 ## Principles for future work
 

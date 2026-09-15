@@ -12,10 +12,10 @@ def test_assistant_prompt_contains_behavior_rules():
     prompt = load_assistant_prompt().lower()
 
     assert "portfolio-first" in prompt
-    assert "knowledge base" in prompt
+    assert "approved portfolio facts" in prompt
     assert "never mention" in prompt
     assert "do not use emojis" in prompt
-    assert "plain text only" in prompt
+    assert "restrained formatting" in prompt
     assert "not a general-purpose ai assistant" in prompt
     assert "do not provide standalone coding help" in prompt
     assert "do not answer any part" in prompt
@@ -99,6 +99,36 @@ def test_portfolio_requests_are_not_rejected(message):
 
 def test_rate_limit_message_has_no_emoji():
     assert "⏳" not in function_app.RATE_LIMIT_MESSAGE
+    assert "10 assistant questions per hour" in function_app.RATE_LIMIT_MESSAGE
+
+
+def test_obvious_scope_rejection_is_throttled_without_charging_ai_quota(monkeypatch):
+    created = []
+
+    class RateContainer:
+        def read_item(self, **kwargs):
+            raise exceptions.CosmosResourceNotFoundError(status_code=404, message="missing")
+
+        def create_item(self, *, body):
+            created.append(body)
+
+    class Database:
+        def get_container_client(self, name):
+            return RateContainer()
+
+    class Cosmos:
+        def get_database_client(self, name):
+            return Database()
+
+    monkeypatch.setattr(function_app, "get_cosmos_client", lambda: Cosmos())
+    response = function_app.AiChatAssistant(Request(json.dumps({"message": "What is 200 + 100?"})))
+
+    assert response.status_code == 200
+    payload = json.loads(response.get_body())
+    assert payload["sources"] == []
+    assert "outside this portfolio assistant's scope" in payload["reply"]
+    assert created[0]["count"] == 0
+    assert created[0]["api_count"] == 1
 
 
 def test_load_knowledge_base_returns_dictionary():
@@ -266,6 +296,10 @@ def test_ai_request_forwards_browser_session_to_opencode(monkeypatch):
 
     assert response.status_code == 200
     assert provider_calls[0]["extra_headers"]["x-opencode-session"] == "browser-session-123"
+    payload = json.loads(response.get_body())
+    assert payload["reply"] == "Jerome works with Terraform."
+    assert payload["sources"][0]["id"] == "project-cloud-portfolio"
+    assert payload["usage"]["limit"] == function_app.MAX_MESSAGES
 
 
 def test_ai_cors_allows_opencode_session_header():

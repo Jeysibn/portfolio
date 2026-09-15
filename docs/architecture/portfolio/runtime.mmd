@@ -8,6 +8,7 @@ flowchart TB
   end
   subgraph applicationApi["APPLICATION API · AZURE FUNCTIONS"]
     functions["Python 3.11 API<br/>health · visitors · assistant"]:::runtime
+    knowledge["Approved knowledge projection<br/>local deterministic retrieval"]:::state
   end
   subgraph dependencies["STATE / EXTERNAL SERVICE / OBSERVABILITY"]
     direction LR
@@ -18,6 +19,7 @@ flowchart TB
   end
   visitor -->|"HTTPS"| pages
   pages -->|"CORS HTTPS · JSON"| functions
+  functions -->|"retrieve relevant sections"| knowledge
   functions -->|"read / conditional write"| cosmos
   functions -->|"chat completions"| provider
   functions -.->|"requests · failures · exceptions"| insights

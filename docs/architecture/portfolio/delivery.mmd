@@ -6,13 +6,16 @@ flowchart TB
     direction LR
     engineer(["Engineer<br/>dev → main"]):::actor
     source["Jeysibn/portfolio<br/>source repository"]:::surface
+    content["content/portfolio.json<br/>canonical facts"]:::surface
     engineer -->|"push / pull request"| source
+    source --> content
   end
   subgraph validationPhase["VALIDATION"]
     gates["GitHub Actions<br/>typecheck · tests · audit · plan"]:::control
   end
   subgraph deliveryPhase["DELIVERY PATHS"]
     direction LR
+    knowledge["Allow-list + knowledge build<br/>approved_knowledge.json"]:::pipeline
     frontend["Frontend<br/>Vite build"]:::pipeline
     backend["Backend<br/>Function package"]:::pipeline
     infra["Infrastructure<br/>Terraform apply"]:::pipeline
@@ -27,6 +30,8 @@ flowchart TB
     tfstate[("Azure Storage<br/>remote Terraform state")]:::state
   end
   source -->|"workflow triggers"| gates
+  content -->|"validate + generate"| knowledge
+  knowledge -->|"included in package"| backend
   gates --> frontend
   gates --> backend
   gates --> infra

@@ -9,10 +9,26 @@ The portfolio uses Azure-native observability to make production behavior visibl
 The Azure Function records:
 
 - HTTP request and exception telemetry through Application Insights;
-- structured operational events for health checks, visitor-counter requests, AI requests, successful operations, and rate limiting;
+- structured operational events for health checks, visitor-counter requests, AI requests, successful operations, rate limiting, scope rejection, provider failures, empty responses, and sanitizer failures;
 - correlation IDs returned to callers in `X-Correlation-ID`.
 
 Application request bodies, AI prompts/responses, raw client IP addresses, API keys, connection strings, and other secrets must not be written to logs.
+
+### AI request telemetry
+
+Successful assistant events include the provider label/model label, prompt hash
+and canonical knowledge version, retrieval/provider/full latency, retrieved
+source IDs and section count, retrieval-miss flag, quota count/remaining, and
+provider token counts when the provider returns them. This makes a bad answer
+traceable to a content snapshot without retaining a visitor's raw question or
+conversation. There is no cost estimate unless the provider exposes a reliable
+usage price; the current provider contract does not provide one.
+
+Scope rejections record `quota_charged=false` while incrementing the separate
+per-visitor API throttle. API-throttle and accepted-question quota events are
+separate. Rate-limit events record the hourly limit and remaining value.
+Provider, retrieval, empty-response, and sanitizer failures record failure
+class and correlation metadata only.
 
 ## Health Endpoint
 
@@ -136,6 +152,17 @@ exceptions
 traces
 | where timestamp > ago(24h)
 | where message startswith "portfolio_event="
+| project timestamp, message, operation_Id
+| order by timestamp desc
+```
+
+### Assistant retrieval diagnostics
+
+```kusto
+traces
+| where timestamp > ago(24h)
+| where message startswith "portfolio_event="
+| where message has_any ("ai_chat_success", "ai_chat_scope_rejected", "ai_chat_rate_limited")
 | project timestamp, message, operation_Id
 | order by timestamp desc
 ```

@@ -9,6 +9,11 @@ A production-oriented Cloud and DevOps portfolio built as an end-to-end engineer
 
 The current frontend uses an infrastructure control-surface visual system while keeping the site portfolio-first rather than dashboard-first. It includes live production health, release metadata, interactive project details, detailed skill inspection, certification cards, a fully visible resume, and an opportunity-focused contact experience.
 
+The assistant uses the same canonical project facts as the website. It currently
+answers about all four visible projects with deterministic lightweight retrieval,
+curated source links, bounded scope, and no vector database or repository-wide
+ingestion.
+
 ## Live Project
 
 - **Portfolio:** https://jeysibn.github.io/
@@ -46,8 +51,13 @@ portfolio/
 │       ├── frontend-deploy.yml
 │       ├── backend-deploy.yml
 │       └── terraform-deploy.yml
+├── content/
+│   └── portfolio.json             # canonical shared portfolio content
 ├── backend/
-│   ├── data/
+│   ├── assistant/
+│   ├── data/                      # generated approved assistant projection
+│   ├── evals/                     # offline assistant evaluations
+│   ├── tools/                     # knowledge builder/validator
 │   ├── tests/
 │   ├── function_app.py
 │   ├── host.json
@@ -99,6 +109,7 @@ Current frontend features include:
 - live Manila time in the monitoring panel;
 - visitor counter with loading and unavailable states;
 - AI assistant with session history, rate-limit/error handling, and a closed state that does not block page interaction;
+- assistant starter questions that populate the input without auto-submitting, subtle factual source links, clear/reset behavior, and accessible loading/error states;
 - one four-project System Deck with stacked dossier selection, numbered controls, previous/next navigation, keyboard arrows, and pointer swipe support;
 - compact repository-derived architecture previews on the deck, with full SVG diagrams deferred to the selected project's inspection dialog;
 - static-host-safe project inspection links using `?project=<slug>` and browser history synchronization;
@@ -191,6 +202,7 @@ A push to `dev` or pull request targeting `dev` validates:
 - strict TypeScript typecheck;
 - Vite production build and artifact verification;
 - Python dependency compatibility, syntax, Ruff, and backend tests;
+- canonical knowledge projection validation and offline assistant retrieval evaluations;
 - Terraform formatting, backend-disabled initialization, and validation;
 - final `Development CI Passed` gate.
 
@@ -205,8 +217,8 @@ No application or infrastructure mutation occurs from the pull request itself.
 After merge into `main`, path-specific workflows deploy only the affected layer:
 
 ```text
-frontend/**  → Vite build → Jeysibn/jeysibn.github.io → root-site smoke check
-backend/**   → Azure Functions → health + visitor API smoke tests
+frontend/** or content/** → Vite build → Jeysibn/jeysibn.github.io → root-site smoke check
+backend/** or content/**  → Azure Functions → health + visitor API smoke tests
 terraform/** → Terraform plan + apply
 ```
 
@@ -249,6 +261,8 @@ Key security decisions include:
 - local environment and secret files excluded from Git;
 - generated TypeScript build caches (`*.tsbuildinfo`) excluded from Git;
 - lazy AI-client initialization so optional AI failures cannot prevent unrelated Function routes from being indexed;
+- canonical content is allow-listed and validated into a generated assistant artifact; repository files are never automatically ingested;
+- assistant telemetry contains retrieval/source/version/latency metadata but not raw prompts, full conversations, plaintext IPs, or secrets;
 - no provider API keys or Azure connection strings embedded in the React bundle.
 
 Application-secret flow:
