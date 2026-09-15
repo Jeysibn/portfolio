@@ -116,8 +116,9 @@ Current frontend features include:
 - clickable skill capability cards with detailed modal explanations;
 - provider-styled certification cards with hover/focus descriptions;
 - a concise on-page resume with direct PDF download and a form-less recruiter handoff;
-- restrained one-time reveal motion and `prefers-reduced-motion` support.
-- height-aware desktop density for 1920×1080 workstations, with static large-screen capability relationships and restrained operational motion.
+- restrained reveal motion and `prefers-reduced-motion` support;
+- an in-view Control Plane orbital topology on supported desktop layouts, with slow upright domain/tool orbits, pause-on-inspection behavior, and a structured static fallback for constrained widths;
+- height-aware desktop density for 1920×1080 workstations, with restrained operational motion elsewhere.
 
 The primary page flow is:
 
