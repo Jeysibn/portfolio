@@ -3,7 +3,7 @@ import type { FormEvent, MouseEvent } from "react";
 import { fetchVisitorCount, sendChatMessage } from "../api";
 import type { ChatMessage } from "../portfolio";
 import { AssistantMessageContent } from "./AssistantMessageContent";
-import { resolveAssistantLink, type AssistantLink } from "./assistantLinks";
+import { projectNavigationUrl, resolveAssistantLink, type AssistantLink } from "./assistantLinks";
 
 const KEY = "jeysibn_chat_history";
 const SESSION_KEY = "jeysibn_chat_session";
@@ -29,35 +29,85 @@ function navigateToSection(event: MouseEvent<HTMLAnchorElement>, target: string)
   window.history.pushState({}, "", `#${target}`);
 }
 
+function navigateToProject(event: MouseEvent<HTMLAnchorElement>, projectSlug: string) {
+  event.preventDefault();
+  window.history.pushState(
+    { project: projectSlug },
+    "",
+    projectNavigationUrl(projectSlug),
+  );
+  // App already owns the project query-parameter state. Dispatching the same
+  // browser event used for back/forward keeps the assistant on that path
+  // instead of creating a second project-selection state machine.
+  window.dispatchEvent(new PopStateEvent("popstate"));
+
+  const projectsSection = document.getElementById("projects");
+  if (!projectsSection) return;
+  const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
+  projectsSection.scrollIntoView?.({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+}
+
 function AssistantSources({ sources }: { sources: ChatMessage["sources"] }) {
   const links = (sources ?? [])
     .map((source) => resolveAssistantLink(source))
     .filter((link): link is AssistantLink => link !== null);
+  const projectLinks = links.filter((link): link is Extract<AssistantLink, { type: "project" }> => link.type === "project");
+  const otherLinks = links.filter((link) => link.type !== "project");
 
   if (!links.length) return null;
 
   return (
     <nav className="message-sources" aria-label="Related portfolio links">
-      <span className="message-sources-label">Related</span>
-      <ul>
-        {links.map((link) =>
-          link.type === "section" ? (
-            // Native hash links preserve keyboard activation, browser history,
-            // visible focus, and the site's existing smooth-scroll behavior.
-            <li key={`${link.type}-${link.target}`}>
-              <a href={`#${link.target}`} onClick={(event) => navigateToSection(event, link.target)}>
-                {link.label}
-              </a>
-            </li>
-          ) : (
-            <li key={`${link.type}-${link.url}`}>
-              <a href={link.url} target="_blank" rel="noopener noreferrer">
-                {link.label}
-              </a>
-            </li>
-          ),
-        )}
-      </ul>
+      {projectLinks.length ? (
+        <div className="message-source-group">
+          <span className="message-sources-label">Related projects</span>
+          <ul className="message-project-list">
+            {projectLinks.map((link) => (
+              <li key={`${link.type}-${link.projectSlug}`}>
+                <a
+                  href={projectNavigationUrl(link.projectSlug)}
+                  onClick={(event) => navigateToProject(event, link.projectSlug)}
+                >
+                  {link.label}
+                </a>
+                <a
+                  className="message-repository-link"
+                  href={link.repositoryUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`Open ${link.label} repository on GitHub`}
+                >
+                  GitHub <span aria-hidden="true">↗</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+      {otherLinks.length ? (
+        <div className="message-source-group">
+          <span className="message-sources-label">Related</span>
+          <ul>
+            {otherLinks.map((link) =>
+              link.type === "section" ? (
+                // Native hash links preserve keyboard activation, browser history,
+                // visible focus, and the site's existing smooth-scroll behavior.
+                <li key={`${link.type}-${link.target}`}>
+                  <a href={`#${link.target}`} onClick={(event) => navigateToSection(event, link.target)}>
+                    {link.label}
+                  </a>
+                </li>
+              ) : (
+                <li key={`${link.type}-${link.url}`}>
+                  <a href={link.url} target="_blank" rel="noopener noreferrer">
+                    {link.label}
+                  </a>
+                </li>
+              ),
+            )}
+          </ul>
+        </div>
+      ) : null}
     </nav>
   );
 }

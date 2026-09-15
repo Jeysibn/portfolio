@@ -120,6 +120,12 @@ while retaining normal paragraphs, flat lists, bold labels, inline code, URLs,
 paths, commands, and technical punctuation such as `app=*`. The frontend
 renders that small safe subset without injecting HTML.
 
+The provider output budget defaults to 800 tokens and is bounded at 900 through
+the `AI_MAX_TOKENS` setting. If an OpenAI-compatible response reports a length
+finish reason, the backend makes one concise rewrite attempt. A second
+length-limited response, a content-filtered response, or an empty response is
+returned as a controlled error rather than as an incomplete answer.
+
 ## API contract
 
 Successful responses have this shape:
@@ -140,8 +146,11 @@ Successful responses have this shape:
 
 Sources are curated public links, not raw retrieval chunk IDs. The frontend
 shows them subtly under factual answers and omits them when the backend has no
-material source to attach. Errors retain the existing `{ "error": "..." }`
-shape and HTTP behavior.
+material source to attach. Project source IDs are resolved against canonical
+frontend project metadata: the project name opens the existing project dialog
+using `?project=<slug>` in the current tab, while its GitHub repository is a
+separate external action. Errors retain the existing `{ "error": "..." }` shape
+and HTTP behavior.
 
 ## Limits, privacy, and security
 
@@ -164,7 +173,7 @@ shape and HTTP behavior.
 
 ## Evaluations
 
-`backend/evals/assistant_evals.json` contains 49 representative cases covering
+`backend/evals/assistant_evals.json` contains 51 representative cases covering
 profile, education, employment, certifications, skills, all four projects,
 technical comparisons, recruiter fit, missing facts, scope, prompt injection,
 false premises, seniority, professional/project boundaries, contact, and
@@ -180,7 +189,7 @@ added later as an explicit manual evaluation using the same dataset.
 
 Application Insights structured events record assistant request, scope
 rejection, rate limiting, provider failure, empty response, sanitizer failure,
-and success. Successful events include:
+output truncation/incomplete responses, and success. Successful events include:
 
 - request/correlation ID;
 - provider label and configured model label;
@@ -189,6 +198,8 @@ and success. Successful events include:
 - retrieved source IDs and section count;
 - retrieval miss flag;
 - quota count and remaining quota;
+- finish reason, configured output-token limit, regeneration status, and final
+  completion status;
 - provider token counts when returned.
 
 The existing Log Analytics 30-day retention and 0.1 GB/day cap remain in

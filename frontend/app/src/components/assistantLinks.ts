@@ -1,8 +1,9 @@
 import type { ChatSource } from "../portfolio";
-import { portfolioUrl } from "../portfolio";
+import { portfolioUrl, projects } from "../portfolio";
 
 export type AssistantLink =
   | { type: "section"; label: string; target: string }
+  | { type: "project"; label: string; projectSlug: string; repositoryUrl: string }
   | { type: "external"; label: string; url: string };
 
 const SECTION_IDS = new Set([
@@ -29,10 +30,30 @@ const SOURCE_SECTION_TARGETS: Record<string, string> = {
 
 const canonicalPortfolio = new URL(portfolioUrl);
 
+export function projectNavigationUrl(
+  projectSlug: string,
+  currentUrl = typeof window === "undefined" ? portfolioUrl : window.location.href,
+) {
+  const url = new URL(currentUrl);
+  url.searchParams.set("project", projectSlug);
+  url.hash = "";
+  return `${url.pathname}${url.search}${url.hash}`;
+}
+
 export function resolveAssistantLink(
   source: ChatSource,
   currentUrl = typeof window === "undefined" ? portfolioUrl : window.location.href,
 ): AssistantLink | null {
+  const project = projects.find((candidate) => source.id === `project-${candidate.slug}`);
+  if (project) {
+    return {
+      type: "project",
+      label: project.title,
+      projectSlug: project.slug,
+      repositoryUrl: project.repositoryUrl,
+    };
+  }
+
   if (/\s/.test(source.url)) return null;
 
   let url: URL;

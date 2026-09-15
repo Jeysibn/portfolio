@@ -177,6 +177,17 @@ def test_get_ai_client_requires_runtime_key(monkeypatch):
         function_app.get_ai_client()
 
 
+def test_ai_output_budget_uses_default_and_server_side_bounds(monkeypatch):
+    monkeypatch.delenv("AI_MAX_TOKENS", raising=False)
+    assert function_app._get_ai_max_tokens() == function_app.AI_MAX_TOKENS_DEFAULT
+
+    monkeypatch.setenv("AI_MAX_TOKENS", "5000")
+    assert function_app._get_ai_max_tokens() == function_app.AI_MAX_TOKENS_MAX
+
+    monkeypatch.setenv("AI_MAX_TOKENS", "not-a-number")
+    assert function_app._get_ai_max_tokens() == function_app.AI_MAX_TOKENS_DEFAULT
+
+
 class Request:
     method = "POST"
     headers = {"content-type": "application/json"}
@@ -289,7 +300,10 @@ def test_ai_request_forwards_browser_session_to_opencode(monkeypatch):
                         type(
                             "Choice",
                             (),
-                            {"message": type("Message", (), {"content": "Jerome works with Terraform."})()},
+                            {
+                                "finish_reason": "stop",
+                                "message": type("Message", (), {"content": "Jerome works with Terraform."})(),
+                            },
                         )()
                     ]
                 },
@@ -308,11 +322,122 @@ def test_ai_request_forwards_browser_session_to_opencode(monkeypatch):
     )
 
     assert response.status_code == 200
+    assert len(provider_calls) == 1
     assert provider_calls[0]["extra_headers"]["x-opencode-session"] == "browser-session-123"
     payload = json.loads(response.get_body())
     assert payload["reply"] == "Jerome works with Terraform."
     assert payload["sources"][0]["id"] == "project-cloud-portfolio"
     assert payload["usage"]["limit"] == function_app.MAX_MESSAGES
+
+
+def configure_chat_provider(monkeypatch, responses):
+    """Patch the route dependencies for completion-status tests."""
+    class RateContainer:
+        def read_item(self, **kwargs):
+            raise exceptions.CosmosResourceNotFoundError(status_code=404, message="missing")
+
+        def create_item(self, body):
+            return body
+
+    class Database:
+        def get_container_client(self, name):
+            return RateContainer()
+
+    class Cosmos:
+        def get_database_client(self, name):
+            return Database()
+
+    calls = []
+
+    class Completions:
+        def create(self, **kwargs):
+            calls.append(kwargs)
+            content, finish_reason = responses[len(calls) - 1]
+            return type(
+                "Response",
+                (),
+                {
+                    "choices": [
+                        type(
+                            "Choice",
+                            (),
+                            {
+                                "finish_reason": finish_reason,
+                                "message": type("Message", (), {"content": content})(),
+                            },
+                        )()
+                    ]
+                },
+            )()
+
+    client = type("Client", (), {"chat": type("Chat", (), {"completions": Completions()})()})()
+    monkeypatch.setattr(function_app, "get_cosmos_client", lambda: Cosmos())
+    monkeypatch.setattr(function_app, "get_ai_client", lambda: client)
+    return calls
+
+
+def test_length_limited_completion_is_regenerated_once(monkeypatch):
+    calls = configure_chat_provider(
+        monkeypatch,
+        [
+            ("MoniKey demonstrates durable background work, but the answer is cut", "length"),
+            ("MoniKey demonstrates PostgreSQL-backed durable background work.", "stop"),
+        ],
+    )
+    events = []
+    monkeypatch.setattr(function_app, "log_event", lambda event, request_id, **fields: events.append((event, fields)))
+
+    response = function_app.AiChatAssistant(Request(json.dumps({"message": "Tell me about MoniKey."})))
+
+    assert response.status_code == 200
+    assert len(calls) == 2
+    assert calls[1]["messages"][-1]["content"].startswith("Rewrite your previous answer more concisely")
+    payload = json.loads(response.get_body())
+    assert payload["reply"] == "MoniKey demonstrates PostgreSQL-backed durable background work."
+    truncation = next(fields for event, fields in events if event == "ai_chat_output_truncated")
+    assert truncation["finish_reason"] == "length"
+    assert truncation["output_token_limit"] == function_app.AI_MAX_TOKENS
+    success = next(fields for event, fields in events if event == "ai_chat_success")
+    assert success["regeneration_required"] is True
+    assert success["final_completed"] is True
+
+
+def test_length_limited_retry_returns_controlled_error_when_still_incomplete(monkeypatch):
+    calls = configure_chat_provider(
+        monkeypatch,
+        [("The answer ends abruptly", "length"), ("The rewrite also ends", "length")],
+    )
+
+    response = function_app.AiChatAssistant(Request(json.dumps({"message": "Which projects best demonstrate Jerome's skills?"})))
+
+    assert response.status_code == 502
+    assert len(calls) == 2
+    payload = json.loads(response.get_body())
+    assert payload["error"] == function_app.INCOMPLETE_RESPONSE_MESSAGE
+    assert "ends abruptly" not in json.dumps(payload)
+
+
+def test_project_skills_question_can_return_all_projects_completely(monkeypatch):
+    complete = (
+        "Jerome's projects demonstrate different skill areas.\n\n"
+        "- Cloud-Backed Portfolio — Azure delivery and observability.\n"
+        "- Homelab GitOps Environment — Kubernetes and GitOps operations.\n"
+        "- MoniKey — full-stack application and durable worker design.\n"
+        "- NOC Report Builder — evidence-aware operations automation.\n\n"
+        "Homelab GitOps is the clearest fit for a Kubernetes-focused role."
+    )
+    calls = configure_chat_provider(monkeypatch, [(complete, "stop")])
+
+    response = function_app.AiChatAssistant(
+        Request(json.dumps({"message": "Which projects best demonstrate Jerome's skills?"}))
+    )
+
+    assert response.status_code == 200
+    assert len(calls) == 1
+    payload = json.loads(response.get_body())
+    for project in ("Cloud-Backed Portfolio", "Homelab GitOps Environment", "MoniKey", "NOC Report Builder"):
+        assert project in payload["reply"]
+    assert payload["reply"].endswith("role.")
 
 
 def test_ai_cors_allows_opencode_session_header():
