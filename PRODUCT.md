@@ -54,6 +54,7 @@ The experience is a single-page portfolio deployed at `jeysibn.github.io`. Recru
 - Treat performance, accessibility, and graceful degradation as part of the portfolio's engineering message.
 - Preserve one factual source of truth for portfolio content.
 - Keep the recruiter scan path dense and readable on 1920×1080 displays: use height-aware desktop density, restrained display type, and motion that explains system state rather than decorating every section.
+- Keep the portfolio content sequence independent from the ambient infrastructure lifecycle; evidence remains before principles while the Signal Rail progresses monotonically from SIGNAL through IMPROVE.
 
 ## Accessibility & Inclusion
 

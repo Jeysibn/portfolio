@@ -46,29 +46,15 @@ function Section({
   children: ReactNode;
   className?: string;
 }) {
-  const signalStages: Record<string, string> = {
-    about: "PROVISION",
-    projects: "DEPLOY",
-    experience: "RUN",
-    skills: "OBSERVE",
-    contact: "IMPROVE",
-  };
-  const signalStage = signalStages[id];
   return (
     <section
       id={id}
       className={`section ${className}`}
       aria-labelledby={`${id}-title`}
-      data-signal-stage={signalStage}
     >
       <header className="section-heading">
         <h2 id={`${id}-title`}>{title}</h2>
         <span className="section-rule" aria-hidden="true" />
-        {signalStage ? (
-          <span className="chapter-signal" aria-hidden="true">
-            {signalStage}
-          </span>
-        ) : null}
       </header>
       {children}
     </section>
@@ -101,7 +87,6 @@ export function Hero() {
       id="top"
       className="hero"
       aria-labelledby="hero-title"
-      data-signal-stage="SIGNAL"
     >
       <div className="hero-meta">
         <span>Malolos · Philippines</span>
@@ -250,9 +235,20 @@ export function Credentials() {
               <span>{String(i + 1).padStart(2, "0")}</span>
               <div>
                 {certification.name}
-                {certification.status === "in-progress" ? (
-                  <small>In progress</small>
-                ) : null}
+                <small className="credential-meta">
+                  {certification.issuer ? `${certification.issuer} · ` : null}
+                  <span
+                    className={
+                      certification.status === "in-progress"
+                        ? "credential-in-progress"
+                        : undefined
+                    }
+                  >
+                    {certification.status === "in-progress"
+                      ? "In progress"
+                      : "Earned"}
+                  </span>
+                </small>
               </div>
             </li>
           ))}

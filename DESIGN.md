@@ -47,7 +47,7 @@ components:
 
 **Creative North Star: “The Editorial Control-Plane Atlas”**
 
-Infrastructure in Motion combines magazine-scale typography with precise system notation. One copper signal travels through every chapter and changes state from signal to provision, deploy, run, observe, and improve. Quiet paper sections alternate with dense ink and petrol system chapters.
+Infrastructure in Motion combines magazine-scale typography with precise system notation. One copper signal travels through the page as an ambient infrastructure lifecycle—signal, provision, deploy, run, observe, improve—while the portfolio chapters remain ordered for recruiter comprehension. Quiet paper sections alternate with dense ink and petrol system chapters.
 
 Key characteristics: asymmetric composition, hairline rules, open whitespace, explicit architecture flows, restrained operational color, and motion that communicates relationships.
 
@@ -64,6 +64,8 @@ Bodoni Moda carries identity and chapter scale; Manrope carries readable detail;
 Content uses a fluid maximum-width atlas with strongly asymmetric offsets. Projects are represented as stacked system dossiers rather than generic cards. The active dossier becomes the current inspection plane while background dossiers retain visible technical identity. The capability map remains a topology-inspired control plane, but its large-screen relationships are static so interaction—not perpetual orbiting—provides the evidence path. At 900px, wide structures collapse; at 600px, the narrative becomes a vertical stack, architecture becomes a two-column sequence, and interactive topology becomes a one-column domain list.
 
 Desktop density is height-aware as well as width-aware. On wide displays with limited vertical space, display type, section padding, and project dossier geometry use a compact treatment so a 1920×1080 workstation remains scanable. One-time hero, signal, and dialog transitions remain; decorative continuous motion is not required to understand the system.
+
+The fixed Signal Rail is not a second navigation menu and does not map one lifecycle stage to one portfolio section. Its progress line and active/completed nodes derive from one monotonic document-scroll progress model, so the infrastructure metaphor never moves backward when the content order changes. Full labels are reserved for wide gutters; medium desktop uses marker-only presentation.
 
 ## Elevation & Depth
 

@@ -27,6 +27,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and 
 
 ### Changed
 
+- **Signal lifecycle coherence**: Decoupled the ambient Signal Rail from portfolio section ownership, deriving its line and active/completed stages from one monotonic document-progress model. Removed redundant inline chapter stages, added a quieter medium-desktop rail mode, raised functional technical labels, restrained System Deck offsets, and surfaced canonical credential issuer/status metadata.
+
 - **Frontend visual hierarchy**: Reduced display scale and ordinary section spacing, raised selected technical labels for readability, removed generic section-entry drift, and reduced assistant trigger weight while preserving the signal lifecycle and editorial light/dark system.
 
 - **Contact hierarchy**: Shifted the dominant Contact statement from the raw email address to working-together intent while preserving the existing editorial system handoff language and relative `#top` wordmark navigation.

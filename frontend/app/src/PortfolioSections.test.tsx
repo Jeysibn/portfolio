@@ -1,7 +1,7 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { Contact, Resume } from "./sections/PortfolioSections";
+import { Contact, Credentials, Projects, Resume } from "./sections/PortfolioSections";
 
 afterEach(cleanup);
 
@@ -62,5 +62,28 @@ describe("Resume actions", () => {
       "download",
       "Jerome-Ibon-Resume.pdf",
     );
+  });
+});
+
+describe("Credential metadata", () => {
+  it("renders canonical issuer and credential status", () => {
+    render(<Credentials />);
+
+    expect(screen.getByText("Oracle ·", { exact: false }).parentElement).toHaveTextContent(
+      "Oracle · Earned",
+    );
+    expect(screen.getByText("HashiCorp ·", { exact: false }).parentElement).toHaveTextContent(
+      "HashiCorp · In progress",
+    );
+  });
+});
+
+describe("Section headings", () => {
+  it("keeps lifecycle stages out of content headings", () => {
+    render(<Projects onOpen={vi.fn()} />);
+
+    expect(screen.getByRole("heading", { name: "Projects" })).toBeInTheDocument();
+    expect(document.querySelectorAll(".chapter-signal")).toHaveLength(0);
+    expect(document.querySelectorAll("[data-signal-stage]")).toHaveLength(0);
   });
 });
