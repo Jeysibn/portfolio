@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { resolveAssistantLink } from "./assistantLinks";
+import { projectNavigationUrl, resolveAssistantLink } from "./assistantLinks";
 
 describe("assistant link resolution", () => {
   it("maps same-site section sources to current-page hash links", () => {
@@ -25,15 +25,32 @@ describe("assistant link resolution", () => {
     ).toEqual({ type: "section", label: "Portfolio profile", target: "about" });
   });
 
-  it("keeps external repositories external and safely rejects malformed URLs", () => {
+  it("maps approved project source IDs to canonical portfolio projects", () => {
     expect(
       resolveAssistantLink(
-        { id: "project-homelab-gitops", label: "Homelab GitOps", url: "https://github.com/Jeysibn/homelab-gitops" },
+        { id: "project-monikey", label: "Untrusted label", url: "https://example.com/wrong" },
+        "https://jeysibn.github.io/",
+      ),
+    ).toEqual({
+      type: "project",
+      label: "MoniKey",
+      projectSlug: "monikey",
+      repositoryUrl: "https://github.com/Jeysibn/monikey",
+    });
+
+    expect(projectNavigationUrl("monikey", "https://jeysibn.github.io/#experience"))
+      .toBe("/?project=monikey");
+  });
+
+  it("keeps unknown external repositories external and safely rejects malformed URLs", () => {
+    expect(
+      resolveAssistantLink(
+        { id: "repository-homelab", label: "Homelab repository", url: "https://github.com/Jeysibn/homelab-gitops" },
         "https://jeysibn.github.io/",
       ),
     ).toEqual({
       type: "external",
-      label: "Homelab GitOps",
+      label: "Homelab repository",
       url: "https://github.com/Jeysibn/homelab-gitops",
     });
 

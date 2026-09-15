@@ -1335,6 +1335,9 @@ body:has(.inspection-dialog[open]) {
   margin-top: 8px;
   font: 500 10px var(--mono);
 }
+.portfolio-assistant .message-source-group + .message-source-group {
+  margin-top: 8px;
+}
 .portfolio-assistant .message-sources-label {
   display: block;
   color: var(--muted);
@@ -1351,6 +1354,12 @@ body:has(.inspection-dialog[open]) {
 .portfolio-assistant .message-sources li {
   margin: 0;
 }
+.portfolio-assistant .message-sources .message-project-list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 8px;
+}
 .portfolio-assistant .message-sources a {
   display: inline-flex;
   align-items: center;
@@ -1362,6 +1371,10 @@ body:has(.inspection-dialog[open]) {
 .portfolio-assistant .message-sources a:hover,
 .portfolio-assistant .message-sources a:focus-visible {
   text-decoration: underline;
+}
+.portfolio-assistant .message-sources .message-repository-link {
+  color: var(--muted);
+  font-size: 9px;
 }
 .portfolio-assistant .assistant-usage {
   margin: 8px 0 0;

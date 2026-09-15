@@ -60,6 +60,9 @@ RATE_LIMIT_MESSAGE = (
 )
 
 API_RATE_LIMIT_MESSAGE = "Too many assistant requests from this visitor. Please try again later."
+INCOMPLETE_RESPONSE_MESSAGE = (
+    "I couldn't complete that answer. Please try asking about one project or comparison at a time."
+)
 
 OUT_OF_SCOPE_MESSAGE = (
     "That request is outside this portfolio assistant's scope. "
@@ -70,7 +73,23 @@ OUT_OF_SCOPE_MESSAGE = (
 AI_MODEL = os.environ.get("AI_MODEL", "mimo-v2.5-free")
 AI_BASE_URL = os.environ.get("AI_BASE_URL", "https://opencode.ai/zen/v1")
 AI_TEMPERATURE = float(os.environ.get("AI_TEMPERATURE", "0.35"))
-AI_MAX_TOKENS = int(os.environ.get("AI_MAX_TOKENS", "450"))
+AI_MAX_TOKENS_DEFAULT = 800
+AI_MAX_TOKENS_MAX = 900
+
+
+def _get_ai_max_tokens() -> int:
+    """Read a bounded output budget so deployment config cannot request essays."""
+    try:
+        configured = int(os.environ.get("AI_MAX_TOKENS", str(AI_MAX_TOKENS_DEFAULT)))
+    except ValueError:
+        configured = AI_MAX_TOKENS_DEFAULT
+    return max(1, min(configured, AI_MAX_TOKENS_MAX))
+
+
+AI_MAX_TOKENS = _get_ai_max_tokens()
+
+LENGTH_FINISH_REASONS = frozenset({"length", "max_tokens", "max_output_tokens", "token_limit"})
+CONTENT_FILTER_FINISH_REASONS = frozenset({"content_filter", "content-filter"})
 
 ALLOWED_ORIGIN = os.environ.get("ALLOWED_ORIGIN", "https://jeysibn.github.io")
 
@@ -292,6 +311,30 @@ def get_provider_usage(response) -> dict[str, int]:
         "total_tokens": getattr(usage, "total_tokens", None),
     }
     return {key: value for key, value in fields.items() if isinstance(value, int)}
+
+
+def get_finish_reason(response) -> str | None:
+    """Read the provider completion status without assuming one SDK shape."""
+    choices = getattr(response, "choices", None) or []
+    if not choices:
+        return None
+    choice = choices[0]
+    reason = getattr(choice, "finish_reason", None) or getattr(choice, "stop_reason", None)
+    return reason.strip().lower() if isinstance(reason, str) and reason.strip() else None
+
+
+def is_length_limited(finish_reason: str | None) -> bool:
+    """Recognize OpenAI-compatible length-limit variants."""
+    if not finish_reason:
+        return False
+    normalized = finish_reason.strip().lower().replace("-", "_")
+    return normalized in {reason.replace("-", "_") for reason in LENGTH_FINISH_REASONS}
+
+
+def is_content_filtered(finish_reason: str | None) -> bool:
+    if not finish_reason:
+        return False
+    return finish_reason.strip().lower() in CONTENT_FILTER_FINISH_REASONS
 
 
 def is_obviously_out_of_scope(user_message: str) -> bool:
@@ -589,7 +632,50 @@ def AiChatAssistant(req: func.HttpRequest) -> func.HttpResponse:
             },
         )
         provider_latency_ms = round((time.perf_counter() - provider_started) * 1000)
-        response_content = response.choices[0].message.content
+        finish_reason = get_finish_reason(response)
+        initial_finish_reason = finish_reason
+        regeneration_required = False
+        regeneration_latency_ms = 0
+
+        if is_length_limited(finish_reason):
+            regeneration_required = True
+            log_event(
+                "ai_chat_output_truncated",
+                request_id,
+                finish_reason=finish_reason,
+                output_token_limit=AI_MAX_TOKENS,
+                regeneration_required=True,
+                provider_latency_ms=provider_latency_ms,
+            )
+            regeneration_started = time.perf_counter()
+            response = client.chat.completions.create(
+                model=AI_MODEL,
+                messages=[
+                    *chat_context.messages,
+                    {
+                        "role": "user",
+                        "content": (
+                            "Rewrite your previous answer more concisely and ensure it finishes completely. "
+                            "Keep only the most relevant verified portfolio facts."
+                        ),
+                    },
+                ],
+                temperature=AI_TEMPERATURE,
+                max_tokens=AI_MAX_TOKENS,
+                extra_headers={
+                    OPENCODE_SESSION_HEADER: opencode_session_id,
+                    "x-opencode-client": "jeysibn-portfolio-assistant/1.0",
+                    "User-Agent": "jeysibn-portfolio-assistant/1.0",
+                },
+            )
+            regeneration_latency_ms = round((time.perf_counter() - regeneration_started) * 1000)
+            provider_latency_ms += regeneration_latency_ms
+            finish_reason = get_finish_reason(response)
+
+        choices = getattr(response, "choices", None) or []
+        response_content = None
+        if choices:
+            response_content = getattr(getattr(choices[0], "message", None), "content", None)
 
         if not response_content:
             log_event(
@@ -597,9 +683,34 @@ def AiChatAssistant(req: func.HttpRequest) -> func.HttpResponse:
                 request_id,
                 provider_latency_ms=provider_latency_ms,
                 knowledge_version=chat_context.retrieval.knowledge_version,
+                finish_reason=finish_reason,
+                initial_finish_reason=initial_finish_reason,
+                output_token_limit=AI_MAX_TOKENS,
+                regeneration_required=regeneration_required,
+                regeneration_latency_ms=regeneration_latency_ms,
+                final_completed=False,
             )
             return json_response(
                 {"error": "The AI assistant did not return a response."},
+                502,
+                AI_HEADERS,
+                request_id,
+            )
+
+        if is_length_limited(finish_reason) or is_content_filtered(finish_reason):
+            log_event(
+                "ai_chat_incomplete_response",
+                request_id,
+                finish_reason=finish_reason,
+                initial_finish_reason=initial_finish_reason,
+                output_token_limit=AI_MAX_TOKENS,
+                regeneration_required=regeneration_required,
+                regeneration_latency_ms=regeneration_latency_ms,
+                final_completed=False,
+                provider_latency_ms=provider_latency_ms,
+            )
+            return json_response(
+                {"error": INCOMPLETE_RESPONSE_MESSAGE},
                 502,
                 AI_HEADERS,
                 request_id,
@@ -634,6 +745,12 @@ def AiChatAssistant(req: func.HttpRequest) -> func.HttpResponse:
             retrieval_miss=chat_context.retrieval.retrieval_miss,
             quota_count=quota_count,
             quota_remaining=max(0, MAX_MESSAGES - quota_count),
+            finish_reason=finish_reason,
+            initial_finish_reason=initial_finish_reason,
+            output_token_limit=AI_MAX_TOKENS,
+            regeneration_required=regeneration_required,
+            regeneration_latency_ms=regeneration_latency_ms,
+            final_completed=True,
             **provider_usage,
         )
         return json_response(

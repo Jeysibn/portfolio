@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { Project } from "./portfolio";
-import { navigation, projects } from "./portfolio";
+import { navigation } from "./portfolio";
 import { useActiveSection, useTheme } from "./hooks";
 import { SiteHeader, SiteFooter } from "./components/SiteChrome";
 import { MotionDirector, SignalPath } from "./components/MotionSystem";
@@ -19,11 +19,11 @@ import { ProjectDialog, SkillDialog } from "./components/Dialogs";
 import { PortfolioAssistant } from "./components/PortfolioAssistant";
 import type { SkillSelection } from "./components/capabilities/CapabilityMap";
 import { CursorGlow } from "./components/CursorGlow";
+import { projectFromSearch } from "./projectNavigation";
 
 function projectFromLocation() {
   if (typeof window === "undefined") return null;
-  const slug = new URLSearchParams(window.location.search).get("project");
-  return projects.find((project) => project.slug === slug) ?? null;
+  return projectFromSearch(window.location.search);
 }
 
 export default function App() {

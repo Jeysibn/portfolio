@@ -12,6 +12,7 @@ vi.mock("../api", () => ({
 describe("portfolio assistant", () => {
   beforeEach(() => {
     sessionStorage.clear();
+    window.history.replaceState({}, "", "/");
     mocks.sendChatMessage.mockReset();
   });
 
@@ -30,13 +31,19 @@ describe("portfolio assistant", () => {
     const experienceSection = document.createElement("section");
     experienceSection.id = "experience";
     document.body.appendChild(experienceSection);
+    const projectsSection = document.createElement("section");
+    projectsSection.id = "projects";
+    document.body.appendChild(projectsSection);
     mocks.sendChatMessage.mockResolvedValue({
       reply: "Jerome currently has four documented projects:\n\n- **Cloud-Backed Portfolio** — Azure Functions and Cosmos DB.\n- `MoniKey` — PostgreSQL-backed durable jobs.",
       sources: [
         { id: "profile", label: "Portfolio profile", url: "https://jeysibn.github.io/" },
         { id: "professional-experience", label: "Professional experience", url: "https://jeysibn.github.io/#experience" },
         { id: "certifications", label: "Certifications", url: "https://jeysibn.github.io/#credentials-title" },
+        { id: "project-cloud-portfolio", label: "Cloud-Backed Portfolio", url: "https://github.com/Jeysibn/portfolio" },
+        { id: "project-homelab-gitops", label: "Homelab GitOps", url: "https://github.com/Jeysibn/homelab-gitops" },
         { id: "project-monikey", label: "MoniKey", url: "https://github.com/Jeysibn/monikey" },
+        { id: "project-noc-report", label: "NOC Report Builder", url: "https://github.com/Jeysibn/noc-report" },
         { id: "bad", label: "Bad link", url: "not a url" },
       ],
       usage: { limit: 10, remaining: 9 },
@@ -48,9 +55,10 @@ describe("portfolio assistant", () => {
     fireEvent.submit(input.closest("form") as HTMLFormElement);
 
     await waitFor(() => expect(screen.getByText("MoniKey", { selector: "code" })).toBeInTheDocument());
-    expect(screen.getByText("Cloud-Backed Portfolio")).toBeInTheDocument();
-    expect(screen.getByText("Cloud-Backed Portfolio").closest("ul")).toBeInTheDocument();
-    expect(screen.getByText("Cloud-Backed Portfolio").closest("strong")).toBeInTheDocument();
+    const projectDescription = screen.getByText("Cloud-Backed Portfolio", { selector: "strong" });
+    expect(projectDescription).toBeInTheDocument();
+    expect(projectDescription.closest("ul")).toBeInTheDocument();
+    expect(projectDescription.closest("strong")).toBeInTheDocument();
     expect(screen.getByText("MoniKey", { selector: "code" })).toBeInTheDocument();
     const experienceLink = screen.getByRole("link", { name: "Professional experience" });
     expect(experienceLink).toHaveAttribute("href", "#experience");
@@ -58,9 +66,22 @@ describe("portfolio assistant", () => {
     fireEvent.click(experienceLink);
     expect(window.location.hash).toBe("#experience");
     expect(screen.getByRole("link", { name: "Certifications" })).toHaveAttribute("href", "#credentials");
-    expect(screen.getByRole("link", { name: "MoniKey" })).toHaveAttribute("href", "https://github.com/Jeysibn/monikey");
-    expect(screen.getByRole("link", { name: "MoniKey" })).toHaveAttribute("target", "_blank");
-    expect(screen.getByRole("link", { name: "MoniKey" })).toHaveAttribute("rel", "noopener noreferrer");
+    for (const [label, slug] of [
+      ["Cloud-Backed Portfolio", "cloud-portfolio"],
+      ["Homelab GitOps Environment", "homelab-gitops"],
+      ["MoniKey", "monikey"],
+      ["NOC Report Builder", "noc-report"],
+    ]) {
+      const projectLink = screen.getByRole("link", { name: label });
+      expect(projectLink).toHaveAttribute("href", `/?project=${slug}`);
+      expect(projectLink).not.toHaveAttribute("target");
+      fireEvent.click(projectLink);
+      expect(new URLSearchParams(window.location.search).get("project")).toBe(slug);
+    }
+    const repositoryLink = screen.getByRole("link", { name: "Open MoniKey repository on GitHub" });
+    expect(repositoryLink).toHaveAttribute("href", "https://github.com/Jeysibn/monikey");
+    expect(repositoryLink).toHaveAttribute("target", "_blank");
+    expect(repositoryLink).toHaveAttribute("rel", "noopener noreferrer");
     expect(screen.queryByRole("link", { name: "Bad link" })).not.toBeInTheDocument();
     expect(screen.getByText("10 assistant questions per hour · 9 remaining")).toBeInTheDocument();
   });
