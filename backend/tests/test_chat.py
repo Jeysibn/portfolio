@@ -138,8 +138,10 @@ class Request:
     method = "POST"
     headers = {"content-type": "application/json"}
 
-    def __init__(self, body):
+    def __init__(self, body, headers=None):
         self.body = body
+        if headers is not None:
+            self.headers = {"content-type": "application/json", **headers}
 
     def get_body(self):
         return self.body.encode()
@@ -213,3 +215,58 @@ def test_rate_limit_concurrency_failure_fails_closed_without_provider_call(monke
 
     assert response.status_code == 503
     assert provider_called is False
+
+
+def test_ai_request_forwards_browser_session_to_opencode(monkeypatch):
+    class RateContainer:
+        def read_item(self, **kwargs):
+            raise exceptions.CosmosResourceNotFoundError(status_code=404, message="missing")
+
+        def create_item(self, body):
+            return body
+
+    class Database:
+        def get_container_client(self, name):
+            return RateContainer()
+
+    class Cosmos:
+        def get_database_client(self, name):
+            return Database()
+
+    provider_calls = []
+
+    class Completions:
+        def create(self, **kwargs):
+            provider_calls.append(kwargs)
+            return type(
+                "Response",
+                (),
+                {
+                    "choices": [
+                        type(
+                            "Choice",
+                            (),
+                            {"message": type("Message", (), {"content": "Jerome works with Terraform."})()},
+                        )()
+                    ]
+                },
+            )()
+
+    client = type("Client", (), {"chat": type("Chat", (), {"completions": Completions()})()})()
+
+    monkeypatch.setattr(function_app, "get_cosmos_client", lambda: Cosmos())
+    monkeypatch.setattr(function_app, "get_ai_client", lambda: client)
+
+    response = function_app.AiChatAssistant(
+        Request(
+            json.dumps({"message": "What does Jerome use Terraform for?"}),
+            headers={"x-opencode-session": "browser-session-123"},
+        )
+    )
+
+    assert response.status_code == 200
+    assert provider_calls[0]["extra_headers"]["x-opencode-session"] == "browser-session-123"
+
+
+def test_ai_cors_allows_opencode_session_header():
+    assert "X-OpenCode-Session" in function_app.AI_HEADERS["Access-Control-Allow-Headers"]

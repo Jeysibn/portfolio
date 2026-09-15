@@ -47,7 +47,10 @@ MAX_MESSAGE_CHARS = 2000
 MAX_HISTORY_ENTRIES = 10
 MAX_HISTORY_ITEM_CHARS = 2000
 MAX_HISTORY_TOTAL_CHARS = 8000
+MAX_SESSION_ID_CHARS = 128
 VISITOR_HASH_SECRET_ENV = "VISITOR_HASH_SECRET"
+OPENCODE_SESSION_HEADER = "x-opencode-session"
+SESSION_ID_PATTERN = re.compile(r"^[A-Za-z0-9._:-]+$")
 
 RATE_LIMIT_MESSAGE = (
     "You've reached the maximum limit of 10 messages for this chat session. "
@@ -91,7 +94,7 @@ COUNTER_HEADERS = {
 AI_HEADERS = {
     "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
     "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Headers": "Content-Type, X-OpenCode-Session",
 }
 
 
@@ -243,6 +246,25 @@ def get_request_id(req: func.HttpRequest) -> str:
         or req.headers.get("x-request-id")
         or str(uuid.uuid4())
     )
+
+
+def get_opencode_session_id(req: func.HttpRequest, ip_hash: str) -> str:
+    """Return a stable, bounded routing ID for the OpenCode provider.
+
+    OpenCode's free Console-backed models require this non-secret session
+    header for provider affinity. The browser supplies one per chat session;
+    the privacy-preserving visitor hash is a safe fallback for older clients
+    and direct API callers that do not send the header.
+    """
+    candidate = req.headers.get(OPENCODE_SESSION_HEADER, "").strip()
+    if (
+        candidate
+        and len(candidate) <= MAX_SESSION_ID_CHARS
+        and SESSION_ID_PATTERN.fullmatch(candidate)
+    ):
+        return candidate
+
+    return f"portfolio-{ip_hash[:32]}"
 
 
 def log_event(event: str, request_id: str, **fields) -> None:
@@ -415,6 +437,7 @@ def AiChatAssistant(req: func.HttpRequest) -> func.HttpResponse:
 
         client_ip = get_client_ip(req)
         ip_hash = hash_ip(client_ip)
+        opencode_session_id = get_opencode_session_id(req, ip_hash)
         rate_limit_id = f"chat_limit_{ip_hash}"
 
         db_client = get_cosmos_client()
@@ -503,6 +526,11 @@ def AiChatAssistant(req: func.HttpRequest) -> func.HttpResponse:
             messages=messages,
             temperature=AI_TEMPERATURE,
             max_tokens=AI_MAX_TOKENS,
+            extra_headers={
+                OPENCODE_SESSION_HEADER: opencode_session_id,
+                "x-opencode-client": "jeysibn-portfolio-assistant/1.0",
+                "User-Agent": "jeysibn-portfolio-assistant/1.0",
+            },
         )
         response_content = response.choices[0].message.content
 
