@@ -118,6 +118,14 @@ class PortfolioRetriever:
         explicit_projects = list(dict.fromkeys(explicit_projects))
 
         comparison = any(word in query_tokens for word in {"compare", "comparison", "versus", "difference", "different"})
+        project_list_question = any(
+            phrase in query
+            for phrase in ("what projects", "which projects", "projects has", "projects he made", "projects does")
+        )
+        recommendation_question = any(
+            phrase in query
+            for phrase in ("best project", "best for", "strongest project", "most relevant project")
+        )
         recruiter = any(
             phrase in query
             for phrase in ("junior role", "good fit", "qualified", "consider jerome", "strongest", "recruiter")
@@ -141,7 +149,7 @@ class PortfolioRetriever:
             signal_projects = ["cloud-portfolio", "homelab-gitops"]
         if "backend engineering" in query or "backend project" in query:
             signal_projects = ["monikey", "noc-report"]
-        if "strongest devops" in query or "best demonstrates troubleshooting" in query:
+        if "strongest devops" in query or "best devops" in query or "best demonstrates troubleshooting" in query:
             signal_projects = ["cloud-portfolio", "homelab-gitops"]
         if "portfolio" in query and any(term in query for term in ("deployed", "deployment", "cost-conscious")):
             signal_projects = ["cloud-portfolio"]
@@ -178,6 +186,8 @@ class PortfolioRetriever:
             selected_projects = [
                 project for slug in signal_projects for project in self.projects if project.get("slug") == slug
             ]
+        elif project_list_question or recommendation_question:
+            selected_projects = [project for project in self.projects]
         elif comparison and any(term in query for term in ("four", "all projects", "all four")):
             selected_projects = [project for project in self.projects]
         elif comparison:

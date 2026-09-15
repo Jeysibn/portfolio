@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "knowledge_version": "portfolio-3509070582c3a3cb",
-    "content_hash": "3509070582c3a3cb635ef0680fa6d529fa9b65f21e65e33c2da85f79a0b9e850",
+    "knowledge_version": "portfolio-3c5c7d307e0f8886",
+    "content_hash": "3c5c7d307e0f8886605a4252d35f391c6bd511155149b968083be014426b3c70",
     "last_verified": "2026-09-15",
     "purpose": "Canonical approved portfolio content shared by the website and assistant knowledge build.",
     "approved_sources": [
@@ -32,13 +32,13 @@
     {
       "id": "education",
       "label": "Education",
-      "url": "https://jeysibn.github.io/#credentials-title",
+      "url": "https://jeysibn.github.io/#credentials",
       "source_type": "education"
     },
     {
       "id": "certifications",
       "label": "Certifications",
-      "url": "https://jeysibn.github.io/#credentials-title",
+      "url": "https://jeysibn.github.io/#credentials",
       "source_type": "certifications"
     },
     {

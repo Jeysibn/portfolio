@@ -167,8 +167,8 @@ def build_approved_knowledge(content: dict[str, Any]) -> dict[str, Any]:
         "source_catalog": [
             _source("profile", "Portfolio profile", profile["portfolio"], "profile"),
             _source("professional-experience", "Professional experience", f'{profile["portfolio"]}#experience', "experience"),
-            _source("education", "Education", f'{profile["portfolio"]}#credentials-title', "education"),
-            _source("certifications", "Certifications", f'{profile["portfolio"]}#credentials-title', "certifications"),
+            _source("education", "Education", f'{profile["portfolio"]}#credentials', "education"),
+            _source("certifications", "Certifications", f'{profile["portfolio"]}#credentials', "certifications"),
             *[
                 {
                     **project["knowledge"]["source"],

@@ -228,7 +228,7 @@ export function Skills({
 export function Credentials() {
   return (
     <Section
-      id="credentials-title"
+      id="credentials"
       title="Credentials"
       className="credentials-section"
     >
