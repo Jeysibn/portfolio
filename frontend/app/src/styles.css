@@ -28,6 +28,17 @@
   --s4: 2.5rem;
   --s5: 4rem;
   --s6: 7rem;
+  --type-hero: clamp(5.25rem, 8vw, 11rem);
+  --type-section: clamp(3.25rem, 5vw, 5rem);
+  --type-project: clamp(2.75rem, 4vw, 5rem);
+  --type-experience: clamp(2rem, 2.7vw, 3.375rem);
+  --type-credential: clamp(2.8rem, 3.5vw, 4rem);
+  --type-resume: clamp(2.5rem, 3.2vw, 3.5rem);
+  --type-contact: clamp(3rem, 4vw, 4.5rem);
+  --type-email: clamp(1.8rem, 2.2vw, 2.625rem);
+  --type-dialog: clamp(3rem, 4.5vw, 5rem);
+  --space-section: clamp(110px, 6.5vw, 130px);
+  --space-heading: clamp(60px, 4vw, 75px);
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
   --shadow: 0 22px 70px rgba(32, 28, 18, 0.16);
   color-scheme: light;
@@ -216,7 +227,7 @@ a {
   z-index: 20;
   top: 104px;
   bottom: 32px;
-  left: 22px;
+  left: max(22px, calc((100vw - var(--atlas-max)) / 2 - 92px));
   width: 78px;
   pointer-events: none;
 }
@@ -252,7 +263,7 @@ a {
   align-items: center;
   gap: 8px;
   color: var(--muted);
-  font: 500 8px var(--mono);
+  font: 500 10px var(--mono);
   letter-spacing: 0.08em;
   opacity: 0.38;
   transition:
@@ -293,7 +304,7 @@ a {
   grid-column: 2;
   justify-self: end;
   color: var(--signal-text);
-  font: 500 9px var(--mono);
+  font: 500 10px var(--mono);
   letter-spacing: 0.12em;
 }
 .section,
@@ -342,7 +353,7 @@ a {
   grid-template-columns: repeat(12, minmax(0, 1fr));
   grid-template-rows: repeat(3, auto);
   margin: 0;
-  font: 400 clamp(5.25rem, 13vw, 12.25rem)/0.77 var(--display);
+  font: 400 var(--type-hero)/0.77 var(--display);
   letter-spacing: -0.04em;
   text-transform: uppercase;
 }
@@ -366,7 +377,7 @@ a {
   align-items: end;
   border-top: 1px solid var(--ink);
   padding-top: 18px;
-  font-size: 13px;
+  font-size: 15px;
 }
 .hero-foot p {
   margin: 0;
@@ -375,7 +386,7 @@ a {
 }
 .hero-foot a {
   text-transform: uppercase;
-  font: 500 11px var(--mono);
+  font: 500 12px var(--mono);
 }
 .hero-topology {
   position: absolute;
@@ -404,32 +415,19 @@ a {
   stroke: var(--signal);
   opacity: 0.3;
   transform-origin: center;
-  animation: pulse 3s ease-out infinite;
-}
-@keyframes pulse {
-  0%,
-  20% {
-    transform: scale(0.4);
-    opacity: 0.6;
-  }
-  80%,
-  100% {
-    transform: scale(2);
-    opacity: 0;
-  }
 }
 .section {
-  padding: clamp(90px, 12vw, 180px) 0;
+  padding: var(--space-section) 0;
 }
 .section-heading {
   display: grid;
   grid-template-columns: auto 1fr;
   gap: 30px;
   align-items: center;
-  margin-bottom: clamp(48px, 8vw, 110px);
+  margin-bottom: var(--space-heading);
 }
 .section-heading h2 {
-  font: 400 clamp(3.25rem, 6.6vw, 6.25rem)/0.88 var(--display);
+  font: 400 var(--type-section)/0.88 var(--display);
   letter-spacing: -0.03em;
   margin: 0;
   text-transform: uppercase;
@@ -452,7 +450,7 @@ a {
 .principle-list {
   list-style: none;
   padding: 0;
-  margin: 100px 0 0;
+  margin: 72px 0 0;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   border-top: 1px solid var(--ink);
@@ -496,8 +494,8 @@ a {
   background: var(--line);
 }
 .projects-intro {
-  margin-top: -70px;
-  margin-bottom: 80px;
+  margin-top: -42px;
+  margin-bottom: 54px;
   max-width: 38ch;
   color: var(--muted);
   font-size: 14px;
@@ -506,20 +504,20 @@ a {
   display: grid;
   grid-template-columns: 25% 1fr;
   border-top: 1px solid var(--line);
-  padding: 35px 0 70px;
+  padding: 28px 0 52px;
 }
 .experience-list aside {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  font: 500 10px/1.5 var(--mono);
+  font: 500 11px/1.5 var(--mono);
   text-transform: uppercase;
 }
 .experience-list aside span {
   color: var(--signal-text);
 }
 .experience-list h3 {
-  font: 400 clamp(2rem, 3.7vw, 3.8rem)/0.98 var(--display);
+  font: 400 var(--type-experience)/0.98 var(--display);
   margin: 0;
   max-width: 15ch;
 }
@@ -536,7 +534,7 @@ a {
   margin-block: 10px;
 }
 .skills-section {
-  min-height: 110vh;
+  min-height: 0;
 }
 .skills-copy {
   max-width: 48ch;
@@ -545,10 +543,9 @@ a {
   line-height: 1.7;
 }
 .capability-system {
-  --domain-orbit-radius: clamp(280px, 28vw, 355px);
-  --domain-orbit-duration: 96s;
+  --domain-orbit-radius: clamp(220px, 21vw, 280px);
   position: relative;
-  min-height: 900px;
+  min-height: 760px;
   isolation: isolate;
   overflow: visible;
 }
@@ -582,7 +579,7 @@ a {
 }
 .control-plane span,
 .control-plane small {
-  font: 500 8px var(--mono);
+  font: 500 9px var(--mono);
   letter-spacing: 0.12em;
   color: var(--muted);
 }
@@ -594,9 +591,6 @@ a {
   position: absolute;
   inset: 0;
   transform-origin: center;
-}
-.capability-system.is-running:not(.is-paused) .outer-orbit {
-  animation: outer-domain-orbit var(--domain-orbit-duration) linear infinite;
 }
 .domain-orbit-slot {
   --domain-angle: 0deg;
@@ -613,15 +607,6 @@ a {
   width: 1px;
   height: 1px;
   transform: rotate(calc(-1 * var(--domain-angle)));
-}
-.capability-system.is-running:not(.is-paused) .domain-counter-rotation {
-  animation: counter-domain-orbit var(--domain-orbit-duration) linear infinite;
-}
-.capability-system:has(.capability-domain:hover) .outer-orbit,
-.capability-system:has(.capability-domain:focus-within) .outer-orbit,
-.capability-system:has(.capability-domain:hover) .domain-counter-rotation,
-.capability-system:has(.capability-domain:focus-within) .domain-counter-rotation {
-  animation-play-state: paused !important;
 }
 .capability-domain {
   --orbit-radius: 90px;
@@ -672,7 +657,7 @@ a {
 .domain-anchor span,
 .domain-anchor small {
   display: block;
-  font: 500 7px var(--mono);
+  font: 500 9px var(--mono);
   letter-spacing: 0.08em;
   color: var(--muted);
 }
@@ -706,14 +691,6 @@ a {
   transform: rotate(var(--orbit-angle)) translateX(var(--orbit-radius));
   transform-origin: 0 0;
 }
-.capability-system.is-running:not(.is-paused) .orbiting-skills {
-  animation: orbit-layer var(--orbit-duration) linear infinite
-    var(--orbit-direction);
-}
-.capability-domain:hover .orbiting-skills,
-.capability-domain:focus-within .orbiting-skills {
-  animation-play-state: paused !important;
-}
 .skill-orbit:hover,
 .skill-orbit:focus-within {
   z-index: 12;
@@ -732,14 +709,6 @@ a {
   transition:
     transform 180ms var(--ease),
     color 180ms;
-}
-.capability-system.is-running:not(.is-paused) .orbit-skill {
-  animation: counter-orbit-layer var(--orbit-duration) linear infinite
-    var(--orbit-direction);
-}
-.capability-domain:hover .orbit-skill,
-.capability-domain:focus-within .orbit-skill {
-  animation-play-state: paused !important;
 }
 .skill-orbit:hover .orbit-skill,
 .skill-orbit:focus-within .orbit-skill {
@@ -803,38 +772,6 @@ a {
   border-color: var(--signal);
   opacity: 1;
 }
-@keyframes orbit-layer {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-@keyframes counter-orbit-layer {
-  from {
-    transform: rotate(calc(-1 * var(--orbit-angle)));
-  }
-  to {
-    transform: rotate(calc(-1 * (var(--orbit-angle) + 360deg)));
-  }
-}
-@keyframes outer-domain-orbit {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-@keyframes counter-domain-orbit {
-  from {
-    transform: rotate(calc(-1 * var(--domain-angle)));
-  }
-  to {
-    transform: rotate(calc(-1 * (var(--domain-angle) + 360deg)));
-  }
-}
 .credentials-section {
   background: var(--surface-raised);
   width: 100%;
@@ -846,7 +783,7 @@ a {
   gap: 10vw;
 }
 .credential-layout article h3 {
-  font: 400 clamp(2.8rem, 5vw, 5.2rem)/0.95 var(--display);
+  font: 400 var(--type-credential)/0.95 var(--display);
   margin: 0 0 25px;
 }
 .credential-layout time,
@@ -884,7 +821,7 @@ a {
   display: block;
   margin-top: 7px;
   color: var(--signal-text);
-  font: 600 9px var(--mono);
+  font: 600 10px var(--mono);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -896,7 +833,7 @@ a {
   padding: 50px 0;
 }
 .resume-band h3 {
-  font: 400 clamp(2.5rem, 5vw, 5.5rem)/0.92 var(--display);
+  font: 400 var(--type-resume)/0.92 var(--display);
   margin: 0;
 }
 .resume-band p {
@@ -970,7 +907,7 @@ a {
 .contact-intent h3 {
   max-width: 10ch;
   margin: 28px 0 30px;
-  font: 400 clamp(3.2rem, 7vw, 7.5rem)/0.84 var(--display);
+  font: 400 var(--type-contact)/0.88 var(--display);
   letter-spacing: -0.04em;
 }
 .contact-intent > p:not(.contact-kicker):not(.contact-availability) {
@@ -1005,7 +942,7 @@ a {
 .contact-email {
   display: inline-block;
   margin: 25px 0 28px;
-  font: italic 400 clamp(1.8rem, 3.8vw, 3.8rem)/0.95 var(--display);
+  font: italic 400 var(--type-email)/0.95 var(--display);
   letter-spacing: -0.03em;
   text-decoration-thickness: 2px;
 }
@@ -1088,7 +1025,7 @@ body:has(.inspection-dialog[open]) {
   color: var(--signal);
 }
 .inspection-dialog h2 {
-  font: 400 clamp(3rem, 7vw, 7rem)/0.85 var(--display);
+  font: 400 var(--type-dialog)/0.85 var(--display);
   margin: 0;
 }
 .inspection-dialog header button {
@@ -1251,9 +1188,9 @@ body:has(.inspection-dialog[open]) {
 .portfolio-assistant-trigger {
   border: 1px solid var(--ink);
   background: var(--paper);
-  padding: 13px 18px;
-  box-shadow: var(--shadow);
-  font: 600 11px var(--mono);
+  padding: 11px 15px;
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--ink) 14%, transparent);
+  font: 600 10px var(--mono);
   text-transform: uppercase;
   cursor: pointer;
 }
@@ -1517,9 +1454,7 @@ body:has(.inspection-dialog[open]) {
   }
   .outer-orbit,
   .domain-orbit-slot,
-  .domain-counter-rotation,
-  .capability-system.is-running:not(.is-paused) .outer-orbit,
-  .capability-system.is-running:not(.is-paused) .domain-counter-rotation {
+  .domain-counter-rotation {
     display: contents;
     position: static;
     width: auto;
@@ -1554,8 +1489,7 @@ body:has(.inspection-dialog[open]) {
     gap: 14px 8px;
     margin-top: 20px;
   }
-  .orbiting-skills,
-  .capability-system.is-running:not(.is-paused) .orbiting-skills {
+  .orbiting-skills {
     animation: none;
   }
   .skill-orbit {
@@ -1564,8 +1498,7 @@ body:has(.inspection-dialog[open]) {
     height: auto;
     transform: none;
   }
-  .orbit-skill,
-  .capability-system.is-running:not(.is-paused) .orbit-skill {
+  .orbit-skill {
     position: relative;
     inset: auto;
     width: 100%;
@@ -1630,7 +1563,7 @@ body:has(.inspection-dialog[open]) {
     padding-top: 92px;
   }
   .hero-name {
-    font-size: clamp(4.5rem, 20vw, 10rem);
+    font-size: clamp(4.5rem, 15vw, 8rem);
   }
   .hero-name span:nth-child(2) {
     grid-column: 2 / span 6;
@@ -1693,6 +1626,7 @@ body:has(.inspection-dialog[open]) {
   .hero-foot {
     grid-template-columns: 1fr;
     gap: 14px;
+    font-size: 14px;
   }
   .hero-foot a {
     grid-column: 1;
@@ -1834,10 +1768,6 @@ body:has(.inspection-dialog[open]) {
   .hero-topology .pulse {
     animation: none;
   }
-  .outer-orbit,
-  .domain-counter-rotation,
-  .orbiting-skills,
-  .orbit-skill,
   .inspection-dialog[open] {
     animation: none !important;
   }
@@ -1859,6 +1789,7 @@ body:has(.inspection-dialog[open]) {
     display: none;
   }
 }
+
 @media print {
   body > *:not(#root) {
     display: none;
@@ -1932,8 +1863,8 @@ body:has(.inspection-dialog[open]) {
 
 .system-deck-stage {
   position: relative;
-  min-height: 730px;
-  padding-top: 110px;
+  min-height: 620px;
+  padding-top: 84px;
   touch-action: pan-y;
   outline: none;
 }
@@ -1945,10 +1876,10 @@ body:has(.inspection-dialog[open]) {
 
 .system-dossier {
   position: absolute;
-  top: 110px;
+  top: 84px;
   right: 0;
   left: 0;
-  min-height: 560px;
+  min-height: 500px;
   overflow: hidden;
   border: 1px solid var(--ink);
   background: var(--surface-raised);
@@ -1981,9 +1912,9 @@ body:has(.inspection-dialog[open]) {
 
 .system-dossier-content {
   display: grid;
-  gap: clamp(20px, 2.5vw, 34px);
-  min-height: 560px;
-  padding: clamp(26px, 3.5vw, 48px);
+  gap: clamp(20px, 2.5vw, 28px);
+  min-height: 500px;
+  padding: clamp(26px, 3vw, 40px);
 }
 
 .system-dossier-header {
@@ -2016,7 +1947,7 @@ body:has(.inspection-dialog[open]) {
 .system-dossier h3 {
   max-width: 11ch;
   margin: 0;
-  font: 400 clamp(2.9rem, 5vw, 5rem)/0.88 var(--display);
+  font: 400 var(--type-project)/0.88 var(--display);
   letter-spacing: -0.035em;
   text-wrap: balance;
 }
@@ -2157,6 +2088,26 @@ body:has(.inspection-dialog[open]) {
   text-decoration: none;
 }
 
+.system-dossier-title-row {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.system-dossier-case-study {
+  flex: 0 0 auto;
+  border: 0;
+  border-bottom: 1px solid currentColor;
+  background: none;
+  padding: 6px 0;
+  color: var(--signal-text);
+  cursor: pointer;
+  font: 500 10px var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .system-dossier-footer button {
   margin-left: auto;
   color: var(--signal-text);
@@ -2262,15 +2213,15 @@ body:has(.inspection-dialog[open]) {
   }
 
   .system-deck-stage {
-    min-height: 700px;
+    min-height: 640px;
   }
 
   .system-dossier {
-    min-height: 540px;
+    min-height: 500px;
   }
 
   .system-dossier-content {
-    min-height: 540px;
+    min-height: 500px;
   }
 
   .system-dossier-body {
@@ -2280,17 +2231,17 @@ body:has(.inspection-dialog[open]) {
 
 @media (max-width: 600px) {
   .system-deck-stage {
-    min-height: 720px;
-    padding-top: 86px;
+    min-height: 680px;
+    padding-top: 76px;
   }
 
   .system-dossier {
-    top: 86px;
-    min-height: 560px;
+    top: 76px;
+    min-height: 520px;
   }
 
   .system-dossier-content {
-    min-height: 560px;
+    min-height: 520px;
     gap: 20px;
     padding: 22px 18px 26px;
   }
@@ -2310,6 +2261,15 @@ body:has(.inspection-dialog[open]) {
   .system-dossier h3 {
     max-width: 9ch;
     font-size: clamp(2.55rem, 14vw, 4rem);
+  }
+
+  .system-dossier-title-row {
+    display: grid;
+    gap: 16px;
+  }
+
+  .system-dossier-case-study {
+    justify-self: start;
   }
 
   .system-dossier-summary {
@@ -2472,5 +2432,42 @@ a {
   }
   .architecture-diagram-frame img {
     min-width: 680px;
+  }
+}
+
+@media (min-width: 1200px) and (max-height: 1150px) {
+  :root {
+    --type-hero: clamp(5.25rem, 7.5vw, 9.5rem);
+    --space-section: 110px;
+    --space-heading: 64px;
+  }
+
+  .hero {
+    padding-top: 92px;
+    padding-bottom: 28px;
+  }
+
+  .projects-section {
+    padding-block: 80px;
+  }
+
+  .system-deck-stage {
+    min-height: 580px;
+    padding-top: 76px;
+  }
+
+  .system-dossier {
+    top: 76px;
+    min-height: 480px;
+  }
+
+  .system-dossier-content {
+    min-height: 480px;
+    gap: 22px;
+    padding: 32px;
+  }
+
+  .capability-system {
+    min-height: 720px;
   }
 }

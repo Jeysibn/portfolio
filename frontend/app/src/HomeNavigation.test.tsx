@@ -24,4 +24,11 @@ describe("home navigation", () => {
     expect(document.querySelectorAll("#top")).toHaveLength(1);
     expect(document.querySelector("#top")).toHaveClass("hero");
   });
+
+  it("keeps conventional capability and credential navigation targets", () => {
+    render(<SiteHeader activeSection="" theme="light" onTheme={vi.fn()} />);
+
+    expect(screen.getByRole("link", { name: "Capabilities" })).toHaveAttribute("href", "#skills");
+    expect(screen.getByRole("link", { name: "Credentials" })).toHaveAttribute("href", "#credentials");
+  });
 });

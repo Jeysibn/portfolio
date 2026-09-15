@@ -10,6 +10,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and 
 
 ### Added
 
+- **Visual restraint pass**: Added height-aware desktop density, a more compact project case-study entry point, clearer conventional section headings, and a static large-screen capability topology so the engineering evidence scans more comfortably at 1920×1080.
+
 - **System Handoff contact path**: Added a recruiter-focused, form-less final section with canonical email actions, accessible Copy email feedback, availability context, and secondary LinkedIn, resume, and GitHub links.
 - **Canonical assistant knowledge**: Added `content/portfolio.json` as the shared source for visible portfolio facts and generated an explicit allow-listed `backend/data/approved_knowledge.json` projection covering Cloud-Backed Portfolio, Homelab GitOps Environment, MoniKey, and NOC Report Builder.
 - **Lightweight retrieval and provenance**: Added deterministic project/technology retrieval, knowledge hashing, prompt hashing, curated source metadata, usage metadata, and 49 offline assistant evaluation cases.
@@ -24,6 +26,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and 
 - **Certification-state AI guardrail**: Added structured `certifications_in_progress` knowledge, recruiter-facing FAQ coverage, and tests so the portfolio assistant can discuss the Terraform Associate study accurately without presenting it as an earned certification.
 
 ### Changed
+
+- **Frontend visual hierarchy**: Reduced display scale and ordinary section spacing, raised selected technical labels for readability, removed generic section-entry drift, and reduced assistant trigger weight while preserving the signal lifecycle and editorial light/dark system.
 
 - **Contact hierarchy**: Shifted the dominant Contact statement from the raw email address to working-together intent while preserving the existing editorial system handoff language and relative `#top` wordmark navigation.
 - **Assistant grounding**: Reworked the behavior prompt, project boundaries, missing-fact handling, prompt-injection resistance, and restrained formatting policy.

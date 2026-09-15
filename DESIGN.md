@@ -33,7 +33,7 @@ spacing:
   md: "1.5rem"
   lg: "2.5rem"
   xl: "4rem"
-  section: "clamp(90px, 12vw, 180px)"
+  section: "clamp(110px, 6.5vw, 130px)"
 components:
   button-primary:
     backgroundColor: "{colors.ink}"
@@ -61,7 +61,9 @@ Bodoni Moda carries identity and chapter scale; Manrope carries readable detail;
 
 ## Layout
 
-Content uses a fluid maximum-width atlas with strongly asymmetric offsets. Projects are represented as stacked system dossiers rather than generic cards. The active dossier becomes the current inspection plane while background dossiers retain visible technical identity. The capability map is an orbital control plane on large screens and becomes a complete static grouped system on tablets and phones. At 900px, wide structures collapse; at 600px, the narrative becomes a vertical stack, architecture becomes a two-column sequence, and interactive topology becomes a one-column domain list.
+Content uses a fluid maximum-width atlas with strongly asymmetric offsets. Projects are represented as stacked system dossiers rather than generic cards. The active dossier becomes the current inspection plane while background dossiers retain visible technical identity. The capability map remains a topology-inspired control plane, but its large-screen relationships are static so interaction—not perpetual orbiting—provides the evidence path. At 900px, wide structures collapse; at 600px, the narrative becomes a vertical stack, architecture becomes a two-column sequence, and interactive topology becomes a one-column domain list.
+
+Desktop density is height-aware as well as width-aware. On wide displays with limited vertical space, display type, section padding, and project dossier geometry use a compact treatment so a 1920×1080 workstation remains scanable. One-time hero, signal, and dialog transitions remain; decorative continuous motion is not required to understand the system.
 
 ## Elevation & Depth
 

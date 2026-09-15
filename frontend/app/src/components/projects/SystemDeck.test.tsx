@@ -47,6 +47,8 @@ describe("system deck", () => {
     ).toBe(true);
 
     expect(screen.getByRole("heading", { name: "Cloud-Backed Portfolio" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /Open case study/ }));
+    expect(onInspect).toHaveBeenCalledWith(projects[0]);
     const selector = screen.getByRole("navigation", { name: "System selector" });
     expect(within(selector).getAllByRole("button", { name: /Select system/ })).toHaveLength(4);
 

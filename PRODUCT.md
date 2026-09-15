@@ -53,6 +53,7 @@ The experience is a single-page portfolio deployed at `jeysibn.github.io`. Recru
 - Use motion to explain relationships and system state, never to gate facts.
 - Treat performance, accessibility, and graceful degradation as part of the portfolio's engineering message.
 - Preserve one factual source of truth for portfolio content.
+- Keep the recruiter scan path dense and readable on 1920×1080 displays: use height-aware desktop density, restrained display type, and motion that explains system state rather than decorating every section.
 
 ## Accessibility & Inclusion
 

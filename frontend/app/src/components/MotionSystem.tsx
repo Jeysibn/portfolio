@@ -7,19 +7,6 @@ export function MotionDirector() {
   useEffect(() => {
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     document.documentElement.classList.add("motion-enabled");
-    const capabilityMap =
-      document.querySelector<HTMLElement>(".capability-system");
-    const mapObserver = capabilityMap
-      ? new IntersectionObserver(
-          ([entry]) =>
-            capabilityMap.classList.toggle("is-running", entry.isIntersecting),
-          { rootMargin: "15% 0px" },
-        )
-      : null;
-    if (capabilityMap && mapObserver) mapObserver.observe(capabilityMap);
-    const handleVisibility = () =>
-      capabilityMap?.classList.toggle("is-paused", document.hidden);
-    document.addEventListener("visibilitychange", handleVisibility);
     const context = gsap.context(() => {
       gsap.from(".hero-name span", {
         yPercent: 115,
@@ -49,15 +36,6 @@ export function MotionDirector() {
           duration: 0.9,
           ease: "expo.out",
           scrollTrigger: { trigger: el, start: "top 92%", once: true },
-        }),
-      );
-      gsap.utils.toArray<HTMLElement>("[data-resolve]").forEach((el, index) =>
-        gsap.from(el, {
-          x: index % 2 ? 24 : -24,
-          duration: 0.9,
-          ease: "expo.out",
-          immediateRender: false,
-          scrollTrigger: { trigger: el, start: "top 90%", once: true },
         }),
       );
       gsap.to(".signal-progress", {
@@ -92,8 +70,6 @@ export function MotionDirector() {
     document.fonts?.ready.then(() => ScrollTrigger.refresh());
     return () => {
       context.revert();
-      mapObserver?.disconnect();
-      document.removeEventListener("visibilitychange", handleVisibility);
       document.documentElement.classList.remove("motion-enabled");
     };
   }, []);
