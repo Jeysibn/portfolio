@@ -13,7 +13,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and 
 - **Canonical assistant knowledge**: Added `content/portfolio.json` as the shared source for visible portfolio facts and generated an explicit allow-listed `backend/data/approved_knowledge.json` projection covering Cloud-Backed Portfolio, Homelab GitOps Environment, MoniKey, and NOC Report Builder.
 - **Lightweight retrieval and provenance**: Added deterministic project/technology retrieval, knowledge hashing, prompt hashing, curated source metadata, usage metadata, and 49 offline assistant evaluation cases.
 - **Assistant UX**: Added visitor-controlled suggestion chips, source links, reset behavior, accessible loading/error states, and accurate hourly quota wording.
-
+- **Cursor-following ambient glow**: Added a subtle, theme-aware viewport glow that tracks fine-pointer movement without intercepting interactions and disables for touch devices or reduced-motion preferences.
 - **Dedicated GitHub Pages deployment repository**: Frontend production publishing now targets `Jeysibn/jeysibn.github.io`, allowing the portfolio to use the root URL `https://jeysibn.github.io/` while keeping application source and CI/CD in `Jeysibn/portfolio`.
 - **Pages publish credential**: Added the `PAGES_DEPLOY_TOKEN` workflow secret boundary for authenticated checkout/push to the dedicated Pages repository.
 - **Optimized architecture previews**: Project cards and normal project-detail views now request resized WebP previews instead of immediately downloading the original multi-megabyte PNG diagrams.
