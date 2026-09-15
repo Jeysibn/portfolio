@@ -1,23 +1,20 @@
 @import "tailwindcss";
 :root {
-  --paper: #eee9de;
+  --surface-page: #eee9de;
+  --surface-section: #e7e1d5;
+  --surface-raised: #ded8ca;
+  --surface-overlay: #f8f4eb;
+  --surface-technical-sheet: #eee9de;
+  --text-technical-sheet: #171912;
+  --rule-technical-sheet: #766f62;
+  --paper: var(--surface-page);
   --ink: #171912;
   --muted: #5b5b50;
-  --panel: #ded8ca;
   --line: rgba(23, 25, 18, 0.22);
   --signal: #e0522d;
   --signal-text: #a93618;
-  --signal2: #275d57;
-  --white: #fffdf7;
+  --accent-petrol: #275d57;
   --danger: #a02e25;
-  --system-bg: #171912;
-  --system-fg: #f3eee3;
-  --system-muted: #c9c4b8;
-  --system-signal: #ff8668;
-  --petrol: #275d57;
-  --petrol-fg: #fffdf7;
-  --petrol-muted: #d5e0db;
-  --petrol-signal: #ffc1ae;
   --display: "Bodoni Moda", Georgia, serif;
   --body: "Manrope", Arial, sans-serif;
   --mono: "IBM Plex Mono", monospace;
@@ -35,15 +32,20 @@
   text-rendering: optimizeLegibility;
 }
 :root[data-theme="dark"] {
-  --paper: #10130f;
+  --surface-page: #10130f;
+  --surface-section: #171b15;
+  --surface-raised: #1b1f19;
+  --surface-overlay: #20251e;
+  --surface-technical-sheet: #eee9de;
+  --text-technical-sheet: #171912;
+  --rule-technical-sheet: #766f62;
+  --paper: var(--surface-page);
   --ink: #e8e6da;
   --muted: #a2a397;
-  --panel: #1b1f19;
   --line: rgba(232, 230, 218, 0.2);
   --signal: #ff6841;
   --signal-text: #ff9a7d;
-  --signal2: #79a69c;
-  --white: #242920;
+  --accent-petrol: #79a69c;
   --danger: #ff8e83;
   --shadow: 0 24px 80px rgba(0, 0, 0, 0.42);
   color-scheme: dark;
@@ -53,13 +55,13 @@
 }
 html {
   scroll-behavior: smooth;
-  background: var(--paper);
+  background: var(--surface-page);
   scrollbar-gutter: stable;
 }
 body {
   margin: 0;
   min-width: 320px;
-  background: var(--paper);
+  background: var(--surface-page);
   color: var(--ink);
   transition:
     background 0.35s,
@@ -94,7 +96,7 @@ a {
   background: var(--paper);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--signal2);
+  background: var(--accent-petrol);
   border: 3px solid var(--paper);
 }
 .skip-link {
@@ -120,7 +122,7 @@ a {
   align-items: center;
   padding: 0 clamp(20px, 4vw, 72px);
   border-bottom: 1px solid var(--line);
-  background: color-mix(in srgb, var(--paper) 90%, transparent);
+  background: color-mix(in srgb, var(--surface-page) 90%, transparent);
   backdrop-filter: blur(12px);
 }
 .wordmark {
@@ -359,7 +361,7 @@ a {
 }
 .hero-topology path {
   fill: none;
-  stroke: var(--signal2);
+  stroke: var(--accent-petrol);
   stroke-width: 1.2;
   stroke-dasharray: 700;
 }
@@ -440,7 +442,7 @@ a {
 }
 .projects-section .project-case header > span,
 .projects-section .architecture-node > span {
-  color: var(--system-signal);
+  color: var(--signal-text);
 }
 .experience-list aside span,
 .credential-layout li span {
@@ -459,17 +461,17 @@ a {
 .projects-section {
   width: 100%;
   padding-inline: clamp(20px, 4vw, 72px);
-  background: var(--system-bg);
-  color: var(--system-fg);
+  background: var(--surface-section);
+  color: var(--ink);
   overflow: hidden;
 }
 .projects-section .section-rule {
-  background: color-mix(in srgb, var(--system-fg) 24%, transparent);
+  background: var(--line);
 }
 .projects-intro {
   margin: -70px 0 80px auto;
   max-width: 38ch;
-  color: var(--system-muted);
+  color: var(--muted);
   font-size: 14px;
 }
 .projects-rail {
@@ -481,11 +483,10 @@ a {
   align-content: center;
   gap: 55px;
   padding: clamp(45px, 7vw, 95px);
-  border-top: 1px solid color-mix(in srgb, var(--system-fg) 25%, transparent);
+  border-top: 1px solid var(--line);
 }
 .project-case:nth-child(2) {
-  background: color-mix(in srgb, var(--system-bg) 91%, var(--petrol));
-  color: var(--system-fg);
+  border-top-color: color-mix(in srgb, var(--accent-petrol) 60%, var(--line));
 }
 .project-case header {
   display: grid;
@@ -524,7 +525,7 @@ a {
   grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 18px;
-  color: var(--system-muted);
+  color: var(--muted);
   font: 500 9px var(--mono);
   letter-spacing: 0.12em;
 }
@@ -534,7 +535,7 @@ a {
 }
 .architecture-flow > p {
   margin: 0 0 12px;
-  color: var(--system-muted);
+  color: var(--muted);
   font: 500 10px var(--mono);
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -559,9 +560,9 @@ a {
   background: color-mix(in srgb, currentColor 34%, transparent);
 }
 .architecture-signal {
-  background: var(--system-signal);
+  background: var(--signal);
   transform: scaleX(0);
-  box-shadow: 0 0 12px color-mix(in srgb, var(--system-signal) 42%, transparent);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--signal) 42%, transparent);
 }
 .architecture-node {
   z-index: 1;
@@ -570,7 +571,7 @@ a {
   position: relative;
   border-right: 1px solid color-mix(in srgb, currentColor 45%, transparent);
   background: inherit;
-  color: var(--system-muted);
+  color: var(--muted);
   opacity: 1;
   transform: scale(0.94);
   transform-origin: center;
@@ -594,27 +595,27 @@ a {
   left: calc(50% - 4px);
   width: 8px;
   height: 8px;
-  background: var(--system-bg);
+  background: var(--surface-section);
   border: 1px solid currentColor;
   transform: rotate(45deg);
 }
 .project-case:nth-child(2) .architecture-node::after {
-  background: color-mix(in srgb, var(--system-bg) 91%, var(--petrol));
+  background: var(--surface-section);
 }
 .project-case:nth-child(2) .architecture-node > span,
 .project-case:nth-child(2) .architecture-flow > p {
-  color: var(--petrol-signal);
+  color: var(--accent-petrol);
 }
 .project-case:nth-child(2) .architecture-node,
 .project-case:nth-child(2) .architecture-status {
-  color: var(--petrol-muted);
+  color: var(--accent-petrol);
 }
 .project-case:nth-child(2) .architecture-signal {
-  background: var(--petrol-signal);
-  box-shadow: 0 0 12px color-mix(in srgb, var(--petrol-signal) 42%, transparent);
+  background: var(--accent-petrol);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--accent-petrol) 42%, transparent);
 }
 .project-case:nth-child(2) :focus-visible {
-  outline-color: var(--petrol-signal);
+  outline-color: var(--accent-petrol);
 }
 .architecture-flow[data-flow="0"] .architecture-track {
   --node-count: 6;
@@ -683,7 +684,7 @@ a {
   max-width: 15ch;
 }
 .experience-list .org {
-  color: var(--signal2);
+  color: var(--accent-petrol);
   font-weight: 700;
 }
 .experience-list article > div > p,
@@ -995,7 +996,7 @@ a {
   }
 }
 .credentials-section {
-  background: var(--panel);
+  background: var(--surface-raised);
   width: 100%;
   padding-inline: clamp(20px, 7vw, 120px);
 }
@@ -1144,7 +1145,7 @@ a {
   overflow: auto;
   border: 0;
   padding: 0;
-  background: var(--paper);
+  background: var(--surface-overlay);
   color: var(--ink);
   box-shadow: var(--shadow);
   opacity: 0;
@@ -1241,18 +1242,18 @@ body:has(.inspection-dialog[open]) {
 .architecture-diagram-frame {
   position: relative;
   overflow-x: auto;
-  border: 1px solid color-mix(in srgb, #171912 28%, transparent);
-  background: #eee9de;
-  color: #171912;
+  border: 1px solid color-mix(in srgb, var(--rule-technical-sheet) 55%, transparent);
+  background: var(--surface-technical-sheet);
+  color: var(--text-technical-sheet);
   padding: 12px;
-  scrollbar-color: #766f62 #ded8ca;
-  box-shadow: inset 0 0 0 5px #eee9de;
+  scrollbar-color: var(--rule-technical-sheet) var(--surface-technical-sheet);
+  box-shadow: inset 0 0 0 5px var(--surface-technical-sheet);
 }
 .architecture-diagram-frame::before,
 .architecture-diagram-frame::after {
   position: absolute;
   z-index: 1;
-  color: #766f62;
+  color: var(--rule-technical-sheet);
   font: 500 8px var(--mono);
   letter-spacing: 0.12em;
   pointer-events: none;
@@ -1362,7 +1363,7 @@ body:has(.inspection-dialog[open]) {
   bottom: 55px;
   width: min(420px, calc(100vw - 32px));
   height: min(650px, calc(100vh - 130px));
-  background: var(--paper);
+  background: var(--surface-overlay);
   border: 1px solid var(--ink);
   box-shadow: var(--shadow);
   display: grid;
@@ -1915,10 +1916,10 @@ a {
   overflow: clip;
 }
 .projects-section > .section-heading .chapter-signal {
-  color: var(--system-signal);
+  color: var(--signal-text);
 }
 .project-case:nth-child(2) header > span {
-  color: var(--petrol-signal);
+  color: var(--accent-petrol);
 }
 .contact-email {
   max-width: 100%;
