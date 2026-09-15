@@ -3,7 +3,28 @@ import type { FormEvent } from "react";
 import { fetchVisitorCount, sendChatMessage } from "../api";
 import type { ChatMessage } from "../portfolio";
 const KEY = "jeysibn_chat_history";
+const SESSION_KEY = "jeysibn_chat_session";
 type UiMessage = ChatMessage & { error?: boolean };
+
+function loadChatSessionId(): string {
+  const valid = (value: string | null): value is string =>
+    Boolean(value && /^[A-Za-z0-9._:-]{1,128}$/.test(value));
+
+  try {
+    const existing = sessionStorage.getItem(SESSION_KEY);
+    if (valid(existing)) return existing;
+
+    const generated =
+      typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+        ? crypto.randomUUID()
+        : `browser-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    sessionStorage.setItem(SESSION_KEY, generated);
+    return generated;
+  } catch {
+    return `browser-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  }
+}
+
 function load(): UiMessage[] {
   try {
     const value = JSON.parse(sessionStorage.getItem(KEY) || "[]") as unknown;
@@ -52,6 +73,7 @@ export function PortfolioAssistant() {
   const [value, setValue] = useState("");
   const [sending, setSending] = useState(false);
   const end = useRef<HTMLDivElement>(null);
+  const chatSessionId = useRef(loadChatSessionId()).current;
   useEffect(() => {
     sessionStorage.setItem(
       KEY,
@@ -70,7 +92,11 @@ export function PortfolioAssistant() {
     setValue("");
     setSending(true);
     try {
-      const reply = await sendChatMessage(text, previousHistory.slice(-8));
+      const reply = await sendChatMessage(
+        text,
+        previousHistory.slice(-8),
+        chatSessionId,
+      );
       setMessages([...nextMessages, { role: "assistant", content: reply }]);
     } catch (err) {
       setMessages([
@@ -90,19 +116,23 @@ export function PortfolioAssistant() {
   }
   return (
     <aside
-      className={open ? "assistant is-open" : "assistant"}
+      className={open ? "portfolio-assistant is-open" : "portfolio-assistant"}
       aria-label="Ask this portfolio"
     >
       <button
-        className="assistant-trigger"
+        className="portfolio-assistant-trigger"
         type="button"
         aria-expanded={open}
-        aria-controls="assistant-panel"
+        aria-controls="portfolio-assistant-panel"
         onClick={() => setOpen(!open)}
       >
         <span aria-hidden="true">?</span> Ask this portfolio
       </button>
-      <div id="assistant-panel" className="assistant-panel" hidden={!open}>
+      <div
+        id="portfolio-assistant-panel"
+        className="portfolio-assistant-panel"
+        hidden={!open}
+      >
         <header>
           <div>
             <small>Contextual inspection</small>

@@ -111,7 +111,7 @@ export function MotionDirector() {
             {
               opacity: 1,
               scale: 1,
-              color: "var(--system-fg)",
+              color: "var(--ink)",
               duration: 0.18,
               ease: "power2.out",
             },

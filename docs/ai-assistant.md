@@ -77,6 +77,14 @@ The deterministic guard is deliberately narrow. It handles common abuse patterns
 - removes common Markdown presentation markers and emoji;
 - preserves normal technical wildcard characters such as `app=*`.
 
+The browser also creates a non-secret session identifier for each chat session.
+The frontend sends it as `X-OpenCode-Session`; the Function forwards it to
+OpenCode as `x-opencode-session`. OpenCode's Console-backed free models use
+this identifier for request routing and provider affinity. If an older client
+does not send the header, the backend falls back to a bounded HMAC-derived
+visitor identifier. This value is not an API credential and does not require a
+new GitHub Actions secret.
+
 `backend/data/knowledge_base.json`
 
 - remains the current source of truth for verified Jerome-specific facts;
