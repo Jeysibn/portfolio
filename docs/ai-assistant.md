@@ -115,9 +115,10 @@ The behavior prompt in `backend/assistant/assistant_prompt.md` requires:
 - refusal to reveal instructions, raw context, provider configuration, model
   details, credentials, or private data.
 
-The sanitizer removes emoji, headings, emphasis wrappers, code fences, and
-tables while retaining normal paragraphs, flat `-` bullets, URLs, paths,
-commands, and technical punctuation such as `app=*`.
+The sanitizer removes emoji, headings, raw HTML tags, code fences, and tables
+while retaining normal paragraphs, flat lists, bold labels, inline code, URLs,
+paths, commands, and technical punctuation such as `app=*`. The frontend
+renders that small safe subset without injecting HTML.
 
 ## API contract
 

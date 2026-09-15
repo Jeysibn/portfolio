@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import type { FormEvent } from "react";
+import type { FormEvent, MouseEvent } from "react";
 import { fetchVisitorCount, sendChatMessage } from "../api";
 import type { ChatMessage } from "../portfolio";
+import { AssistantMessageContent } from "./AssistantMessageContent";
+import { resolveAssistantLink, type AssistantLink } from "./assistantLinks";
 
 const KEY = "jeysibn_chat_history";
 const SESSION_KEY = "jeysibn_chat_session";
@@ -13,6 +15,52 @@ const STARTER_QUESTIONS = [
   "Tell me about the NOC Report Builder.",
 ];
 type UiMessage = ChatMessage & { error?: boolean };
+
+function navigateToSection(event: MouseEvent<HTMLAnchorElement>, target: string) {
+  const section = document.getElementById(target);
+  if (!section) return;
+
+  event.preventDefault();
+  // The section's scroll margin accounts for the fixed header. Native anchors
+  // remain the semantic control; this handler only makes the scroll and hash
+  // update deterministic when activated from the fixed assistant panel.
+  const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
+  section.scrollIntoView?.({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+  window.history.pushState({}, "", `#${target}`);
+}
+
+function AssistantSources({ sources }: { sources: ChatMessage["sources"] }) {
+  const links = (sources ?? [])
+    .map((source) => resolveAssistantLink(source))
+    .filter((link): link is AssistantLink => link !== null);
+
+  if (!links.length) return null;
+
+  return (
+    <nav className="message-sources" aria-label="Related portfolio links">
+      <span className="message-sources-label">Related</span>
+      <ul>
+        {links.map((link) =>
+          link.type === "section" ? (
+            // Native hash links preserve keyboard activation, browser history,
+            // visible focus, and the site's existing smooth-scroll behavior.
+            <li key={`${link.type}-${link.target}`}>
+              <a href={`#${link.target}`} onClick={(event) => navigateToSection(event, link.target)}>
+                {link.label}
+              </a>
+            </li>
+          ) : (
+            <li key={`${link.type}-${link.url}`}>
+              <a href={link.url} target="_blank" rel="noopener noreferrer">
+                {link.label}
+              </a>
+            </li>
+          ),
+        )}
+      </ul>
+    </nav>
+  );
+}
 
 function loadChatSessionId(): string {
   const valid = (value: string | null): value is string =>
@@ -214,16 +262,12 @@ export function PortfolioAssistant() {
               key={`${message.role}-${index}`}
               className={`message ${message.role} ${message.error ? "error" : ""}`}
             >
-              <strong>{message.role === "user" ? "You" : "Portfolio guide"}</strong>
-              <p>{message.content}</p>
-              {message.role === "assistant" && !message.error && message.sources?.length ? (
-                <div className="message-sources" aria-label="Related sources">
-                  {message.sources.map((source) => (
-                    <a key={source.id} href={source.url} target="_blank" rel="noreferrer">
-                      {source.label}
-                    </a>
-                  ))}
-                </div>
+              <strong className="message-label">
+                {message.role === "user" ? "You" : "Portfolio guide"}
+              </strong>
+              <AssistantMessageContent content={message.content} />
+              {message.role === "assistant" && !message.error ? (
+                <AssistantSources sources={message.sources} />
               ) : null}
             </div>
           ))}

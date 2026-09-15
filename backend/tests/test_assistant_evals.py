@@ -12,7 +12,7 @@ def test_assistant_eval_dataset_is_large_and_structured():
     categories = {case["category"] for case in cases}
 
     assert len(cases) >= 40
-    assert {"MoniKey", "NOC Report Builder", "prompt injection", "follow-up"} <= categories
+    assert {"MoniKey", "NOC Report Builder", "prompt injection", "follow-up", "readability"} <= categories
 
 
 def test_offline_retrieval_evaluations_pass():

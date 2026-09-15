@@ -27,9 +27,18 @@ describe("portfolio assistant", () => {
   });
 
   it("renders sources and usage returned by the API", async () => {
+    const experienceSection = document.createElement("section");
+    experienceSection.id = "experience";
+    document.body.appendChild(experienceSection);
     mocks.sendChatMessage.mockResolvedValue({
-      reply: "MoniKey uses PostgreSQL-backed durable jobs.",
-      sources: [{ id: "project-monikey", label: "MoniKey", url: "https://github.com/Jeysibn/monikey" }],
+      reply: "Jerome currently has four documented projects:\n\n- **Cloud-Backed Portfolio** — Azure Functions and Cosmos DB.\n- `MoniKey` — PostgreSQL-backed durable jobs.",
+      sources: [
+        { id: "profile", label: "Portfolio profile", url: "https://jeysibn.github.io/" },
+        { id: "professional-experience", label: "Professional experience", url: "https://jeysibn.github.io/#experience" },
+        { id: "certifications", label: "Certifications", url: "https://jeysibn.github.io/#credentials-title" },
+        { id: "project-monikey", label: "MoniKey", url: "https://github.com/Jeysibn/monikey" },
+        { id: "bad", label: "Bad link", url: "not a url" },
+      ],
       usage: { limit: 10, remaining: 9 },
     });
     render(<PortfolioAssistant />);
@@ -38,8 +47,21 @@ describe("portfolio assistant", () => {
     fireEvent.change(input, { target: { value: "Tell me about MoniKey." } });
     fireEvent.submit(input.closest("form") as HTMLFormElement);
 
-    await waitFor(() => expect(screen.getByText("MoniKey uses PostgreSQL-backed durable jobs.")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText("MoniKey", { selector: "code" })).toBeInTheDocument());
+    expect(screen.getByText("Cloud-Backed Portfolio")).toBeInTheDocument();
+    expect(screen.getByText("Cloud-Backed Portfolio").closest("ul")).toBeInTheDocument();
+    expect(screen.getByText("Cloud-Backed Portfolio").closest("strong")).toBeInTheDocument();
+    expect(screen.getByText("MoniKey", { selector: "code" })).toBeInTheDocument();
+    const experienceLink = screen.getByRole("link", { name: "Professional experience" });
+    expect(experienceLink).toHaveAttribute("href", "#experience");
+    expect(experienceLink).not.toHaveAttribute("target");
+    fireEvent.click(experienceLink);
+    expect(window.location.hash).toBe("#experience");
+    expect(screen.getByRole("link", { name: "Certifications" })).toHaveAttribute("href", "#credentials");
     expect(screen.getByRole("link", { name: "MoniKey" })).toHaveAttribute("href", "https://github.com/Jeysibn/monikey");
+    expect(screen.getByRole("link", { name: "MoniKey" })).toHaveAttribute("target", "_blank");
+    expect(screen.getByRole("link", { name: "MoniKey" })).toHaveAttribute("rel", "noopener noreferrer");
+    expect(screen.queryByRole("link", { name: "Bad link" })).not.toBeInTheDocument();
     expect(screen.getByText("10 assistant questions per hour · 9 remaining")).toBeInTheDocument();
   });
 

@@ -21,6 +21,9 @@ def test_assistant_prompt_contains_behavior_rules():
     assert "do not answer any part" in prompt
     assert "in progress" in prompt
     assert "must never be described as earned" in prompt
+    assert "three or more items" in prompt
+    assert "state the criterion used" in prompt
+    assert "short paragraphs" in prompt
 
 
 def test_build_chat_messages_separates_prompt_and_portfolio_facts():
@@ -53,14 +56,24 @@ def test_build_chat_messages_ignores_invalid_history_entries():
     assert {"role": "user", "content": "valid history"} in messages
 
 
-def test_sanitize_ai_response_removes_markdown_and_emoji():
+def test_sanitize_ai_response_keeps_safe_formatting_and_removes_emoji():
     response = "**Jerome** is focused on Cloud and DevOps. 🚀\n### Details\nUse `Terraform`."
 
     cleaned = sanitize_ai_response(response)
 
-    assert cleaned == "Jerome is focused on Cloud and DevOps.\nDetails\nUse Terraform."
-    assert "`" not in cleaned
+    assert cleaned == "**Jerome** is focused on Cloud and DevOps.\nDetails\nUse `Terraform`."
+    assert "**Jerome**" in cleaned
+    assert "`Terraform`" in cleaned
     assert "🚀" not in cleaned
+
+
+def test_sanitize_ai_response_preserves_flat_lists_and_removes_html_tags():
+    response = "- **Cloud Portfolio**\n1. `Terraform`\n<strong>unsafe markup</strong>"
+
+    cleaned = sanitize_ai_response(response)
+
+    assert cleaned == "- **Cloud Portfolio**\n1. `Terraform`\nunsafe markup"
+    assert "<strong>" not in cleaned
 
 
 def test_sanitize_ai_response_keeps_technical_wildcards():

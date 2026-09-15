@@ -1262,16 +1262,41 @@ body:has(.inspection-dialog[open]) {
   padding: 12px 0;
   border-bottom: 1px solid var(--line);
 }
-.portfolio-assistant .message strong {
+.portfolio-assistant .message .message-label {
   font: 500 9px var(--mono);
   text-transform: uppercase;
   color: var(--signal);
 }
-.portfolio-assistant .message p,
+.portfolio-assistant .assistant-content,
 .portfolio-assistant .assistant-empty,
 .portfolio-assistant .messages > p {
   font-size: 13px;
   line-height: 1.55;
+}
+.portfolio-assistant .assistant-content p {
+  margin: 8px 0 0;
+}
+.portfolio-assistant .assistant-content p:first-child {
+  margin-top: 8px;
+}
+.portfolio-assistant .assistant-content ul,
+.portfolio-assistant .assistant-content ol {
+  margin: 8px 0 0;
+  padding-left: 20px;
+}
+.portfolio-assistant .assistant-content li {
+  padding-left: 3px;
+  margin: 5px 0;
+}
+.portfolio-assistant .assistant-content strong {
+  font-weight: 700;
+  color: var(--ink);
+}
+.portfolio-assistant .assistant-content code {
+  padding: 1px 4px;
+  border: 1px solid var(--line);
+  font: 500 0.9em var(--mono);
+  color: var(--signal);
 }
 .portfolio-assistant .message.user {
   margin-left: 15%;
@@ -1307,13 +1332,30 @@ body:has(.inspection-dialog[open]) {
   font-size: 12px;
 }
 .portfolio-assistant .message-sources {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 12px;
   margin-top: 8px;
   font: 500 10px var(--mono);
 }
+.portfolio-assistant .message-sources-label {
+  display: block;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.portfolio-assistant .message-sources ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  margin: 3px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.portfolio-assistant .message-sources li {
+  margin: 0;
+}
 .portfolio-assistant .message-sources a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 4px 2px;
   color: var(--signal);
   text-decoration: none;
 }
@@ -1595,7 +1637,7 @@ body:has(.inspection-dialog[open]) {
   #contact-title {
     font-size: clamp(2.4rem, 11.5vw, 2.85rem);
   }
-  #credentials-title-title {
+  #credentials-title {
     font-size: clamp(2.35rem, 12vw, 2.9rem);
     white-space: nowrap;
     overflow-wrap: normal;
@@ -2284,6 +2326,9 @@ a {
 .section-heading h2,
 .experience-list h3 {
   text-wrap: balance;
+}
+.section-heading h2 {
+  scroll-margin-top: 76px;
 }
 .inspection-dialog {
   overscroll-behavior: contain;

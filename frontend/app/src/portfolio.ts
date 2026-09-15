@@ -86,3 +86,4 @@ export const projects = canonicalContent.projects as Project[];
 export const certifications = canonicalContent.certifications as Certification[];
 export const education = canonicalContent.education;
 export const professionalSummary = canonicalContent.career.professional_summary;
+export const portfolioUrl = canonicalContent.profile.portfolio;
