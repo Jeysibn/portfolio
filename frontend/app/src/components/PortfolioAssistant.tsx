@@ -116,19 +116,23 @@ export function PortfolioAssistant() {
   }
   return (
     <aside
-      className={open ? "assistant is-open" : "assistant"}
+      className={open ? "portfolio-assistant is-open" : "portfolio-assistant"}
       aria-label="Ask this portfolio"
     >
       <button
-        className="assistant-trigger"
+        className="portfolio-assistant-trigger"
         type="button"
         aria-expanded={open}
-        aria-controls="assistant-panel"
+        aria-controls="portfolio-assistant-panel"
         onClick={() => setOpen(!open)}
       >
         <span aria-hidden="true">?</span> Ask this portfolio
       </button>
-      <div id="assistant-panel" className="assistant-panel" hidden={!open}>
+      <div
+        id="portfolio-assistant-panel"
+        className="portfolio-assistant-panel"
+        hidden={!open}
+      >
         <header>
           <div>
             <small>Contextual inspection</small>
