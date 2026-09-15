@@ -53,17 +53,18 @@ export function ProjectDialog({
           <header>
             <p>{project.category}</p>
             <h2 id="project-dialog-title">{project.title}</h2>
+            <p className="dialog-status">{project.status}</p>
             <button
               type="button"
               onClick={onClose}
-              aria-label="Close case study"
+              aria-label="Close system inspection"
               data-dialog-close
             >
               Close
             </button>
           </header>
           <p className="dialog-lead" id="project-dialog-summary">
-            {project.summary}
+            {project.details.summary}
           </p>
           <section className="dialog-architecture" aria-labelledby="architecture-title">
             <div className="dialog-section-heading">
@@ -98,12 +99,12 @@ export function ProjectDialog({
           <div className="dialog-grid">
             <section>
               <h3>Why it exists</h3>
-              <p>{project.purpose}</p>
+              <p>{project.details.purpose}</p>
             </section>
             <section>
               <h3>Operating outcomes</h3>
               <ul>
-                {project.outcomes.map((x) => (
+                {project.details.outcomes.map((x) => (
                   <li key={x}>{x}</li>
                 ))}
               </ul>
@@ -111,24 +112,31 @@ export function ProjectDialog({
             <section>
               <h3>Engineering highlights</h3>
               <ul>
-                {project.highlights.map((x) => (
+                {project.details.highlights.map((x) => (
                   <li key={x}>{x}</li>
                 ))}
               </ul>
             </section>
             <section>
               <h3>Technology</h3>
-              <p>{project.technologies.join(" · ")}</p>
+              <p>{project.details.technologies.join(" · ")}</p>
             </section>
           </div>
-          <a
-            className="action-primary"
-            href={project.repositoryUrl}
-            target="_blank"
-            rel="noreferrer"
-          >
-            View repository ↗
-          </a>
+          <div className="dialog-actions">
+            <a
+              className="action-primary"
+              href={project.repositoryUrl}
+              target="_blank"
+              rel="noreferrer"
+            >
+              View repository ↗
+            </a>
+            {project.liveUrl ? (
+              <a href={project.liveUrl} target="_blank" rel="noreferrer">
+                Open live system ↗
+              </a>
+            ) : null}
+          </div>
         </article>
       )}
     </dialog>

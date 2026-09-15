@@ -39,8 +39,8 @@ The source repository is authoritative. Do not treat direct edits in the publica
 - Pages publication failed;
 - the dedicated Pages repository was not updated;
 - theme controls behave incorrectly;
-- project/skill dialogs do not open;
-- architecture previews are missing or the full-resolution zoom does not load;
+- the System Deck does not select or reorder a dossier;
+- a project inspection dialog or architecture SVG does not load;
 - the closed chatbot blocks clicks underneath it;
 - the health monitor or Release age presentation looks incorrect;
 - navigation scroll alignment or active-section state is incorrect.
@@ -63,16 +63,17 @@ After a frontend release, verify:
 - `https://jeysibn.github.io/` loads successfully;
 - the hero headline displays **Jerome Christian Ibon** and supporting Cloud/DevOps role positioning;
 - no navigation item is active while still inside the hero;
-- navigation order is About → Projects → Experience → Skills → Certifications → Resume → Contact;
+- navigation order is Projects → Experience → Skills → Certifications → Resume → Contact;
 - navigation lands sections below the sticky header without centering the heading in the viewport;
 - the theme icon toggles Light/Dark and persists the selected value;
 - with no saved theme, initial load follows the browser/OS preference;
 - the hero health monitor transitions from Checking to the appropriate state;
 - Release age is displayed as release metadata rather than uptime;
 - phone-sized monitoring metrics remain readable with clean separators;
-- project cards open centered project-detail dialogs;
-- project cards/details use lightweight architecture previews during normal browsing;
-- the original full-resolution diagram is requested only when architecture zoom is explicitly opened;
+- the System Deck exposes all four projects and keeps the selected dossier visually in front;
+- previous/next, numbered selector, ArrowLeft/ArrowRight, background dossier buttons, and pointer swipe change the active system;
+- `?project=<slug>` opens the matching inspection dialog and browser back/forward updates it;
+- the deck uses compact flow previews; inspection loads the selected project's full SVG sheets and text summaries;
 - skill cards open their detail dialogs;
 - certification descriptions are readable through hover/focus behavior;
 - the resume is visible on-page and the PDF download works;
@@ -98,26 +99,16 @@ npm run preview
 
 Open the preview URL (normally `http://localhost:4173`), enable **Disable cache** in browser DevTools, and hard refresh.
 
-### Architecture preview behavior
+### Project architecture behavior
 
-The full architecture PNG files are intentionally large. Normal browsing should use resized WebP previews through `wsrv.nl`.
+The deck preview is generated from `project.preview.flow` and does not fetch full diagram assets. The inspection dialog loads SVGs from `frontend/app/public/architecture/` and renders their adjacent text summaries.
 
-Expected flow:
+If an architecture sheet fails:
 
-```text
-card/detail -> lightweight WebP preview
-explicit architecture zoom -> original PNG
-```
-
-If a project card preview fails:
-
-1. inspect the failed preview URL in the Network panel;
-2. confirm the source GitHub-hosted PNG is publicly reachable;
-3. confirm the preview URL contains the expected source URL and resize/WebP parameters;
-4. test the original PNG independently;
-5. treat a preview-CDN failure separately from an original-asset failure.
-
-A preview service failure should not be confused with Azure API health.
+1. confirm the SVG exists under the matching project directory;
+2. open the SVG directly and verify its `<title>`, `<desc>`, labels, and arrows;
+3. check the dialog's text summary separately from image loading;
+4. treat an asset failure separately from Azure API health or System Deck state.
 
 ### Local Vite startup failure
 

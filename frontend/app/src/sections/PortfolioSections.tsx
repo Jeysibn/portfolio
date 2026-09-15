@@ -12,7 +12,7 @@ import {
 import type { Project } from "../portfolio";
 import { CapabilityMap } from "../components/capabilities/CapabilityMap";
 import type { SkillSelection } from "../components/capabilities/CapabilityMap";
-import { SystemArchitecture } from "../components/systems/SystemArchitecture";
+import { SystemDeck } from "../components/projects/SystemDeck";
 
 const principles = [
   [
@@ -173,46 +173,9 @@ export function Projects({ onOpen }: { onOpen: (p: Project) => void }) {
       className="projects-section"
     >
       <p className="projects-intro">
-        Two working environments, presented as systems—not thumbnails.
+        Selected engineering work, presented as working systems rather than isolated screenshots.
       </p>
-      <div className="projects-rail">
-        {projects.map((project, index) => (
-          <article
-            className="project-case system-stage"
-            key={project.id}
-            data-project={project.id}
-          >
-            <header>
-              <span>System {String(index + 1).padStart(2, "0")}</span>
-              <p>{project.category}</p>
-              <h3>{project.title}</h3>
-              <p>{project.summary}</p>
-            </header>
-            <SystemArchitecture project={project} />
-            <div className="case-columns">
-              <div>
-                <h4>Why it exists</h4>
-                <p>{project.purpose}</p>
-              </div>
-              <div>
-                <h4>Operating outcomes</h4>
-                <ul>
-                  {project.outcomes.slice(0, 2).map((x) => (
-                    <li key={x}>{x}</li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-            <button
-              type="button"
-              className="case-open"
-              onClick={() => onOpen(project)}
-            >
-              Inspect full case study <span aria-hidden="true">↗</span>
-            </button>
-          </article>
-        ))}
-      </div>
+      <SystemDeck projects={projects} onInspect={onOpen} />
     </Section>
   );
 }
@@ -409,7 +372,7 @@ export function PrintResume() {
         <section key={x.id}>
           <h3>{x.title}</h3>
           <ul>
-            {x.highlights.map((h) => (
+            {x.details.highlights.map((h) => (
               <li key={h}>{h}</li>
             ))}
           </ul>

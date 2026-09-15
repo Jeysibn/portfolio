@@ -61,7 +61,7 @@ Bodoni Moda carries identity and chapter scale; Manrope carries readable detail;
 
 ## Layout
 
-Content uses a fluid maximum-width atlas with strongly asymmetric offsets. Project case studies intentionally become near-full-viewport chapters. The capability map is an orbital control plane on large screens and becomes a complete static grouped system on tablets and phones. At 900px, wide structures collapse; at 600px, the narrative becomes a vertical stack, architecture becomes a two-column sequence, and interactive topology becomes a one-column domain list.
+Content uses a fluid maximum-width atlas with strongly asymmetric offsets. Projects are represented as stacked system dossiers rather than generic cards. The active dossier becomes the current inspection plane while background dossiers retain visible technical identity. The capability map is an orbital control plane on large screens and becomes a complete static grouped system on tablets and phones. At 900px, wide structures collapse; at 600px, the narrative becomes a vertical stack, architecture becomes a two-column sequence, and interactive topology becomes a one-column domain list.
 
 ## Elevation & Depth
 
@@ -73,7 +73,13 @@ Rectilinear editorial frames dominate. Circular forms belong only to topology or
 
 ## Components
 
-Buttons are square-edged, text-forward, and high contrast. Project chapters are environments rather than cards. Native dialogs provide focus protection. Navigation uses a restrained active underline, while the mobile navigation becomes a compact two-column sheet.
+Buttons are square-edged, text-forward, and high contrast. Project dossiers use hairline overlap, controlled translation, scale, and surface shifts to create physical paper depth. Native dialogs provide focus protection. Navigation uses a restrained active underline, while the mobile navigation becomes a compact two-column sheet.
+
+### System Deck
+
+The Projects chapter uses one interactive System Deck. A circular logical order keeps the active dossier at depth zero and exposes the remaining dossiers behind it with useful system number, title, and category labels. Selecting a dossier is a deliberate reorder: the active sheet lifts and moves toward the back while the selected sheet settles into the front plane. GSAP owns this state-change motion; idle dossiers remain still.
+
+The deck preview uses a compact repository-derived flow and one engineering outcome. Full architecture evidence stays in the native inspection dialog, with a text equivalent beside every SVG. Reduced-motion users receive immediate deck reordering without translation, rotation, parallax, or dramatic scaling. On phones, exposed dossiers become top-edge sheets and the preview flow becomes a readable two-column sequence rather than a shrunken desktop diagram.
 
 ## Do's and Don'ts
 

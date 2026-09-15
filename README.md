@@ -99,8 +99,9 @@ Current frontend features include:
 - live Manila time in the monitoring panel;
 - visitor counter with loading and unavailable states;
 - AI assistant with session history, rate-limit/error handling, and a closed state that does not block page interaction;
-- whole-card project interaction with architecture-first project cards and centered detail dialogs;
-- lightweight resized WebP architecture previews for normal browsing, with full-resolution PNGs deferred until explicit architecture zoom;
+- one four-project System Deck with stacked dossier selection, numbered controls, previous/next navigation, keyboard arrows, and pointer swipe support;
+- compact repository-derived architecture previews on the deck, with full SVG diagrams deferred to the selected project's inspection dialog;
+- static-host-safe project inspection links using `?project=<slug>` and browser history synchronization;
 - clickable skill capability cards with detailed modal explanations;
 - provider-styled certification cards with hover/focus descriptions;
 - a concise on-page resume with direct PDF download;
@@ -109,23 +110,21 @@ Current frontend features include:
 The primary page flow is:
 
 ```text
-Hero → About → Projects → Experience → Skills → Certifications → Resume → Contact
+Hero → Projects → Experience → Skills → Certifications → Resume → Contact
 ```
 
 Navigation scrolls the requested section to the top of the content viewport beneath the sticky header, and no navigation entry is forced active while the user remains in the hero.
 
 The hero copy is applied during the initial browser render task so the current name-first headline is not preceded by a visible stale headline during rapid reloads.
 
-### Architecture-image loading
+### Project architecture loading
 
-Architecture diagrams intentionally use two presentation levels:
+Projects use two presentation levels:
 
-1. Project cards and normal project-detail dialogs request resized WebP previews through `wsrv.nl`.
-2. The original source PNG is requested only when the visitor explicitly opens the architecture zoom.
+1. The System Deck renders a lightweight flow from each project's typed preview data.
+2. The selected project's inspection dialog loads the repository-derived SVG architecture sheets and exposes a text equivalent for each diagram.
 
-The transformation service receives public image URLs only. No application secret or Azure credential is involved in image delivery.
-
-This avoids transferring multi-megabyte source diagrams during ordinary browsing while preserving the original diagram when detailed inspection is requested.
+The deck does not load the full architecture set into the active preview, keeping the first project interaction compact while preserving detailed evidence on demand.
 
 ### Health and release-age semantics
 
