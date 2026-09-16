@@ -14,7 +14,7 @@ describe("capability control plane", () => {
     expect(document.querySelectorAll(".orbit-skill")).toHaveLength(
       skillGroups.reduce((total, group) => total + group.items.length, 0),
     );
-    expect(document.querySelectorAll(".domain-inspection")).toHaveLength(skillGroups.length);
+    expect(document.querySelector(".domain-inspection")).not.toBeInTheDocument();
     expect((document.querySelector(".capability-system") as HTMLElement).style.getPropertyValue("--domain-orbit-duration")).toBe("104s");
     expect(document.querySelector(".domain-1")?.getAttribute("style")).toContain("--skill-orbit-duration: 32s");
 
@@ -25,25 +25,20 @@ describe("capability control plane", () => {
     });
   });
 
-  it("pauses and exposes an inspected domain through pointer and keyboard focus", () => {
+  it("keeps technology names scoped to each technology control", () => {
     render(<CapabilityMap onOpen={vi.fn()} />);
 
     const system = document.querySelector(".capability-system") as HTMLElement;
     const domain = document.querySelector(".capability-domain") as HTMLElement;
-    const inspection = domain.querySelector(".domain-inspection") as HTMLElement;
+    const skill = domain.querySelector(".orbit-skill") as HTMLElement;
+    const skillLabel = skill.querySelector("span") as HTMLElement;
 
     fireEvent.mouseEnter(domain);
-    expect(system).toHaveClass("has-inspected-domain");
-    expect(domain).toHaveClass("is-inspected");
-    expect(inspection).toHaveAttribute("aria-hidden", "false");
-
-    fireEvent.mouseLeave(domain);
     expect(system).not.toHaveClass("has-inspected-domain");
+    expect(domain).not.toHaveClass("is-inspected");
+    expect(skillLabel).toHaveTextContent("Azure");
 
-    const anchor = domain.querySelector(".domain-anchor") as HTMLElement;
-    fireEvent.focus(anchor);
-    expect(domain).toHaveClass("is-inspected");
-    fireEvent.blur(anchor, { relatedTarget: null });
-    expect(system).not.toHaveClass("has-inspected-domain");
+    fireEvent.focus(skill);
+    expect(skill).toHaveAttribute("aria-label", "Azure — inspect Cloud & virtualization");
   });
 });

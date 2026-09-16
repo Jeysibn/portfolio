@@ -117,7 +117,7 @@ Current frontend features include:
 - provider-styled certification cards with hover/focus descriptions;
 - a concise on-page resume with direct PDF download and a form-less recruiter handoff;
 - restrained reveal motion and `prefers-reduced-motion` support;
-- an in-view Control Plane orbital topology on supported desktop layouts, with a domain guide tied to the actual orbit radius, slow upright domain/tool orbits, stable inspected-domain tool labels, pause-on-inspection behavior, and a structured static fallback for constrained widths;
+- an in-view Control Plane orbital topology on supported desktop layouts, with a domain guide tied to the actual orbit radius, slow upright domain/tool orbits, per-technology name inspection with local pause behavior, and a structured static fallback for constrained widths;
 - height-aware desktop density for 1920×1080 workstations, with restrained operational motion elsewhere.
 
 The primary page flow is:

@@ -31,7 +31,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and 
 
 - **Signal lifecycle coherence**: Decoupled the ambient Signal Rail from portfolio section ownership, deriving its line and active/completed stages from one monotonic document-progress model. Removed redundant inline chapter stages, added a quieter medium-desktop rail mode, raised functional technical labels, restrained System Deck offsets, and surfaced canonical credential issuer/status metadata.
 
-- **Capability inspection geometry**: Matched the desktop domain guide to the actual orbit radius, removed the redundant global ellipse, slowed the outer orbit to 104 seconds, and added a stable inspected-domain tool-name strip so the living topology remains readable without label collisions.
+- **Capability inspection geometry**: Matched the desktop domain guide to the actual orbit radius, removed the redundant global ellipse, slowed the outer orbit to 104 seconds, and kept technology-name inspection local to each hovered or focused skill so the living topology remains readable without covering neighboring icons.
 
 - **Frontend visual hierarchy**: Reduced display scale and ordinary section spacing, raised selected technical labels for readability, removed generic section-entry drift, and reduced assistant trigger weight while preserving the signal lifecycle and editorial light/dark system.
 

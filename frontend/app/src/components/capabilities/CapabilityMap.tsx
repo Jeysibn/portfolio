@@ -34,7 +34,6 @@ export function CapabilityMap({
 }) {
   const systemRef = useRef<HTMLDivElement>(null);
   const [isInView, setIsInView] = useState(false);
-  const [inspectedDomain, setInspectedDomain] = useState<number | null>(null);
 
   useEffect(() => {
     const element = systemRef.current;
@@ -51,9 +50,7 @@ export function CapabilityMap({
   return (
     <div
       ref={systemRef}
-      className={`capability-system ${isInView ? "is-in-view" : ""} ${
-        inspectedDomain === null ? "" : "has-inspected-domain"
-      }`}
+      className={`capability-system ${isInView ? "is-in-view" : ""}`}
       aria-label="Interactive technical capability map"
       style={{ "--domain-orbit-duration": "104s" } as CSSProperties}
     >
@@ -72,25 +69,13 @@ export function CapabilityMap({
           const motion = skillOrbitMotion[domainIndex % skillOrbitMotion.length];
           return (
             <div
-              className={`domain-orbit-slot ${
-                inspectedDomain === domainIndex ? "is-inspected" : ""
-              }`}
+              className="domain-orbit-slot"
               key={group.label}
               style={{ "--domain-angle": `${domainAngle}deg` } as CSSProperties}
             >
               <div className="domain-counter-rotation">
                 <section
-                  className={`capability-domain domain-${domainIndex + 1} ${
-                    inspectedDomain === domainIndex ? "is-inspected" : ""
-                  }`}
-                  onMouseEnter={() => setInspectedDomain(domainIndex)}
-                  onMouseLeave={() => setInspectedDomain(null)}
-                  onFocusCapture={() => setInspectedDomain(domainIndex)}
-                  onBlurCapture={(event) => {
-                    if (!event.currentTarget.contains(event.relatedTarget)) {
-                      setInspectedDomain(null);
-                    }
-                  }}
+                  className={`capability-domain domain-${domainIndex + 1}`}
                   style={
                     {
                       "--orbit-radius": `${group.items.length >= 8 ? 104 : group.items.length >= 5 ? 96 : 84}px`,
@@ -129,14 +114,6 @@ export function CapabilityMap({
                         </div>
                       );
                     })}
-                  </div>
-                  <div
-                    className="domain-inspection"
-                    aria-hidden={inspectedDomain !== domainIndex}
-                  >
-                    {group.items.map((item) => (
-                      <span key={item}>{item}</span>
-                    ))}
                   </div>
                 </section>
               </div>

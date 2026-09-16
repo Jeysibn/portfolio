@@ -81,7 +81,7 @@ Navigation scrolls the selected section to the start of the viewport beneath the
 - provider-styled certification cards;
 - fully visible on-page resume plus direct PDF download;
 - form-less System Handoff with direct email, copy-email, LinkedIn, resume, and GitHub paths;
-- height-aware desktop density and an in-view Control Plane capability topology with a radius-matched domain guide, slow nested CSS orbits, upright counter-rotation, stable inspected-domain tool labels, pause-on-focus/hover behavior, and a static constrained-width fallback;
+- height-aware desktop density and an in-view Control Plane capability topology with a radius-matched domain guide, slow nested CSS orbits, upright counter-rotation, per-technology name inspection with local pause-on-focus/hover behavior, and a static constrained-width fallback;
 - an ambient Signal Rail whose progress line and active/completed lifecycle nodes share monotonic document-scroll state rather than section-specific stage ownership;
 - keyboard focus behavior and reduced-motion support.
 

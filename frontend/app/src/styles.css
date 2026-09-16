@@ -603,9 +603,6 @@ a {
   transform: rotate(var(--domain-angle)) translateX(var(--domain-orbit-radius));
   transform-origin: 0 0;
 }
-.domain-orbit-slot.is-inspected {
-  z-index: 20;
-}
 .domain-counter-rotation {
   position: absolute;
   width: 1px;
@@ -621,7 +618,6 @@ a {
   top: -125px;
   width: 290px;
   height: 250px;
-  transition: opacity 180ms;
 }
 .orbit-track {
   position: absolute;
@@ -727,6 +723,10 @@ a {
   animation-play-state: paused !important;
   color: var(--signal);
 }
+.capability-domain:has(.skill-orbit:hover) .orbiting-skills,
+.capability-domain:has(.skill-orbit:focus-within) .orbiting-skills {
+  animation-play-state: paused;
+}
 .skill-orbit:hover .orbit-skill svg,
 .skill-orbit:focus-within .orbit-skill svg {
   transform: scale(1.12);
@@ -783,53 +783,9 @@ a {
   transform: translate(-50%, 0);
 }
 .capability-domain:hover .orbit-track,
-.capability-domain:focus-within .orbit-track,
-.capability-domain.is-inspected .orbit-track {
+.capability-domain:focus-within .orbit-track {
   border-color: var(--signal);
   opacity: 1;
-}
-.capability-system.has-inspected-domain .capability-domain:not(.is-inspected) {
-  opacity: 0.5;
-}
-.capability-domain.is-inspected .orbit-skill span,
-.capability-domain:focus-within .orbit-skill span {
-  opacity: 0.92;
-  transform: translate(-50%, 0);
-}
-.capability-domain.is-inspected .orbit-skill span {
-  opacity: 0;
-}
-.domain-inspection {
-  position: absolute;
-  z-index: 7;
-  left: 50%;
-  top: calc(50% + 53px);
-  display: none;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 4px 8px;
-  width: min(220px, calc(100% - 12px));
-  padding: 8px 10px;
-  transform: translateX(-50%);
-  border: 1px solid var(--signal);
-  background: var(--paper);
-  color: var(--ink);
-  font: 500 10px var(--mono);
-  line-height: 1.2;
-  pointer-events: none;
-}
-.capability-domain.is-inspected .domain-inspection,
-.capability-domain:focus-within .domain-inspection {
-  display: grid;
-}
-.capability-domain.is-inspected .domain-anchor {
-  background: var(--ink);
-  color: var(--paper);
-}
-.capability-system.has-inspected-domain .outer-orbit,
-.capability-system.has-inspected-domain .domain-counter-rotation,
-.capability-domain.is-inspected .orbiting-skills,
-.capability-domain.is-inspected .orbit-skill {
-  animation-play-state: paused;
 }
 .capability-system.is-in-view .outer-orbit,
 .capability-system.is-in-view .domain-counter-rotation,
@@ -837,12 +793,6 @@ a {
 .capability-system.is-in-view .orbit-skill {
   animation-play-state: running;
   will-change: transform;
-}
-.capability-system.is-in-view.has-inspected-domain .outer-orbit,
-.capability-system.is-in-view.has-inspected-domain .domain-counter-rotation,
-.capability-system.is-in-view .capability-domain.is-inspected .orbiting-skills,
-.capability-system.is-in-view .capability-domain.is-inspected .orbit-skill {
-  animation-play-state: paused;
 }
 body:has(.capability-system.is-in-view) .signal-stage {
   opacity: 0.22;
@@ -1659,9 +1609,6 @@ body:has(.inspection-dialog[open]) {
     text-align: center;
     white-space: normal;
     opacity: 1;
-  }
-  .domain-inspection {
-    display: none !important;
   }
 }
 @media (max-width: 900px) {
