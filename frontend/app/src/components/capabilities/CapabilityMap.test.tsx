@@ -14,7 +14,8 @@ describe("capability control plane", () => {
     expect(document.querySelectorAll(".orbit-skill")).toHaveLength(
       skillGroups.reduce((total, group) => total + group.items.length, 0),
     );
-    expect((document.querySelector(".capability-system") as HTMLElement).style.getPropertyValue("--domain-orbit-duration")).toBe("88s");
+    expect(document.querySelectorAll(".domain-inspection")).toHaveLength(skillGroups.length);
+    expect((document.querySelector(".capability-system") as HTMLElement).style.getPropertyValue("--domain-orbit-duration")).toBe("104s");
     expect(document.querySelector(".domain-1")?.getAttribute("style")).toContain("--skill-orbit-duration: 32s");
 
     fireEvent.click(screen.getByRole("button", { name: /Terraform/ }));
@@ -22,5 +23,27 @@ describe("capability control plane", () => {
       group: skillGroups.find((group) => group.label === "Infrastructure & delivery"),
       item: "Terraform",
     });
+  });
+
+  it("pauses and exposes an inspected domain through pointer and keyboard focus", () => {
+    render(<CapabilityMap onOpen={vi.fn()} />);
+
+    const system = document.querySelector(".capability-system") as HTMLElement;
+    const domain = document.querySelector(".capability-domain") as HTMLElement;
+    const inspection = domain.querySelector(".domain-inspection") as HTMLElement;
+
+    fireEvent.mouseEnter(domain);
+    expect(system).toHaveClass("has-inspected-domain");
+    expect(domain).toHaveClass("is-inspected");
+    expect(inspection).toHaveAttribute("aria-hidden", "false");
+
+    fireEvent.mouseLeave(domain);
+    expect(system).not.toHaveClass("has-inspected-domain");
+
+    const anchor = domain.querySelector(".domain-anchor") as HTMLElement;
+    fireEvent.focus(anchor);
+    expect(domain).toHaveClass("is-inspected");
+    fireEvent.blur(anchor, { relatedTarget: null });
+    expect(system).not.toHaveClass("has-inspected-domain");
   });
 });
