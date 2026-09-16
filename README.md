@@ -7,7 +7,7 @@
 
 A production-oriented Cloud and DevOps portfolio built as an end-to-end engineering project. The deployed system combines a React + TypeScript single-page frontend, Python Azure Functions APIs, Azure Cosmos DB, Terraform-managed infrastructure, Azure-native observability, a provider-neutral AI portfolio assistant, and GitHub Actions CI/CD using OpenID Connect (OIDC) authentication to Azure.
 
-The current frontend uses an infrastructure control-surface visual system while keeping the site portfolio-first rather than dashboard-first. It includes live production health, release metadata, interactive project details, detailed skill inspection, certification cards, a fully visible resume, and an opportunity-focused contact experience.
+The current frontend uses a **Monochrome Control Plane** visual system: an editorial infrastructure document where neutral surfaces dominate and copper appears only for live, focused, selected, or important states. It remains portfolio-first rather than dashboard-first and includes live production health, release metadata, interactive project details, detailed skill inspection, certification documentation, a fully visible resume, and an opportunity-focused contact handoff.
 
 The assistant uses the same canonical project facts as the website. It currently
 answers about all four visible projects with deterministic lightweight retrieval,
@@ -101,7 +101,7 @@ The portfolio is a single React page built from `frontend/app/`. Navigation uses
 Current frontend features include:
 
 - responsive desktop and mobile navigation with active-section tracking;
-- a compact saved Light/Dark theme control with system preference used as the initial fallback;
+- a compact saved Light/Dark preference with system preference used as the initial fallback, alongside art-directed dark/light page chapters;
 - a name-first hero headed by **Jerome Christian Ibon**, with Cloud Support, DevOps, and Cloud Engineering as supporting positioning;
 - an explicit **Open to opportunities** state with entry-level role context;
 - live production `/api/health` status from Azure Functions;
@@ -116,14 +116,14 @@ Current frontend features include:
 - clickable skill capability cards with detailed modal explanations;
 - provider-styled certification cards with hover/focus descriptions;
 - a concise on-page resume with direct PDF download and a form-less recruiter handoff;
-- restrained reveal motion and `prefers-reduced-motion` support;
-- an in-view Control Plane orbital topology on supported desktop layouts, with slow upright domain/tool orbits, pause-on-inspection behavior, and a structured static fallback for constrained widths;
-- height-aware desktop density for 1920×1080 workstations, with restrained operational motion elsewhere.
+- restrained reveal motion, no cursor-following effect, and `prefers-reduced-motion` support;
+- an in-view Control Plane orbital topology on supported desktop layouts, with a domain guide tied to the actual orbit radius, slow upright domain/tool orbits, per-technology name inspection with local pause behavior, and a structured static fallback for constrained widths;
+- height-aware desktop density for 1920×1080 workstations, with a dark Control Plane environment, neutral inactive capabilities, selective copper reveal, and restrained operational motion.
 
 The primary page flow is:
 
 ```text
-Hero → Projects → Experience → Capabilities → Credentials → Resume → Contact
+Hero → Projects → Experience → Capabilities → Credentials → Principles → Resume → Contact
 ```
 
 Navigation scrolls the requested section to the top of the content viewport beneath the sticky header, and no navigation entry is forced active while the user remains in the hero.

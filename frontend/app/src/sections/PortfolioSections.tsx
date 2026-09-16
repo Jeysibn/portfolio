@@ -85,7 +85,7 @@ export function Hero() {
   return (
     <section
       id="top"
-      className="hero"
+      className="hero dark-chapter"
       aria-labelledby="hero-title"
     >
       <div className="hero-meta">
@@ -125,7 +125,7 @@ export function Principles() {
     <Section
       id="about"
       title="Operating principles"
-      className="principles-section"
+      className="principles-section light-chapter"
     >
       <div className="about-lead">
         <p>
@@ -157,7 +157,7 @@ export function Projects({ onOpen }: { onOpen: (p: Project) => void }) {
     <Section
       id="projects"
       title="Projects"
-      className="projects-section"
+      className="projects-section light-chapter"
     >
       <p className="projects-intro">
         Selected engineering work, presented as working systems rather than isolated screenshots.
@@ -169,7 +169,7 @@ export function Projects({ onOpen }: { onOpen: (p: Project) => void }) {
 
 export function Experience() {
   return (
-    <Section id="experience" title="Experience">
+    <Section id="experience" title="Experience" className="experience-section dark-chapter">
       <div className="experience-list">
         {experience.map((item, i) => (
           <article key={item.role}>
@@ -202,7 +202,7 @@ export function Skills({
   onOpen: (selection: SkillSelection) => void;
 }) {
   return (
-    <Section id="skills" title="Capabilities" className="skills-section">
+    <Section id="skills" title="Capabilities" className="skills-section dark-chapter">
       <p className="skills-copy">
         Select a domain, then a tool, to connect each capability to practical
         project and operational evidence. Every detail remains keyboard
@@ -218,7 +218,7 @@ export function Credentials() {
     <Section
       id="credentials"
       title="Credentials"
-      className="credentials-section"
+      className="credentials-section light-chapter"
     >
       <div className="credential-layout">
         <article>
@@ -260,7 +260,7 @@ export function Credentials() {
 
 export function Resume() {
   return (
-    <Section id="resume" title="Resume">
+    <Section id="resume" title="Resume" className="resume-section light-chapter">
       <div className="resume-band">
         <div>
           <h3>Everything important, ready to take with you.</h3>
@@ -378,7 +378,7 @@ export function Contact() {
   }[copyState];
 
   return (
-    <Section id="contact" title="Contact" className="contact-section">
+    <Section id="contact" title="Contact" className="contact-section dark-chapter">
       <div className="contact-handoff">
         <div className="contact-intent">
           <p className="contact-kicker">IMPROVE / SYSTEM HANDOFF</p>

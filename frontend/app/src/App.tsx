@@ -18,7 +18,6 @@ import {
 import { ProjectDialog, SkillDialog } from "./components/Dialogs";
 import { PortfolioAssistant } from "./components/PortfolioAssistant";
 import type { SkillSelection } from "./components/capabilities/CapabilityMap";
-import { CursorGlow } from "./components/CursorGlow";
 import { projectFromSearch } from "./projectNavigation";
 
 function projectFromLocation() {
@@ -57,7 +56,6 @@ export default function App() {
       <a className="skip-link" href="#main-content">
         Skip navigation
       </a>
-      <CursorGlow />
       <MotionDirector />
       <SignalPath />
       <SiteHeader
