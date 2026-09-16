@@ -2554,3 +2554,558 @@ a {
     min-height: 720px;
   }
 }
+
+/* -----------------------------------------------------------------------
+   MONOCHROME CONTROL PLANE
+   The existing atlas remains the structure. These tokens and chapter
+   treatments make neutral the default and reserve copper for live state.
+   ----------------------------------------------------------------------- */
+:root {
+  --surface-page: #f3f0e8;
+  --surface-section: #e6e2d9;
+  --surface-raised: #d8d3c8;
+  --surface-overlay: #faf8f1;
+  --surface-technical-sheet: #f3f0e8;
+  --text-technical-sheet: #11110f;
+  --rule-technical-sheet: #777269;
+  --paper: #f3f0e8;
+  --ink: #11110f;
+  --muted: #6a675f;
+  --line: rgba(17, 17, 15, 0.18);
+  --signal: #c6532f;
+  --signal-text: #984022;
+  --accent-petrol: #77736a;
+  --danger: #a13d32;
+  --cursor-glow-strong: transparent;
+  --cursor-glow-soft: transparent;
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  --surface-page: #0b0b0a;
+  --surface-section: #121211;
+  --surface-raised: #1b1a17;
+  --surface-overlay: #171715;
+  --surface-technical-sheet: #f3f0e8;
+  --text-technical-sheet: #11110f;
+  --rule-technical-sheet: #777269;
+  --paper: #0b0b0a;
+  --ink: #f1ede4;
+  --muted: #aaa59a;
+  --line: rgba(241, 237, 228, 0.18);
+  --signal: #d7663d;
+  --signal-text: #e69a78;
+  --accent-petrol: #908b80;
+  --danger: #ef8d7d;
+  --cursor-glow-strong: transparent;
+  --cursor-glow-soft: transparent;
+  color-scheme: dark;
+}
+
+body {
+  background: var(--surface-page);
+}
+
+/* A stable dark header reads cleanly over both environmental chapters. */
+.site-header {
+  --header-ink: #f1ede4;
+  --header-line: rgba(241, 237, 228, 0.2);
+  background: rgba(11, 11, 10, 0.92);
+  border-bottom-color: var(--header-line);
+  color: var(--header-ink);
+  backdrop-filter: blur(16px);
+}
+
+.wordmark span {
+  border-color: rgba(241, 237, 228, 0.7);
+}
+
+.site-nav a,
+.theme-switch,
+.nav-toggle {
+  color: #d7d2c8;
+}
+
+.site-nav a:hover,
+.site-nav a:focus-visible,
+.theme-switch:hover,
+.theme-switch:focus-visible,
+.nav-toggle:hover,
+.nav-toggle:focus-visible {
+  color: #fffaf2;
+}
+
+.dark-chapter .domain-anchor:hover,
+.dark-chapter .domain-anchor:focus-visible,
+.dark-chapter .capability-domain:focus-within .domain-anchor {
+  background: #c6532f !important;
+  background-color: #c6532f !important;
+}
+
+.theme-switch span {
+  background: var(--signal);
+}
+
+.hero,
+.dark-chapter {
+  --paper: #0b0b0a;
+  --ink: #f1ede4;
+  --muted: #aaa59a;
+  --line: rgba(241, 237, 228, 0.18);
+  --surface-section: #121211;
+  --surface-raised: #1b1a17;
+  --surface-overlay: #171715;
+  --accent-petrol: #908b80;
+  --signal-text: #e69a78;
+  background: #0b0b0a;
+  color: #f1ede4;
+}
+
+.light-chapter {
+  --paper: #f3f0e8;
+  --ink: #11110f;
+  --muted: #6a675f;
+  --line: rgba(17, 17, 15, 0.18);
+  --surface-section: #e6e2d9;
+  --surface-raised: #d8d3c8;
+  --surface-overlay: #faf8f1;
+  --accent-petrol: #77736a;
+  --signal-text: #984022;
+  background: #f3f0e8;
+  color: #11110f;
+}
+
+.hero {
+  width: 100%;
+  max-width: none;
+  padding-inline: max(var(--atlas-gutter), calc((100vw - var(--atlas-max)) / 2));
+  background:
+    linear-gradient(115deg, rgba(255, 250, 242, 0.025), transparent 48%),
+    #0b0b0a;
+}
+
+.hero-meta {
+  color: #aaa59a;
+}
+
+/* System Deck: the inspected dossier is live; the rest stay legible but quiet. */
+.system-dossier {
+  background: #e5e0d6;
+  border-color: rgba(17, 17, 15, 0.52);
+  filter: grayscale(0.9) saturate(0.25);
+  transition: filter 220ms ease, border-color 220ms ease;
+}
+
+.system-dossier.is-background {
+  opacity: 0.68;
+  border-color: rgba(17, 17, 15, 0.2);
+}
+
+.system-dossier.is-active {
+  background: #faf8f1;
+  border-color: #11110f;
+  box-shadow: inset 3px 0 0 var(--signal);
+  filter: none;
+}
+
+.system-dossier-meta b,
+.system-dossier-status,
+.system-dossier-technologies,
+.system-preview figcaption strong,
+.system-dossier-exposed {
+  color: #6a675f;
+}
+
+.system-dossier-case-study,
+.system-dossier-footer button,
+.system-dossier-technologies .dossier-label {
+  color: var(--signal-text);
+}
+
+.system-preview {
+  border-block-color: rgba(17, 17, 15, 0.28);
+}
+
+.system-preview-track li:first-child .system-preview-node-marker {
+  background: var(--signal);
+  border-color: var(--signal);
+}
+
+.system-preview-node-marker {
+  border-color: #777269;
+  background: #f3f0e8;
+}
+
+.system-preview-arrow {
+  background: rgba(17, 17, 15, 0.3);
+}
+
+.system-dossier-exposed {
+  background: #e5e0d6;
+  border-bottom-color: rgba(17, 17, 15, 0.16);
+}
+
+.system-dossier-exposed:hover,
+.system-dossier-exposed:focus-visible {
+  background: #faf8f1;
+  color: #11110f;
+}
+
+.system-selector {
+  border-top-color: #11110f;
+}
+
+.system-selector ol button.is-active {
+  color: var(--signal-text);
+  font-weight: 700;
+}
+
+/* Control Plane: infrastructure map, not a space scene. */
+.skills-section {
+  background: #0b0b0a;
+}
+
+.skills-copy {
+  color: #aaa59a;
+}
+
+.capability-system {
+  --domain-orbit-radius: clamp(220px, 21vw, 280px);
+  min-height: 720px;
+}
+
+.capability-system::before {
+  border-color: rgba(241, 237, 228, 0.2);
+}
+
+.control-plane {
+  background: #121211;
+  border-color: rgba(241, 237, 228, 0.62);
+  box-shadow: none;
+}
+
+.control-plane span,
+.control-plane small {
+  color: #aaa59a;
+}
+
+.control-plane strong {
+  color: #f1ede4;
+}
+
+.orbit-track {
+  border-color: rgba(241, 237, 228, 0.24);
+  opacity: 0.72;
+}
+
+.domain-anchor {
+  background: #121211;
+  border-color: rgba(241, 237, 228, 0.32);
+  color: #f1ede4;
+}
+
+.domain-anchor span,
+.domain-anchor small {
+  color: #908b80;
+}
+
+.domain-anchor:hover,
+.domain-anchor:focus-visible,
+.capability-domain:focus-within .domain-anchor {
+  background: var(--signal) !important;
+  background-color: var(--signal) !important;
+  border-color: var(--signal);
+  color: #fffaf2;
+}
+
+.domain-anchor:hover span,
+.domain-anchor:hover small,
+.domain-anchor:focus-visible span,
+.domain-anchor:focus-visible small,
+.capability-domain:focus-within .domain-anchor span,
+.capability-domain:focus-within .domain-anchor small {
+  color: #fffaf2;
+}
+
+.orbit-skill {
+  background: #0b0b0a;
+  color: #777269;
+}
+
+.orbit-skill:hover,
+.orbit-skill:focus-visible,
+.capability-domain:focus-within .orbit-skill {
+  color: #f1ede4;
+}
+
+.skill-orbit:hover .orbit-skill,
+.skill-orbit:focus-within .orbit-skill {
+  color: var(--signal);
+}
+
+.orbit-skill span {
+  background: #121211;
+  border-color: rgba(241, 237, 228, 0.48);
+  color: #f1ede4;
+}
+
+.capability-domain:hover .orbit-track,
+.capability-domain:focus-within .orbit-track {
+  border-color: var(--signal);
+}
+
+.capability-system:has(.capability-domain:hover) .capability-domain:not(:hover),
+.capability-system:has(.capability-domain:focus-within) .capability-domain:not(:focus-within) {
+  opacity: 0.42;
+}
+
+.capability-system:has(.capability-domain:hover) .capability-domain:hover,
+.capability-system:has(.capability-domain:focus-within) .capability-domain:focus-within {
+  opacity: 1;
+}
+
+/* The assistant is an instrument panel, not a branded chatbot bubble. */
+.portfolio-assistant-trigger {
+  background: #121211;
+  border-color: rgba(241, 237, 228, 0.3);
+  color: #f1ede4;
+  box-shadow: none;
+}
+
+.portfolio-assistant-trigger span {
+  border: 1px solid rgba(241, 237, 228, 0.42);
+  border-radius: 0;
+  background: transparent;
+  color: #aaa59a;
+}
+
+.portfolio-assistant-trigger:hover,
+.portfolio-assistant-trigger:focus-visible {
+  border-color: var(--signal);
+}
+
+.portfolio-assistant-trigger:hover span,
+.portfolio-assistant-trigger:focus-visible span {
+  border-color: var(--signal);
+  color: var(--signal);
+}
+
+@media (max-width: 900px) {
+  .site-nav {
+    background: #0b0b0a;
+    color: #f1ede4;
+    border-bottom-color: rgba(241, 237, 228, 0.2);
+  }
+
+  .experience-section,
+  .skills-section,
+  .contact-section {
+    padding-inline: var(--atlas-gutter);
+  }
+}
+
+@media (max-width: 600px) {
+  .hero,
+  .section,
+  .site-footer {
+    width: 100%;
+  }
+
+  .hero,
+  .experience-section,
+  .skills-section,
+  .contact-section,
+  .site-footer {
+    padding-inline: 16px;
+  }
+
+  .projects-section,
+  .credentials-section {
+    padding-inline: 16px;
+  }
+
+  .projects-intro {
+    margin-left: 0;
+  }
+
+  .capability-system {
+    min-height: auto;
+  }
+
+  .system-dossier.is-active {
+    box-shadow: inset 2px 0 0 var(--signal);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .system-dossier {
+    transition: none;
+  }
+}
+
+.hero-meta span:last-child {
+  color: var(--signal-text);
+}
+
+.hero-name {
+  color: #f1ede4;
+}
+
+.hero-name span:nth-child(2) {
+  color: #aaa59a;
+}
+
+.hero-foot {
+  border-top-color: rgba(241, 237, 228, 0.6);
+}
+
+.hero-foot p:first-child {
+  color: #f1ede4;
+  font-weight: 600;
+}
+
+.hero-foot p:nth-child(2) {
+  color: #aaa59a;
+}
+
+.hero-foot a {
+  color: #e69a78;
+  text-decoration-color: rgba(214, 102, 61, 0.6);
+}
+
+.hero-topology path {
+  stroke: #777269;
+  opacity: 0.72;
+}
+
+.hero-topology .node {
+  fill: #0b0b0a;
+}
+
+.hero-topology .pulse {
+  opacity: 0.22;
+}
+
+.projects-section {
+  background: #f3f0e8;
+  color: #11110f;
+}
+
+.projects-intro {
+  margin-left: 8%;
+  color: #6a675f;
+}
+
+.experience-section,
+.skills-section,
+.contact-section {
+  width: 100%;
+  padding-inline: var(--atlas-gutter);
+}
+
+.experience-section > .section-heading,
+.experience-section > .experience-list,
+.skills-section > .section-heading,
+.skills-section > .skills-copy,
+.skills-section > .capability-system,
+.contact-section > .section-heading,
+.contact-section > .contact-handoff,
+.contact-section > .contact-links {
+  width: min(var(--atlas-max), 100%);
+  margin-inline: auto;
+}
+
+.experience-list aside span,
+.principle-list span,
+.credential-layout li span {
+  color: var(--muted);
+}
+
+.experience-list .org {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.principles-section {
+  border-top: 1px solid rgba(17, 17, 15, 0.12);
+}
+
+.principle-list {
+  border-top-color: var(--ink);
+}
+
+.principle-list li {
+  border-right-color: var(--line);
+}
+
+.credentials-section {
+  background: #e0dbd0;
+}
+
+.credential-layout li small.credential-meta,
+.credential-layout time,
+.credential-layout p {
+  color: var(--muted);
+}
+
+.resume-section {
+  background: #f3f0e8;
+}
+
+.resume-band {
+  padding-block: 58px;
+}
+
+.action-primary {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--paper);
+}
+
+.action-primary:hover,
+.action-primary:focus-visible {
+  background: var(--signal);
+  border-color: var(--signal);
+  color: #fffaf2;
+}
+
+.action-secondary {
+  border-color: var(--line);
+}
+
+.action-secondary:hover,
+.action-secondary:focus-visible {
+  border-color: var(--signal);
+  color: var(--signal-text);
+}
+
+.contact-section {
+  padding-bottom: 118px;
+}
+
+.contact-kicker {
+  color: var(--signal-text);
+}
+
+.contact-label,
+.contact-links-label {
+  color: var(--muted);
+}
+
+.contact-email {
+  color: #f1ede4;
+}
+
+.contact-links-list a,
+.contact-email {
+  text-decoration-color: rgba(230, 154, 120, 0.55);
+}
+
+.site-footer {
+  width: 100%;
+  max-width: none;
+  padding-inline: max(var(--atlas-gutter), calc((100vw - var(--atlas-max)) / 2));
+  background: #0b0b0a;
+  border-top-color: rgba(241, 237, 228, 0.18);
+  color: #aaa59a;
+}
