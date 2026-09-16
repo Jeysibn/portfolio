@@ -52,7 +52,7 @@ export function CapabilityMap({
       ref={systemRef}
       className={`capability-system ${isInView ? "is-in-view" : ""}`}
       aria-label="Interactive technical capability map"
-      style={{ "--domain-orbit-duration": "88s" } as CSSProperties}
+      style={{ "--domain-orbit-duration": "104s" } as CSSProperties}
     >
       <div className="control-plane" aria-hidden="true">
         <span>CONTROL</span>

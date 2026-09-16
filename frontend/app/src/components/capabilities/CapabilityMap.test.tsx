@@ -14,7 +14,8 @@ describe("capability control plane", () => {
     expect(document.querySelectorAll(".orbit-skill")).toHaveLength(
       skillGroups.reduce((total, group) => total + group.items.length, 0),
     );
-    expect((document.querySelector(".capability-system") as HTMLElement).style.getPropertyValue("--domain-orbit-duration")).toBe("88s");
+    expect(document.querySelector(".domain-inspection")).not.toBeInTheDocument();
+    expect((document.querySelector(".capability-system") as HTMLElement).style.getPropertyValue("--domain-orbit-duration")).toBe("104s");
     expect(document.querySelector(".domain-1")?.getAttribute("style")).toContain("--skill-orbit-duration: 32s");
 
     fireEvent.click(screen.getByRole("button", { name: /Terraform/ }));
@@ -22,5 +23,22 @@ describe("capability control plane", () => {
       group: skillGroups.find((group) => group.label === "Infrastructure & delivery"),
       item: "Terraform",
     });
+  });
+
+  it("keeps technology names scoped to each technology control", () => {
+    render(<CapabilityMap onOpen={vi.fn()} />);
+
+    const system = document.querySelector(".capability-system") as HTMLElement;
+    const domain = document.querySelector(".capability-domain") as HTMLElement;
+    const skill = domain.querySelector(".orbit-skill") as HTMLElement;
+    const skillLabel = skill.querySelector("span") as HTMLElement;
+
+    fireEvent.mouseEnter(domain);
+    expect(system).not.toHaveClass("has-inspected-domain");
+    expect(domain).not.toHaveClass("is-inspected");
+    expect(skillLabel).toHaveTextContent("Azure");
+
+    fireEvent.focus(skill);
+    expect(skill).toHaveAttribute("aria-label", "Azure — inspect Cloud & virtualization");
   });
 });
