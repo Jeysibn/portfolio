@@ -39,10 +39,10 @@ The source repository is authoritative. Do not treat direct edits in the publica
 - Pages publication failed;
 - the dedicated Pages repository was not updated;
 - theme controls behave incorrectly;
-- the System Deck does not select or reorder a dossier;
+- the selected work spread does not change projects;
 - a project inspection dialog or architecture SVG does not load;
 - the closed chatbot blocks clicks underneath it;
-- the health monitor or Release age presentation looks incorrect;
+- the backend health smoke check or project evidence presentation looks incorrect;
 - navigation scroll alignment or active-section state is incorrect.
 
 ### Checks
@@ -61,26 +61,24 @@ The source repository is authoritative. Do not treat direct edits in the publica
 After a frontend release, verify:
 
 - `https://jeysibn.github.io/` loads successfully;
-- the hero headline displays **Jerome Christian Ibon** and supporting Cloud/DevOps role positioning;
+- the hero headline displays **Jerome Ibon** and supporting NOC/Cloud/DevOps role positioning;
 - no navigation item is active while still inside the hero;
-- navigation order is Projects → Experience → Skills → Certifications → Resume → Contact;
+- navigation order is Projects → Experience → Capabilities → About → Contact;
 - navigation lands sections below the sticky header without centering the heading in the viewport;
 - the theme icon toggles Light/Dark and persists the selected value;
 - with no saved theme, initial load follows the browser/OS preference;
-- the hero health monitor transitions from Checking to the appropriate state;
-- Release age is displayed as release metadata rather than uptime;
-- phone-sized monitoring metrics remain readable with clean separators;
-- the System Deck exposes all four projects and keeps the selected dossier visually in front;
-- previous/next, numbered selector, ArrowLeft/ArrowRight, background dossier buttons, and pointer swipe change the active system;
+- the backend health endpoint remains available to deployment smoke checks without a dashboard-style hero widget;
+- the work spread shows one real architecture diagram and the selector can reach all four projects;
+- previous/next, numbered selector, and ArrowLeft/ArrowRight change the active project;
 - `?project=<slug>` opens the matching inspection dialog and browser back/forward updates it;
-- the deck uses compact flow previews; inspection loads the selected project's full SVG sheets and text summaries;
-- skill cards open their detail dialogs;
-- certification descriptions are readable through hover/focus behavior;
+- the spread uses a typed flow preview and a real architecture sheet; inspection loads the selected project's full SVG sheets and text summaries;
+- capability domains and tools open their detail dialogs;
+- certification issuer/status links are readable and keyboard accessible;
 - the resume is visible on-page and the PDF download works;
 - the Contact CTA is reachable from the hero;
 - closing the chatbot leaves underlying page elements clickable;
 - keyboard focus remains visible on interactive cards and controls;
-- About heading/body spacing and the `cat philosophy.txt` principles card remain visually balanced at desktop and mobile sizes.
+- About heading/body spacing and the editorial principles list remain visually balanced at desktop and mobile sizes.
 
 ## Frontend Network and Performance Checks
 
@@ -101,14 +99,14 @@ Open the preview URL (normally `http://localhost:4173`), enable **Disable cache*
 
 ### Project architecture behavior
 
-The deck preview is generated from `project.preview.flow` and does not fetch full diagram assets. The inspection dialog loads SVGs from `frontend/app/public/architecture/` and renders their adjacent text summaries.
+The selected work spread is generated from typed project content and loads the active project's first architecture SVG. The inspection dialog loads the complete SVG set and renders adjacent text summaries.
 
 If an architecture sheet fails:
 
 1. confirm the SVG exists under the matching project directory;
 2. open the SVG directly and verify its `<title>`, `<desc>`, labels, and arrows;
 3. check the dialog's text summary separately from image loading;
-4. treat an asset failure separately from Azure API health or System Deck state.
+4. treat an asset failure separately from Azure API health or project selector state.
 
 ### Local Vite startup failure
 
@@ -143,16 +141,15 @@ npm run build
 npm run dev
 ```
 
-## Monitoring Panel Interpretation
+## Backend Health Interpretation
 
-The hero monitor combines liveness and release metadata.
+The portfolio's editorial UI does not present a live operations dashboard. The
+backend health endpoint remains available for deployment verification.
 
 - `GET /api/health` is a Function App liveness check only.
-- An Operational result does not prove Cosmos DB or the AI provider is healthy.
-- **Release age** is calculated from the frontend Vite build timestamp.
-- Release age resets on a new frontend release.
-- Release age is not Azure Function uptime and must not be used as an availability SLI.
-- Manila time is client-side presentation context, not an infrastructure signal.
+- An operational result does not prove Cosmos DB or the AI provider is healthy.
+- Use Application Insights and Log Analytics for dependency and request-level
+  operational evidence.
 
 ## Backend Incident
 

@@ -7,7 +7,7 @@
 
 A production-oriented Cloud and DevOps portfolio built as an end-to-end engineering project. The deployed system combines a React + TypeScript single-page frontend, Python Azure Functions APIs, Azure Cosmos DB, Terraform-managed infrastructure, Azure-native observability, a provider-neutral AI portfolio assistant, and GitHub Actions CI/CD using OpenID Connect (OIDC) authentication to Azure.
 
-The current frontend uses an infrastructure control-surface visual system while keeping the site portfolio-first rather than dashboard-first. It includes live production health, release metadata, interactive project details, detailed skill inspection, certification cards, a fully visible resume, and an opportunity-focused contact experience.
+The current frontend uses an Infrastructure Editorial visual system: near-black paper, warm monochrome typography, large architecture evidence, generous pacing, and restrained motion. It keeps interactive project details, detailed capability inspection, credentials, resume download, the visitor counter, the AI assistant, and an opportunity-focused contact experience without presenting the site as a dashboard.
 
 The assistant uses the same canonical project facts as the website. It currently
 answers about all four visible projects with deterministic lightweight retrieval,
@@ -28,7 +28,7 @@ ingestion.
 
 | Layer | Technology | Responsibility |
 |---|---|---|
-| Frontend | React, TypeScript, Vite, Tailwind CSS, GitHub Pages | Single-page portfolio UI, health monitor, visitor counter, AI chat, project details, skills, credentials, resume |
+| Frontend | React, TypeScript, Vite, GitHub Pages | Single-page editorial portfolio UI, visitor counter, AI chat, project evidence, capabilities, credentials, resume |
 | Backend | Azure Functions, Python 3.11 | Health, visitor-counter, and AI-assistant APIs |
 | Database | Azure Cosmos DB for NoSQL | Persistent visitor count, hashed visitor records, chat rate-limit records |
 | AI | OpenAI-compatible external API | Portfolio-specific conversational assistant with provider-neutral frontend branding |
@@ -102,28 +102,25 @@ Current frontend features include:
 
 - responsive desktop and mobile navigation with active-section tracking;
 - a compact saved Light/Dark theme control with system preference used as the initial fallback;
-- a name-first hero headed by **Jerome Christian Ibon**, with Cloud Support, DevOps, and Cloud Engineering as supporting positioning;
-- an explicit **Open to opportunities** state with entry-level role context;
-- live production `/api/health` status from Azure Functions;
-- a build-derived **Release age** value that resets with every frontend release;
-- live Manila time in the monitoring panel;
+- a name-first hero headed by **Jerome Ibon**, with NOC Engineering, DevOps, and Cloud as supporting positioning;
+- an explicit **Available now** state with entry-level role context;
 - visitor counter with loading and unavailable states;
 - AI assistant with session history, rate-limit/error handling, and a closed state that does not block page interaction;
 - assistant starter questions that populate the input without auto-submitting, subtle factual source links, clear/reset behavior, and accessible loading/error states;
-- one four-project System Deck with stacked dossier selection, numbered controls, previous/next navigation, keyboard arrows, and pointer swipe support;
-- compact repository-derived architecture previews on the deck, with full SVG diagrams deferred to the selected project's inspection dialog;
+- one four-project editorial work spread with numbered controls, previous/next navigation, keyboard arrows, and progressive project detail;
+- large repository-derived architecture diagrams on the active spread, with the full SVG set available in the selected project's inspection dialog;
 - static-host-safe project inspection links using `?project=<slug>` and browser history synchronization;
-- clickable skill capability cards with detailed modal explanations;
-- provider-styled certification cards with hover/focus descriptions;
+- keyboard- and touch-accessible capability domains with detailed modal explanations;
+- restrained certification and education lists with canonical issuer/status links;
 - a concise on-page resume with direct PDF download and a form-less recruiter handoff;
 - restrained reveal motion and `prefers-reduced-motion` support;
-- an in-view Control Plane orbital topology on supported desktop layouts, with a domain guide tied to the actual orbit radius, slow upright domain/tool orbits, per-technology name inspection with local pause behavior, and a structured static fallback for constrained widths;
-- height-aware desktop density for 1920×1080 workstations, with restrained operational motion elsewhere.
+- an ambient capability field on desktop that becomes a static editorial list on smaller screens, with focused buttons that remain stable while in use;
+- height-aware desktop density for 1920×1080 workstations, with restrained motion elsewhere.
 
 The primary page flow is:
 
 ```text
-Hero → Projects → Experience → Capabilities → Credentials → Principles → Resume → Contact
+Hero → Selected work → Experience → Capabilities → Foundations → About → A concise record → Contact
 ```
 
 Navigation scrolls the requested section to the top of the content viewport beneath the sticky header, and no navigation entry is forced active while the user remains in the hero.
@@ -134,18 +131,10 @@ The hero copy is applied during the initial browser render task so the current n
 
 Projects use two presentation levels:
 
-1. The System Deck renders a lightweight flow from each project's typed preview data.
-2. The selected project's inspection dialog loads the repository-derived SVG architecture sheets and exposes a text equivalent for each diagram.
+1. The active work spread renders the first repository-derived architecture sheet alongside a typed delivery flow.
+2. The selected project's inspection dialog loads the complete SVG architecture set and exposes a text equivalent for each diagram.
 
-The deck does not load the full architecture set into the active preview, keeping the first project interaction compact while preserving detailed evidence on demand.
-
-### Health and release-age semantics
-
-The hero monitor deliberately separates liveness from release metadata:
-
-- `/api/health` confirms that the Azure Function worker loaded and can serve HTTP;
-- it does **not** prove Cosmos DB or the external AI provider is healthy;
-- **Release age** is calculated from a Vite build timestamp and is not server uptime.
+The active preview uses one real architecture sheet to make project evidence visible in the main narrative while keeping the remaining detailed views available on demand.
 
 ### Local frontend development
 
@@ -374,7 +363,7 @@ Production visibility includes:
 - Log Analytics with 30-day retention and a `0.1 GB/day` ingestion cap;
 - backend health and visitor-counter post-deployment smoke checks;
 - frontend root-site post-publication verification;
-- frontend health monitor with explicit liveness and release-age semantics;
+- backend health endpoint with explicit liveness semantics for deployment verification;
 - initial SLI/SLO targets and KQL troubleshooting queries.
 
 See [`docs/observability.md`](docs/observability.md) and [`docs/runbook.md`](docs/runbook.md).

@@ -55,7 +55,7 @@ The frontend is a Vite-built React + TypeScript single-page application. Source 
 The application uses document-anchor navigation instead of client-side routes. The visible flow is:
 
 ```text
-  Hero → Projects → Experience → Capabilities → Credentials → Principles → Resume → Contact
+  Hero → Selected work → Experience → Capabilities → Foundations → About → A concise record → Contact
 ```
 
 Navigation scrolls the selected section to the start of the viewport beneath the sticky header. The hero intentionally has no active navigation item; active-section indication begins when a content section is reached.
@@ -65,24 +65,19 @@ Navigation scrolls the selected section to the start of the viewport beneath the
 - responsive desktop and mobile navigation with active-section tracking;
 - compact Light/Dark theme switching with saved-preference persistence and initial system-preference fallback;
 - typed portfolio content rendering;
-- a name-first hero centered on `Jerome Christian Ibon` with Cloud Support / DevOps / Cloud Engineering positioning;
-- live Azure Function `/api/health` status;
-- build-derived release-age display;
-- live Manila time in the monitoring panel;
-- responsive monitoring-card geometry, including single-column phone metrics;
+- a name-first editorial hero centered on `Jerome Ibon` with NOC Engineering / DevOps / Cloud positioning;
+- backend `/api/health` remains available for deployment verification;
 - visitor-counter display;
 - AI assistant conversation state, starter questions, source links, and session history;
-- a four-project System Deck with explicit circular deck ordering;
-- stacked dossier selection with GSAP state-change motion;
-- compact typed architecture-flow previews;
+- a four-project editorial work spread with numbered project selection and keyboard arrows;
+- a large repository-derived architecture sheet paired with typed delivery-flow previews;
 - static-host-safe `?project=<slug>` inspection deep links;
 - native project-detail dialogs with full SVG architecture sheets and text equivalents;
 - clickable skill-detail dialogs;
-- provider-styled certification cards;
+- restrained certification and education lists;
 - fully visible on-page resume plus direct PDF download;
 - form-less System Handoff with direct email, copy-email, LinkedIn, resume, and GitHub paths;
-- height-aware desktop density and an in-view Control Plane capability topology with a radius-matched domain guide, slow nested CSS orbits, upright counter-rotation, per-technology name inspection with local pause-on-focus/hover behavior, and a static constrained-width fallback;
-- an ambient Signal Rail whose progress line and active/completed lifecycle nodes share monotonic document-scroll state rather than section-specific stage ownership;
+- height-aware desktop density and an ambient capability field with slow, low-amplitude desktop drift, focus stability, and a static constrained-width fallback;
 - keyboard focus behavior and reduced-motion support.
 
 The AI interface remains provider-neutral so backend model/provider changes do not require frontend branding changes.
@@ -100,9 +95,7 @@ On initial load:
 
 The visible header control toggles between Light and Dark and persists the selected value. Theme changes update the document color scheme and browser theme-color metadata.
 
-## Frontend Monitoring Semantics
-
-The hero monitor intentionally combines two different categories of information without treating them as equivalent.
+## Backend health semantics
 
 ### Liveness
 
@@ -110,21 +103,15 @@ The hero monitor intentionally combines two different categories of information 
 
 It does **not** query Cosmos DB or the external AI provider, so an Operational health state must not be interpreted as proof that every downstream dependency is healthy.
 
-### Release age
-
-The frontend build injects a compile-time timestamp through Vite. The UI calculates **Release age** from that timestamp and resets naturally with every new frontend build/release.
-
-Release age is **not server uptime**. Azure Functions is serverless and may scale or recycle instances independently of the frontend release lifecycle.
-
 ## Project Architecture Delivery
 
-The System Deck keeps the homepage preview intentionally small and data-driven:
+The selected work spread keeps the homepage evidence focused and data-driven:
 
 ```text
 Project preview data
    |
    v
-compact flow in the System Deck
+typed flow and first architecture sheet in the work spread
    |
    | Inspect system
    v
@@ -162,7 +149,7 @@ The backend runs as an Azure Functions Python 3.11 application using the Python 
 
 `GET /api/health` verifies that the Function worker loaded and can serve HTTP without making dependency calls to Cosmos DB or the AI provider.
 
-The React hero checks this endpoint when the page loads, and the backend deployment workflow uses the same route as a post-deployment gate.
+The backend deployment workflow uses the same route as a post-deployment gate. The portfolio presentation keeps that operational endpoint available without promoting live health widgets into the hero.
 
 ### Visitor Counter
 

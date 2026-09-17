@@ -5,10 +5,17 @@ import type { ThemePreference } from "./portfolio";
 const THEME_STORAGE_KEY = "color-theme";
 
 function getInitialTheme(): ThemePreference {
-  const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
-  // The reference direction is intentionally dark-first, while the explicit
-  // theme switch keeps the light reading surface available to every visitor.
-  return stored === "light" || stored === "dark" ? stored : "dark";
+  let stored: string | null = null;
+  try {
+    stored = window.localStorage.getItem(THEME_STORAGE_KEY);
+  } catch {
+    // Storage may be unavailable in privacy-restricted browser contexts.
+  }
+  if (stored === "light" || stored === "dark") return stored;
+
+  return window.matchMedia?.("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
 }
 
 export function useTheme() {
@@ -19,7 +26,11 @@ export function useTheme() {
   useEffect(() => {
     document.documentElement.dataset.theme = effectiveTheme;
     document.documentElement.style.colorScheme = effectiveTheme;
-    window.localStorage.setItem(THEME_STORAGE_KEY, preference);
+    try {
+      window.localStorage.setItem(THEME_STORAGE_KEY, preference);
+    } catch {
+      // The theme still applies for the current session when storage is blocked.
+    }
 
     const themeColor = document.querySelector<HTMLMetaElement>(
       'meta[name="theme-color"]',

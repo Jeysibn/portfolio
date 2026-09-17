@@ -29,16 +29,8 @@
       "id": "skills"
     },
     {
-      "label": "Credentials",
-      "id": "credentials"
-    },
-    {
-      "label": "Principles",
+      "label": "About",
       "id": "about"
-    },
-    {
-      "label": "Resume",
-      "id": "resume"
     },
     {
       "label": "Contact",
@@ -81,22 +73,26 @@
     {
       "name": "Oracle Cloud Infrastructure (OCI) Foundations Associate",
       "issuer": "Oracle",
-      "status": "earned"
+      "status": "earned",
+      "referenceUrl": "https://academy.oracle.com/en/resources-oracle-certifications.html"
     },
     {
       "name": "Trend Vision One Server and Workload Protection Professional",
       "issuer": "Trend Micro",
-      "status": "earned"
+      "status": "earned",
+      "referenceUrl": "https://www.trendmicro.com/en_us/business/services/support-services/education.html"
     },
     {
       "name": "GitHub Foundations",
       "issuer": "GitHub",
-      "status": "earned"
+      "status": "earned",
+      "referenceUrl": "https://docs.github.com/en/get-started/showcase-your-expertise-with-github-certifications/about-github-certifications"
     },
     {
       "name": "HashiCorp Certified: Terraform Associate (004)",
       "issuer": "HashiCorp",
-      "status": "in-progress"
+      "status": "in-progress",
+      "referenceUrl": "https://developer.hashicorp.com/certifications/infrastructure-automation"
     }
   ],
   "skills": [

@@ -77,7 +77,7 @@ The frontend job:
 
 Source files and development dependencies are not part of the deployable frontend artifact.
 
-The Vite configuration also injects a build timestamp used by the deployed UI to calculate **Release age**. This timestamp is release metadata, not infrastructure uptime.
+The frontend artifact is presentation-only; backend liveness remains covered by the backend deployment smoke checks.
 
 ### Backend production readiness
 
@@ -165,8 +165,6 @@ The Pages repository is treated as generated deployment output. Source edits bel
 
 `PAGES_DEPLOY_TOKEN` is a GitHub Actions secret used only to authenticate the cross-repository checkout/push. It is separate from Azure authentication and must not be exposed in source, logs, or documentation.
 
-Every new frontend build receives a fresh build timestamp, so the visible Release age counter resets with each release.
-
 The live-page verification means a successful push to the publication repository alone is not considered sufficient evidence of a successful frontend release.
 
 ### Backend
@@ -224,9 +222,9 @@ A fresh plan is generated on `main` even when PR validation previously generated
 
 ## Frontend Asset Delivery
 
-The Vite build contains the application JavaScript/CSS and static public assets. The System Deck uses compact data-driven topology previews; full repository-derived project architecture remains in the SVG sheets under `frontend/app/public/architecture/` and is loaded by the inspection dialog.
+The Vite build contains the application JavaScript/CSS and static public assets. The selected work spread displays one repository-derived architecture sheet from `frontend/app/public/architecture/`, while the inspection dialog exposes the complete SVG set.
 
-Normal project rendering does not load the full SVG set. The selected project's architecture sheets are requested only when the user explicitly opens system inspection, while the adjacent text summaries keep the interaction understandable without image rendering.
+Normal project rendering loads only the active project's first architecture sheet. The remaining sheets are requested when the user explicitly opens system inspection, while the adjacent text summaries keep the interaction understandable without image rendering.
 
 This behavior is application-level optimization rather than a separate deployment job. CI still validates the frontend through the normal TypeScript and Vite build pipeline.
 

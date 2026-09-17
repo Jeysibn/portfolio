@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import { fetchHealth } from "../api";
 import { useEffect, useRef, useState } from "react";
 import {
   career,
@@ -61,61 +60,32 @@ function Section({
   );
 }
 
-function SystemStatus() {
-  const [status, setStatus] = useState("checking");
-  useEffect(() => {
-    const c = new AbortController();
-    fetchHealth(c.signal)
-      .then(() => setStatus("online"))
-      .catch((e: unknown) => {
-        if (!(e instanceof DOMException && e.name === "AbortError"))
-          setStatus("unavailable");
-      });
-    return () => c.abort();
-  }, []);
-  return (
-    <div className="system-status" aria-live="polite">
-      <span className={`status-light ${status}`} />
-      API {status}
-    </div>
-  );
-}
-
 export function Hero() {
   return (
     <section
       id="top"
-      className="hero"
+      className="hero section-frame"
       aria-labelledby="hero-title"
     >
       <div className="hero-meta">
-        <span>Malolos · Philippines</span>
-        <SystemStatus />
-        <span>Open to opportunities</span>
+        <span>01 / 06</span>
+        <span>Malolos, Philippines · 2026</span>
+        <span>Available now</span>
       </div>
       <h1 className="hero-name" id="hero-title">
         <span>Jerome</span>
-        <span>Christian</span>
         <span>Ibon</span>
       </h1>
       <div className="hero-foot">
-        <p>Cloud Support · DevOps · Cloud Engineering</p>
+        <p className="hero-role">NOC Engineer / DevOps / Cloud</p>
         <p>
-          Computer Engineering graduate building cloud infrastructure, automated
-          delivery pipelines, Kubernetes environments, and observable systems.
+          I build infrastructure and systems designed to remain understandable
+          when things fail.
         </p>
         <a href="#projects">
-          View engineering projects <i aria-hidden="true">↓</i>
+          Selected work <i aria-hidden="true">↓</i>
         </a>
       </div>
-      <svg className="hero-topology" viewBox="0 0 700 600" aria-hidden="true">
-        <path d="M55 142 C190 142 160 310 312 310 S420 106 620 106 M312 310 C312 420 485 382 596 500" />
-        <circle className="node" cx="55" cy="142" r="8" />
-        <circle className="node" cx="312" cy="310" r="11" />
-        <circle className="node" cx="620" cy="106" r="7" />
-        <circle className="node" cx="596" cy="500" r="9" />
-        <circle className="pulse" cx="312" cy="310" r="30" />
-      </svg>
     </section>
   );
 }
@@ -124,7 +94,7 @@ export function Principles() {
   return (
     <Section
       id="about"
-      title="Operating principles"
+      title="Systems / people / purpose"
       className="principles-section"
     >
       <div className="about-lead">
@@ -156,11 +126,12 @@ export function Projects({ onOpen }: { onOpen: (p: Project) => void }) {
   return (
     <Section
       id="projects"
-      title="Projects"
+      title="Selected work"
       className="projects-section"
     >
       <p className="projects-intro">
-        Selected engineering work, presented as working systems rather than isolated screenshots.
+        Four working systems, documented from the operational problem to the
+        delivery path.
       </p>
       <SystemDeck projects={projects} onInspect={onOpen} />
     </Section>
@@ -169,7 +140,7 @@ export function Projects({ onOpen }: { onOpen: (p: Project) => void }) {
 
 export function Experience() {
   return (
-    <Section id="experience" title="Experience">
+    <Section id="experience" title="Learning / building / improving">
       <div className="experience-list">
         {experience.map((item, i) => (
           <article key={item.role}>
@@ -204,9 +175,8 @@ export function Skills({
   return (
     <Section id="skills" title="Capabilities" className="skills-section">
       <p className="skills-copy">
-        Select a domain, then a tool, to connect each capability to practical
-        project and operational evidence. Every detail remains keyboard
-        accessible.
+        The tools are a consequence of the work: cloud platforms, delivery
+        systems, observability, and the operating knowledge between them.
       </p>
       <CapabilityMap onOpen={onOpen} />
     </Section>
@@ -217,7 +187,7 @@ export function Credentials() {
   return (
     <Section
       id="credentials"
-      title="Credentials"
+      title="Foundations"
       className="credentials-section"
     >
       <div className="credential-layout">
@@ -234,7 +204,18 @@ export function Credentials() {
             <li key={certification.name}>
               <span>{String(i + 1).padStart(2, "0")}</span>
               <div>
-                {certification.name}
+                {certification.referenceUrl ? (
+                  <a
+                    className="credential-name"
+                    href={certification.referenceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {certification.name} <span aria-hidden="true">↗</span>
+                  </a>
+                ) : (
+                  certification.name
+                )}
                 <small className="credential-meta">
                   {certification.issuer ? `${certification.issuer} · ` : null}
                   <span
@@ -260,7 +241,7 @@ export function Credentials() {
 
 export function Resume() {
   return (
-    <Section id="resume" title="Resume">
+    <Section id="resume" title="A concise record">
       <div className="resume-band">
         <div>
           <h3>Everything important, ready to take with you.</h3>
@@ -381,8 +362,8 @@ export function Contact() {
     <Section id="contact" title="Contact" className="contact-section">
       <div className="contact-handoff">
         <div className="contact-intent">
-          <p className="contact-kicker">IMPROVE / SYSTEM HANDOFF</p>
-          <h3>Interested in working together?</h3>
+          <p className="contact-kicker">06 / CONTACT</p>
+          <h3>Let&apos;s build<br />what matters.</h3>
           <p>
             I&apos;m open to entry-level Cloud Engineering, DevOps and Cloud
             Support opportunities where I can work on infrastructure, delivery

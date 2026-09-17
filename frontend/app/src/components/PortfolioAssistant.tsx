@@ -177,9 +177,11 @@ export function PortfolioAssistant() {
   const [value, setValue] = useState("");
   const [sending, setSending] = useState(false);
   const [remaining, setRemaining] = useState<number | null>(null);
+  const trigger = useRef<HTMLButtonElement>(null);
   const end = useRef<HTMLDivElement>(null);
   const input = useRef<HTMLInputElement>(null);
   const chatSessionId = useRef(loadChatSessionId());
+  const wasOpen = useRef(false);
 
   useEffect(() => {
     try {
@@ -193,7 +195,12 @@ export function PortfolioAssistant() {
   }, [messages, sending]);
 
   useEffect(() => {
-    if (open) input.current?.focus();
+    if (open) {
+      input.current?.focus();
+    } else if (wasOpen.current) {
+      trigger.current?.focus();
+    }
+    wasOpen.current = open;
   }, [open]);
 
   function clearConversation() {
@@ -258,6 +265,7 @@ export function PortfolioAssistant() {
       aria-label="Ask this portfolio"
     >
       <button
+        ref={trigger}
         className="portfolio-assistant-trigger"
         type="button"
         aria-expanded={open}
@@ -270,6 +278,12 @@ export function PortfolioAssistant() {
         id="portfolio-assistant-panel"
         className="portfolio-assistant-panel"
         hidden={!open}
+        onKeyDown={(event) => {
+          if (event.key === "Escape") {
+            event.preventDefault();
+            setOpen(false);
+          }
+        }}
       >
         <header>
           <div>
