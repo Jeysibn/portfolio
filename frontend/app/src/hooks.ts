@@ -4,15 +4,11 @@ import type { ThemePreference } from "./portfolio";
 
 const THEME_STORAGE_KEY = "color-theme";
 
-function getSystemTheme(): "light" | "dark" {
-  return window.matchMedia("(prefers-color-scheme: dark)").matches
-    ? "dark"
-    : "light";
-}
-
 function getInitialTheme(): ThemePreference {
   const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
-  return stored === "light" || stored === "dark" ? stored : getSystemTheme();
+  // The reference direction is intentionally dark-first, while the explicit
+  // theme switch keeps the light reading surface available to every visitor.
+  return stored === "light" || stored === "dark" ? stored : "dark";
 }
 
 export function useTheme() {
@@ -29,7 +25,7 @@ export function useTheme() {
       'meta[name="theme-color"]',
     );
     if (themeColor) {
-      themeColor.content = effectiveTheme === "dark" ? "#10130f" : "#eee9de";
+      themeColor.content = effectiveTheme === "dark" ? "#010100" : "#eee9de";
     }
   }, [effectiveTheme, preference]);
 

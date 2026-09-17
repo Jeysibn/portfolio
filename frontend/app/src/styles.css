@@ -47,24 +47,25 @@
   text-rendering: optimizeLegibility;
 }
 :root[data-theme="dark"] {
-  --surface-page: #10130f;
-  --surface-section: #171b15;
-  --surface-raised: #1b1f19;
-  --surface-overlay: #20251e;
+  /* Grayscale Collective reference translated into the portfolio's system world. */
+  --surface-page: #010100;
+  --surface-section: #0a0a0a;
+  --surface-raised: #0d0c0b;
+  --surface-overlay: #141412;
   --surface-technical-sheet: #eee9de;
   --text-technical-sheet: #171912;
   --rule-technical-sheet: #766f62;
   --paper: var(--surface-page);
-  --ink: #e8e6da;
-  --muted: #a2a397;
-  --line: rgba(232, 230, 218, 0.2);
-  --signal: #ff6841;
-  --signal-text: #ff9a7d;
-  --accent-petrol: #79a69c;
-  --cursor-glow-strong: color-mix(in srgb, var(--accent-petrol) 11%, transparent);
-  --cursor-glow-soft: color-mix(in srgb, var(--accent-petrol) 4.5%, transparent);
-  --danger: #ff8e83;
-  --shadow: 0 24px 80px rgba(0, 0, 0, 0.42);
+  --ink: #f4f1ef;
+  --muted: #918f8d;
+  --line: rgba(244, 241, 239, 0.14);
+  --signal: #d56f54;
+  --signal-text: #e7a391;
+  --accent-petrol: #aaa7a0;
+  --cursor-glow-strong: color-mix(in srgb, #8c2a3f 7%, transparent);
+  --cursor-glow-soft: color-mix(in srgb, #8c2a3f 2.5%, transparent);
+  --danger: #e7a391;
+  --shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
   color-scheme: dark;
 }
 * {
@@ -84,6 +85,9 @@ body {
     background 0.35s,
     color 0.35s;
   overflow-x: hidden;
+}
+:root[data-theme="dark"] body {
+  background: #010100;
 }
 .cursor-glow {
   position: fixed;
@@ -158,6 +162,10 @@ a {
   border-bottom: 1px solid var(--line);
   background: color-mix(in srgb, var(--surface-page) 90%, transparent);
   backdrop-filter: blur(12px);
+}
+:root[data-theme="dark"] .site-header {
+  background: color-mix(in srgb, #010100 94%, transparent);
+  border-bottom-color: #1a1a18;
 }
 .wordmark {
   display: flex;
@@ -317,6 +325,12 @@ a {
   padding: 110px 0 40px;
   display: grid;
   grid-template-rows: auto 1fr auto;
+  border-bottom: 1px solid var(--line);
+}
+:root[data-theme="dark"] .hero {
+  background:
+    radial-gradient(circle at 78% 34%, rgba(140, 42, 63, 0.08), transparent 30%),
+    #010100;
 }
 .hero-meta {
   display: flex;
@@ -353,6 +367,14 @@ a {
   font: 400 var(--type-hero)/0.77 var(--display);
   letter-spacing: -0.04em;
   text-transform: uppercase;
+}
+:root[data-theme="dark"] .hero-name,
+:root[data-theme="dark"] .section-heading h2,
+:root[data-theme="dark"] .experience-list h3,
+:root[data-theme="dark"] .credential-layout article h3,
+:root[data-theme="dark"] .resume-band h3,
+:root[data-theme="dark"] .contact-intent h3 {
+  font-weight: 600;
 }
 .hero-name span {
   display: block;
@@ -480,6 +502,9 @@ a {
   background: var(--surface-section);
   color: var(--ink);
   overflow: hidden;
+}
+:root[data-theme="dark"] .projects-section {
+  background: #0a0a0a;
 }
 .projects-section > .section-heading,
 .projects-section > .projects-intro,
@@ -1057,6 +1082,10 @@ body:has(.capability-system.is-in-view) .signal-stage.is-active {
   font: 500 10px var(--mono);
   text-transform: uppercase;
 }
+:root[data-theme="dark"] .site-footer {
+  background: #0a0a0a;
+  border-top-color: #1a1a18;
+}
 .site-footer p {
   margin: 0;
 }
@@ -1278,7 +1307,8 @@ body:has(.inspection-dialog[open]) {
   height: 22px;
   margin-right: 10px;
   background: var(--signal);
-  color: var(--ink);
+  /* Keep the glyph readable against both the copper light signal and its dark-mode variant. */
+  color: #010100;
   border-radius: 50%;
 }
 .portfolio-assistant-panel {
@@ -1694,9 +1724,28 @@ body:has(.inspection-dialog[open]) {
   .hero-meta span:first-child {
     display: none;
   }
+  .hero-meta {
+    min-width: 0;
+    width: 100%;
+    display: grid;
+    grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+    gap: 12px;
+    align-items: center;
+  }
+  .hero-meta .system-status,
+  .hero-meta span:last-child {
+    min-width: 0;
+    white-space: nowrap;
+  }
+  .hero-meta span:last-child {
+    justify-self: end;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
   .hero-name {
     display: block;
-    font-size: 20vw;
+    min-width: 0;
+    font-size: clamp(3.4rem, 16vw, 6.5rem);
     line-height: 0.78;
   }
   .hero-name span:nth-child(2) {

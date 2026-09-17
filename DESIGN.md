@@ -8,8 +8,12 @@ colors:
   copper-signal: "#e0522d"
   copper-text: "#a93618"
   petrol: "#275d57"
-  paper-dark: "#10130f"
-  ink-dark: "#e8e6da"
+  paper-dark: "#010100"
+  ink-dark: "#f4f1ef"
+  dark-section: "#0a0a0a"
+  dark-raised: "#0d0c0b"
+  dark-muted: "#918f8d"
+  dark-line: "#1a1a18"
 typography:
   display:
     fontFamily: "Bodoni Moda, Georgia, serif"
@@ -53,7 +57,7 @@ Key characteristics: asymmetric composition, hairline rules, open whitespace, ex
 
 ## Colors
 
-Warm Paper and Infrastructure Ink form the reading surface. Copper Signal marks live state and Petrol marks systems depth. Dark mode uses a green-black field and warm off-white ink rather than simple inversion.
+Warm Paper and Infrastructure Ink form the light reading surface. Copper Signal marks live state and Petrol marks systems depth. Dark mode is the default cinematic surface: near-black tonal layers, warm off-white type, quiet hairlines, and desaturated technical diagrams. The reference direction is translated into the portfolio's infrastructure language rather than copied literally.
 
 ## Typography
 
@@ -63,7 +67,7 @@ Bodoni Moda carries identity and chapter scale; Manrope carries readable detail;
 
 Content uses a fluid maximum-width atlas with strongly asymmetric offsets. Projects are represented as stacked system dossiers rather than generic cards. The active dossier becomes the current inspection plane while background dossiers retain visible technical identity. The capability map is a topology-inspired Control Plane: supported desktop layouts use a slow outer domain orbit whose visible guide is tied to the same radius as the moving domains, plus independently paced inner technology orbits. Wrappers counter-rotate content so labels remain upright. Domain cards stay quiet; hovering or keyboard-focusing an individual technology pauses its local orbit and reveals only that technology's name. Constrained widths use a structured static domain list. At 900px, wide structures collapse; at 600px, the narrative becomes a vertical stack, architecture becomes a two-column sequence, and interactive topology becomes a one-column domain list.
 
-Desktop density is height-aware as well as width-aware. On wide displays with limited vertical space, display type, section padding, and project dossier geometry use a compact treatment so a 1920×1080 workstation remains scanable. The Control Plane is the portfolio's one intentional ambient motion system: CSS transforms run only while it is near the viewport, pause during interaction, and stop completely under reduced motion. Hero, signal, and dialog transitions remain restrained.
+Desktop density is height-aware as well as width-aware. On wide displays with limited vertical space, display type, section padding, and project dossier geometry use a compact treatment so a 1920×1080 workstation remains scanable. Dark mode is the first-visit atmosphere, while the explicit light theme remains a complete reading surface. The Control Plane is the portfolio's one intentional ambient motion system: CSS transforms run only while it is near the viewport, pause during interaction, and stop completely under reduced motion. Hero, signal, and dialog transitions remain restrained.
 
 The fixed Signal Rail is not a second navigation menu and does not map one lifecycle stage to one portfolio section. Its progress line and active/completed nodes derive from one monotonic document-scroll progress model, so the infrastructure metaphor never moves backward when the content order changes. Full labels are reserved for wide gutters; medium desktop uses marker-only presentation.
 
