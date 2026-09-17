@@ -29,8 +29,16 @@
       "id": "skills"
     },
     {
-      "label": "About",
+      "label": "Credentials",
+      "id": "credentials"
+    },
+    {
+      "label": "Principles",
       "id": "about"
+    },
+    {
+      "label": "Resume",
+      "id": "resume"
     },
     {
       "label": "Contact",

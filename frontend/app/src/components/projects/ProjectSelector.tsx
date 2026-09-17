@@ -15,7 +15,7 @@ export function ProjectSelector({
   const nextIndex = (activeIndex + 1) % projects.length;
 
   return (
-    <nav className="project-selector" aria-label="Project selector">
+    <nav className="system-selector" aria-label="System selector">
       <ol>
         {projects.map((project, index) => {
           const isActive = project.id === activeId;
@@ -26,7 +26,7 @@ export function ProjectSelector({
                 className={isActive ? "is-active" : undefined}
                 onClick={() => onSelect(project.id)}
                 aria-current={isActive ? "true" : undefined}
-                aria-label={`Select project ${String(index + 1).padStart(2, "0")}: ${project.title}`}
+                aria-label={`Select system ${String(index + 1).padStart(2, "0")}: ${project.title}`}
               >
                 {String(index + 1).padStart(2, "0")}
               </button>
@@ -34,11 +34,11 @@ export function ProjectSelector({
           );
         })}
       </ol>
-      <div className="project-selector-arrows">
+      <div className="system-selector-arrows">
         <button
           type="button"
           onClick={() => onSelect(projects[previousIndex].id)}
-          aria-label="Select previous project"
+          aria-label="Select previous system"
         >
           <span aria-hidden="true">←</span>
         </button>
@@ -48,7 +48,7 @@ export function ProjectSelector({
         <button
           type="button"
           onClick={() => onSelect(projects[nextIndex].id)}
-          aria-label="Select next project"
+          aria-label="Select next system"
         >
           <span aria-hidden="true">→</span>
         </button>

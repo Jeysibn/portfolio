@@ -36,7 +36,7 @@ export function useTheme() {
       'meta[name="theme-color"]',
     );
     if (themeColor) {
-      themeColor.content = effectiveTheme === "dark" ? "#080807" : "#eee9de";
+      themeColor.content = effectiveTheme === "dark" ? "#10130f" : "#eee9de";
     }
   }, [effectiveTheme, preference]);
 

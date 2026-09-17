@@ -10,7 +10,7 @@ describe("Contact handoff", () => {
     render(<Contact />);
 
     expect(screen.getByRole("heading", { name: "Contact" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Let's buildwhat matters." })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Interested in working together?" })).toBeInTheDocument();
     expect(screen.getByText("Open to opportunities")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Email jeysibn@gmail.com" })).toHaveAttribute(
       "href",
@@ -82,7 +82,7 @@ describe("Section headings", () => {
   it("keeps lifecycle stages out of content headings", () => {
     render(<Projects onOpen={vi.fn()} />);
 
-    expect(screen.getByRole("heading", { name: "Selected work" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Projects" })).toBeInTheDocument();
     expect(document.querySelectorAll(".chapter-signal")).toHaveLength(0);
     expect(document.querySelectorAll("[data-signal-stage]")).toHaveLength(0);
   });

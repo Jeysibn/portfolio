@@ -7,7 +7,9 @@ describe("portfolio content contract", () => {
       "projects",
       "experience",
       "skills",
+      "credentials",
       "about",
+      "resume",
       "contact",
     ]);
   });

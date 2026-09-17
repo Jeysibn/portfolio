@@ -4,7 +4,7 @@ import AxeBuilder from "@axe-core/playwright";
 test.describe("portfolio UI smoke coverage", () => {
   test("loads the recruiter path without automatic accessibility violations", async ({ page }) => {
     await page.goto("/", { waitUntil: "domcontentloaded" });
-    await expect(page.getByRole("heading", { name: "Jerome Ibon" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Jerome Christian Ibon" })).toBeVisible();
 
     const results = await new AxeBuilder({ page }).analyze();
     expect(results.violations).toEqual([]);
@@ -23,15 +23,15 @@ test.describe("portfolio UI smoke coverage", () => {
     await expect(page.getByRole("navigation", { name: "Primary navigation" })).toBeHidden();
 
     await menu.click();
-    await page.getByRole("link", { name: "Projects" }).click();
+    await page.locator("#primary-nav").getByRole("link", { name: "Projects", exact: true }).click();
     await expect(page).toHaveURL(/#projects$/);
   });
 
   test("keeps project outcomes visible and project selection usable", async ({ page }) => {
     await page.goto("/", { waitUntil: "domcontentloaded" });
-    await expect(page.locator(".system-dossier.is-active .project-notes")).toBeVisible();
+    await expect(page.locator(".system-dossier.is-active .system-dossier-content")).toBeVisible();
 
-    await page.getByRole("button", { name: /Select project 02:/ }).click();
+    await page.locator(".system-selector").getByRole("button", { name: /Select system 02:/ }).click();
     await expect(page.locator(".system-dossier.is-active h3")).toHaveText(
       "Homelab GitOps Environment",
     );

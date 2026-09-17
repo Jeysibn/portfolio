@@ -10,7 +10,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and 
 
 ### Added
 
-- **Infrastructure Editorial direction**: Reframed the portfolio as a restrained monochrome publication where identity, selected work, real engineering evidence, and concise career context lead the experience.
+- **Control-surface visual direction**: Retained the editorial infrastructure atlas with paper/ink surfaces, copper signal states, petrol system depth, architecture flows, and restrained motion.
 
 - **Published-site browser smoke coverage**: Added a small Playwright smoke path for the deployed GitHub Pages URL, covering hero rendering, accessibility, navigation, project selection, and the assistant focus boundary.
 - **Canonical assistant knowledge**: Added `content/portfolio.json` as the shared source for visible portfolio facts and generated an explicit allow-listed `backend/data/approved_knowledge.json` projection covering Cloud-Backed Portfolio, Homelab GitOps Environment, MoniKey, and NOC Report Builder.
@@ -26,21 +26,21 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and 
 
 ### Changed
 
-- **Project presentation**: Replaced the stacked System Deck interaction with one spacious editorial project spread, authentic architecture evidence, progressive case-study details, and quiet numbered project navigation.
-- **Capabilities**: Retained the spatial skill concept as an ambient constellation with slow drift, a static constrained-width fallback, and focus-within pausing for keyboard users.
+- **Project presentation**: Retained the stacked System Deck interaction with compact architecture-flow previews, numbered navigation, and progressive project inspection.
+- **Capabilities**: Retained the spatial Control Plane concept with slow domain/tool orbits, a structured constrained-width fallback, and focus-within pausing for keyboard users.
 
-- **Frontend visual hierarchy**: Removed dashboard/control-system chrome, increased editorial whitespace, made the name and project evidence primary, and reduced assistant trigger weight while preserving the light/dark system.
+- **Frontend visual hierarchy**: Restored the editorial control-surface balance of warm paper, infrastructure ink, copper state cues, and restrained technical motion.
 
 - **Contact hierarchy**: Shifted the dominant Contact statement from the raw email address to working-together intent while preserving direct recruiter contact actions and relative `#top` wordmark navigation.
 - **Assistant grounding**: Reworked the behavior prompt, project boundaries, missing-fact handling, prompt-injection resistance, and restrained formatting policy.
 - **CI synchronization gate**: Content changes now trigger both frontend and backend deployment paths; CI fails when the approved assistant artifact drifts from canonical content.
 
-- **Hero information hierarchy**: The primary hero headline is now **Jerome Ibon**, with NOC Engineering / DevOps / Cloud positioning and selected work as the immediate next action.
-- **Navigation order**: The page/navigation flow is now Projects → Experience → Capabilities → About → Contact, with credentials and resume discoverable in their editorial sections.
+- **Hero information hierarchy**: The primary hero headline is **Jerome Christian Ibon**, with Cloud Support / DevOps / Cloud Engineering as supporting positioning.
+- **Navigation order**: The page/navigation flow is Projects → Experience → Capabilities → Credentials → Principles → Resume → Contact.
 - **Navigation alignment**: Header navigation scrolls sections to the start of the viewport below the sticky header rather than centering section headings.
 - **Active navigation behavior**: No navigation item is shown as active while the visitor is still inside the hero.
 - **Theme control**: Replaced the visible theme dropdown treatment with a compact icon control while retaining saved theme behavior and initial system-preference fallback.
-- **Project evidence**: Refined the project showcase into a large architecture-first spread with a clear case-study action and preserved project-detail dialogs.
+- **Project evidence**: Refined the project showcase into a stacked System Deck with a clear case-study action and preserved project-detail dialogs.
 - **Frontend deployment flow**: The production workflow now builds `frontend/app/dist/`, checks out `Jeysibn/jeysibn.github.io`, synchronizes the generated artifact with `rsync --delete`, commits the result, pushes to the Pages repository, and verifies the root production URL.
 - **Frontend local-performance guidance**: Production-style local comparisons now use `npm run build` + `npm run preview` instead of judging request count from Vite development mode.
 - **Portfolio assistant knowledge**: Current learning now includes active preparation for Terraform Associate (004), while the earned-certification list remains limited to certifications already completed.

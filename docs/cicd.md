@@ -222,7 +222,7 @@ A fresh plan is generated on `main` even when PR validation previously generated
 
 ## Frontend Asset Delivery
 
-The Vite build contains the application JavaScript/CSS and static public assets. The selected work spread displays one repository-derived architecture sheet from `frontend/app/public/architecture/`, while the inspection dialog exposes the complete SVG set.
+The Vite build contains the application JavaScript/CSS and static public assets. The System Deck displays typed delivery-flow previews, while the inspection dialog exposes the complete repository-derived SVG architecture set.
 
 Normal project rendering loads only the active project's first architecture sheet. The remaining sheets are requested when the user explicitly opens system inspection, while the adjacent text summaries keep the interaction understandable without image rendering.
 
