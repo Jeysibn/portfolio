@@ -10,13 +10,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and 
 
 ### Added
 
-- **Visual restraint pass**: Added height-aware desktop density, a more compact project case-study entry point, clearer conventional section headings, and a restrained large-screen capability topology so the engineering evidence scans more comfortably at 1920×1080.
+- **Infrastructure Editorial direction**: Reframed the portfolio as a restrained monochrome publication where identity, selected work, real engineering evidence, and concise career context lead the experience.
 
-- **System Handoff contact path**: Added a recruiter-focused, form-less final section with canonical email actions, accessible Copy email feedback, availability context, and secondary LinkedIn, resume, and GitHub links.
+- **Published-site browser smoke coverage**: Added a small Playwright smoke path for the deployed GitHub Pages URL, covering hero rendering, accessibility, navigation, project selection, and the assistant focus boundary.
 - **Canonical assistant knowledge**: Added `content/portfolio.json` as the shared source for visible portfolio facts and generated an explicit allow-listed `backend/data/approved_knowledge.json` projection covering Cloud-Backed Portfolio, Homelab GitOps Environment, MoniKey, and NOC Report Builder.
 - **Lightweight retrieval and provenance**: Added deterministic project/technology retrieval, knowledge hashing, prompt hashing, curated source metadata, usage metadata, and 49 offline assistant evaluation cases.
 - **Assistant UX**: Added visitor-controlled suggestion chips, source links, reset behavior, accessible loading/error states, and accurate hourly quota wording.
-- **Cursor-following ambient glow**: Added a subtle, theme-aware viewport glow that tracks fine-pointer movement without intercepting interactions and disables for touch devices or reduced-motion preferences.
 - **Dedicated GitHub Pages deployment repository**: Frontend production publishing now targets `Jeysibn/jeysibn.github.io`, allowing the portfolio to use the root URL `https://jeysibn.github.io/` while keeping application source and CI/CD in `Jeysibn/portfolio`.
 - **Pages publish credential**: Added the `PAGES_DEPLOY_TOKEN` workflow secret boundary for authenticated checkout/push to the dedicated Pages repository.
 - **Optimized architecture previews**: Project cards and normal project-detail views now request resized WebP previews instead of immediately downloading the original multi-megabyte PNG diagrams.
@@ -27,27 +26,21 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and 
 
 ### Changed
 
-- **Control Plane orbital topology**: Reintroduced purposeful large-screen capability motion as a slow, in-view outer domain orbit with independently paced inner technology orbits. Counter-rotating wrappers keep labels upright, hover/focus pauses the system for inspection, and reduced-motion or constrained layouts remain static.
+- **Project presentation**: Replaced the stacked System Deck interaction with one spacious editorial project spread, authentic architecture evidence, progressive case-study details, and quiet numbered project navigation.
+- **Capabilities**: Retained the spatial skill concept as an ambient constellation with slow drift, a static constrained-width fallback, and focus-within pausing for keyboard users.
 
-- **Signal lifecycle coherence**: Decoupled the ambient Signal Rail from portfolio section ownership, deriving its line and active/completed stages from one monotonic document-progress model. Removed redundant inline chapter stages, added a quieter medium-desktop rail mode, raised functional technical labels, restrained System Deck offsets, and surfaced canonical credential issuer/status metadata.
+- **Frontend visual hierarchy**: Removed dashboard/control-system chrome, increased editorial whitespace, made the name and project evidence primary, and reduced assistant trigger weight while preserving the light/dark system.
 
-- **Capability inspection geometry**: Matched the desktop domain guide to the actual orbit radius, removed the redundant global ellipse, slowed the outer orbit to 104 seconds, and kept technology-name inspection local to each hovered or focused skill so the living topology remains readable without covering neighboring icons.
-
-- **Frontend visual hierarchy**: Reduced display scale and ordinary section spacing, raised selected technical labels for readability, removed generic section-entry drift, and reduced assistant trigger weight while preserving the signal lifecycle and editorial light/dark system.
-
-- **Contact hierarchy**: Shifted the dominant Contact statement from the raw email address to working-together intent while preserving the existing editorial system handoff language and relative `#top` wordmark navigation.
+- **Contact hierarchy**: Shifted the dominant Contact statement from the raw email address to working-together intent while preserving direct recruiter contact actions and relative `#top` wordmark navigation.
 - **Assistant grounding**: Reworked the behavior prompt, project boundaries, missing-fact handling, prompt-injection resistance, and restrained formatting policy.
 - **CI synchronization gate**: Content changes now trigger both frontend and backend deployment paths; CI fails when the approved assistant artifact drifts from canonical content.
 
-- **Hero information hierarchy**: The primary hero headline is now **Jerome Christian Ibon**. Cloud Support, DevOps, and Cloud Engineering are supporting positioning rather than replacing the portfolio owner’s identity.
-- **Hero copy**: Removed the large “Aspiring Cloud & DevOps Engineer” headline and moved entry-level context into the opportunity/status copy instead of making seniority the dominant message.
-- **Navigation order**: The page/navigation flow is now About → Projects → Experience → Skills → Certifications → Resume → Contact.
+- **Hero information hierarchy**: The primary hero headline is now **Jerome Ibon**, with NOC Engineering / DevOps / Cloud positioning and selected work as the immediate next action.
+- **Navigation order**: The page/navigation flow is now Projects → Experience → Capabilities → About → Contact, with credentials and resume discoverable in their editorial sections.
 - **Navigation alignment**: Header navigation scrolls sections to the start of the viewport below the sticky header rather than centering section headings.
 - **Active navigation behavior**: No navigation item is shown as active while the visitor is still inside the hero.
 - **Theme control**: Replaced the visible theme dropdown treatment with a compact icon control while retaining saved theme behavior and initial system-preference fallback.
-- **Project cards**: Refined the project showcase into larger architecture-first cards with a clear whole-card interaction cue and preserved project-detail dialogs.
-- **Hero monitoring responsiveness**: Restored the original monitoring-card visual language and changed phone layouts to a single-column metric presentation for reliable separators and readable values.
-- **About section composition**: Preserved the side-by-side desktop design while tightening heading/body spacing and aligning the terminal-style `cat philosophy.txt` principles card with the About copy.
+- **Project evidence**: Refined the project showcase into a large architecture-first spread with a clear case-study action and preserved project-detail dialogs.
 - **Frontend deployment flow**: The production workflow now builds `frontend/app/dist/`, checks out `Jeysibn/jeysibn.github.io`, synchronizes the generated artifact with `rsync --delete`, commits the result, pushes to the Pages repository, and verifies the root production URL.
 - **Frontend local-performance guidance**: Production-style local comparisons now use `npm run build` + `npm run preview` instead of judging request count from Vite development mode.
 - **Portfolio assistant knowledge**: Current learning now includes active preparation for Terraform Associate (004), while the earned-certification list remains limited to certifications already completed.
@@ -56,16 +49,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and 
 
 - **Hero refresh headline flash**: Removed the one-frame timing gap between the initial React render and the compatibility copy update so rapid refreshes no longer expose the stale “Aspiring Cloud & DevOps Engineer” headline before the current name-first hero appears.
 - **Theme interaction scroll jump**: Theme-button interaction now prevents the unwanted page movement that could occur when opening/changing the theme control.
-- **Certification navigation target**: Certification navigation resolves to the Education & Certifications section instead of an inconsistent anchor position.
-- **Mobile monitoring separators**: Removed conflicting multi-column separator geometry on small screens.
-- **About spacing regression**: Reduced excessive empty space between the About heading and its content.
-- **Architecture asset mismatch**: Corrected project architecture references so existing image assets are used instead of requesting a missing file format.
 - **Closed chatbot interaction boundary**: Retained pointer-event isolation so the hidden assistant cannot block underlying page controls.
 
 ### Removed
 
 - **Resume Print / save action**: Removed the portfolio UI action while retaining the custom print-only resume render path for native browser printing, the downloadable PDF, and the on-page resume.
-- **Obsolete `ui-adjustments.ts` module**: Consolidated its small runtime behavior into the active frontend entrypoint and removed the extra development module request.
+- **Obsolete frontend style shim**: Removed the empty `ui-adjustments.css` import after the editorial styles were consolidated into the active stylesheet.
 - **Tracked TypeScript build cache**: Removed `frontend/app/tsconfig.tsbuildinfo` from source control and added `*.tsbuildinfo` to `.gitignore`.
 
 ### Security

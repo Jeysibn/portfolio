@@ -7,6 +7,8 @@ local.settings.json
 # Node / frontend
 node_modules/
 frontend/app/dist/
+frontend/app/test-results/
+frontend/app/playwright-report/
 *.tsbuildinfo
 
 # Python virtual environments

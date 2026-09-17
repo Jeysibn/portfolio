@@ -31,7 +31,7 @@ export function SystemDeck({
       <div
         className="system-deck-stage"
         tabIndex={0}
-        aria-label="System deck: selected work. Use ArrowLeft and ArrowRight to change the active project."
+        aria-label="Selected work. Use ArrowLeft and ArrowRight to change the active project."
         onKeyDown={handleKeyDown}
       >
         <SystemDossier
