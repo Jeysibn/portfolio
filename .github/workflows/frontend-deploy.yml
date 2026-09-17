@@ -104,6 +104,16 @@ jobs:
           echo "GitHub Pages deployment could not be verified."
           exit 1
 
+      - name: Install Playwright Chromium
+        working-directory: frontend/app
+        run: npx playwright install --with-deps chromium
+
+      - name: Smoke test published frontend
+        working-directory: frontend/app
+        env:
+          PLAYWRIGHT_BASE_URL: https://jeysibn.github.io
+        run: npm run test:ui -- --project=chromium tests/ui/portfolio.spec.ts
+
       - name: Deployment summary
         if: success()
         run: |

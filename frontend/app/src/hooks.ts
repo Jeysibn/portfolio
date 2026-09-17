@@ -36,7 +36,7 @@ export function useTheme() {
       'meta[name="theme-color"]',
     );
     if (themeColor) {
-      themeColor.content = effectiveTheme === "dark" ? "#010100" : "#eee9de";
+      themeColor.content = effectiveTheme === "dark" ? "#080807" : "#eee9de";
     }
   }, [effectiveTheme, preference]);
 
@@ -45,12 +45,14 @@ export function useTheme() {
 
 export function useActiveSection(sectionIds: readonly string[]) {
   const [activeSection, setActiveSection] = useState("");
+  const sectionKey = sectionIds.join("\u0000");
 
   useEffect(() => {
     let frame = 0;
+    const stableSectionIds = sectionKey ? sectionKey.split("\u0000") : [];
 
     const resolveSections = () =>
-      sectionIds
+      stableSectionIds
         .map((id) => {
           const anchor = document.getElementById(id);
           const section = anchor?.closest<HTMLElement>("section") ?? anchor;
@@ -93,7 +95,7 @@ export function useActiveSection(sectionIds: readonly string[]) {
       window.removeEventListener("scroll", requestUpdate);
       window.removeEventListener("resize", requestUpdate);
     };
-  }, [sectionIds]);
+  }, [sectionKey]);
 
   return activeSection;
 }

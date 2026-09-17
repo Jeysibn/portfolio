@@ -33,11 +33,11 @@ export function SystemDossier({
         <SystemArchitecturePreview project={project} />
         <aside className="project-notes" aria-label={`${project.title} details`}>
           <div>
-            <span className="dossier-label">Primary outcome</span>
+            <span className="project-note-label">Primary outcome</span>
             <p>{project.preview.primaryOutcome}</p>
           </div>
           <div>
-            <span className="dossier-label">Role / stack</span>
+            <span className="project-note-label">Role / stack</span>
             <p>{project.preview.technologies.join(" · ")}</p>
           </div>
         </aside>

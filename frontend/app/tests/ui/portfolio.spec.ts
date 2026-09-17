@@ -31,7 +31,7 @@ test.describe("portfolio UI smoke coverage", () => {
     await page.goto("/", { waitUntil: "domcontentloaded" });
     await expect(page.locator(".system-dossier.is-active .project-notes")).toBeVisible();
 
-    await page.getByRole("button", { name: /Select system 02:/ }).click();
+    await page.getByRole("button", { name: /Select project 02:/ }).click();
     await expect(page.locator(".system-dossier.is-active h3")).toHaveText(
       "Homelab GitOps Environment",
     );

@@ -76,7 +76,7 @@ Navigation scrolls the selected section to the start of the viewport beneath the
 - clickable skill-detail dialogs;
 - restrained certification and education lists;
 - fully visible on-page resume plus direct PDF download;
-- form-less System Handoff with direct email, copy-email, LinkedIn, resume, and GitHub paths;
+- form-less recruiter-focused Contact section with direct email, copy-email, LinkedIn, resume, and GitHub paths;
 - height-aware desktop density and an ambient capability field with slow, low-amplitude desktop drift, focus stability, and a static constrained-width fallback;
 - keyboard focus behavior and reduced-motion support.
 
@@ -113,7 +113,7 @@ Project preview data
    v
 typed flow and first architecture sheet in the work spread
    |
-   | Inspect system
+   | Read the case study
    v
 native dialog -> repository-derived SVG sheets -> text equivalents
 ```
@@ -127,12 +127,12 @@ Architecture assets live under `frontend/app/public/architecture/`:
 
 Each SVG contains a meaningful `<title>` and `<desc>`. The dialog also renders a text summary so architecture understanding does not depend on image rendering or motion.
 
-Project inspection is static-host safe: opening a dossier updates `?project=<slug>`, while closing removes the query and back/forward events resynchronize the selected project.
+Project inspection is static-host safe: opening a project spread updates `?project=<slug>`, while closing removes the query and back/forward events resynchronize the selected project.
 
 ### Contact handoff
 
 The final Contact section is intentionally form-less. Its recruiter-focused
-System Handoff leads with working-together intent and canonical availability,
+The closing leads with working-together intent and canonical availability,
 then exposes the canonical email as separate Send email and Copy email actions.
 LinkedIn, the downloadable resume, and GitHub remain visible as secondary
 engineering-presence paths. Copy feedback is announced through a local live
