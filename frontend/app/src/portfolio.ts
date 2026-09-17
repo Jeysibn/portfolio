@@ -77,6 +77,7 @@ export interface Certification {
   name: string;
   issuer?: string;
   status: "earned" | "in-progress";
+  referenceUrl?: string;
 }
 
 export const navigation = canonicalContent.navigation;

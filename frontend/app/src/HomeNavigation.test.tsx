@@ -25,10 +25,10 @@ describe("home navigation", () => {
     expect(document.querySelector("#top")).toHaveClass("hero");
   });
 
-  it("keeps conventional capability and credential navigation targets", () => {
+  it("keeps the restrained primary navigation targets", () => {
     render(<SiteHeader activeSection="" theme="light" onTheme={vi.fn()} />);
 
     expect(screen.getByRole("link", { name: "Capabilities" })).toHaveAttribute("href", "#skills");
-    expect(screen.getByRole("link", { name: "Credentials" })).toHaveAttribute("href", "#credentials");
+    expect(screen.getByRole("link", { name: "About" })).toHaveAttribute("href", "#about");
   });
 });

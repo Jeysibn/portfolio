@@ -33,21 +33,15 @@ describe("system deck", () => {
     expect(within(selector).getByRole("button", { name: /Select system 03/ })).toHaveAttribute("aria-current", "true");
   });
 
-  it("renders four discoverable systems and changes the active system", async () => {
+  it("renders one editorial spread and changes the active system", async () => {
     const onInspect = vi.fn();
     render(<SystemDeck projects={projects} onInspect={onInspect} />);
 
-    expect(document.querySelectorAll(".system-dossier")).toHaveLength(4);
+    expect(document.querySelectorAll(".system-dossier")).toHaveLength(1);
     expect(document.querySelectorAll(".system-dossier.is-active")).toHaveLength(1);
-    expect(document.querySelectorAll(".system-dossier.is-background .system-dossier-content a")).toHaveLength(3);
-    expect(
-      [...document.querySelectorAll(".system-dossier.is-background .system-dossier-content a")].every(
-        (link) => link.getAttribute("tabindex") === "-1",
-      ),
-    ).toBe(true);
 
     expect(screen.getByRole("heading", { name: "Cloud-Backed Portfolio" })).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: /Open case study/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Read the case study/ }));
     expect(onInspect).toHaveBeenCalledWith(projects[0]);
     const selector = screen.getByRole("navigation", { name: "System selector" });
     expect(within(selector).getAllByRole("button", { name: /Select system/ })).toHaveLength(4);
@@ -83,7 +77,7 @@ describe("system deck", () => {
       expect(screen.getByRole("heading", { name: "MoniKey" })).toBeInTheDocument(),
     );
 
-    fireEvent.click(screen.getByRole("button", { name: /Inspect system/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Read the case study/ }));
     expect(onInspect).toHaveBeenCalledWith(projects[2]);
   });
 });

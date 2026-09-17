@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ThemePreference } from "../portfolio";
 import { navigation } from "../portfolio";
 import { VisitorCounter } from "./PortfolioAssistant";
@@ -13,9 +13,35 @@ export function SiteHeader({
   onTheme: (t: ThemePreference) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
+  const navToggleRef = useRef<HTMLButtonElement>(null);
   const cycle = () => onTheme(theme === "dark" ? "light" : "dark");
+
+  useEffect(() => {
+    if (!open) return;
+
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      event.preventDefault();
+      setOpen(false);
+      navToggleRef.current?.focus();
+    };
+    const closeOnOutsidePointer = (event: PointerEvent) => {
+      if (!headerRef.current?.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener("keydown", closeOnEscape);
+    document.addEventListener("pointerdown", closeOnOutsidePointer);
+    return () => {
+      document.removeEventListener("keydown", closeOnEscape);
+      document.removeEventListener("pointerdown", closeOnOutsidePointer);
+    };
+  }, [open]);
+
   return (
-    <header className="site-header">
+    <header className="site-header" ref={headerRef}>
       <a className="wordmark" href="#top" aria-label="Jerome Ibon, home">
         <span>JI</span>
         <small>Jeysibn</small>
@@ -47,6 +73,7 @@ export function SiteHeader({
           {theme}
         </button>
         <button
+          ref={navToggleRef}
           className="nav-toggle"
           type="button"
           aria-expanded={open}
