@@ -33,8 +33,8 @@ The experience is a single-page portfolio deployed at `jeysibn.github.io`. Recru
 ## Brand Commitments
 
 - Name: Jerome Christian Ibon / Jeysibn.
-- Visual concept: “Infrastructure Editorial.”
-- Persistent signature: identity-led typography and real system diagrams presented with the restraint of an editorial publication.
+- Visual concept: “Infrastructure in Motion.”
+- Persistent signature: a signal path that transforms from cloud nodes through provisioning, delivery, runtime, telemetry, and human/operator handoff.
 - Editorial, cinematic, diagrammatic, spatial, and typography-led—not terminal-themed, cyberpunk, generic SaaS, or template-like.
 - Both light and dark modes must be intentionally designed.
 
@@ -54,7 +54,7 @@ The experience is a single-page portfolio deployed at `jeysibn.github.io`. Recru
 - Treat performance, accessibility, and graceful degradation as part of the portfolio's engineering message.
 - Preserve one factual source of truth for portfolio content.
 - Keep the recruiter scan path readable on 1920×1080 displays: use height-aware desktop density, restrained display type, and motion that supports hierarchy rather than decorating every section.
-- Keep projects visually central and technical evidence progressive: identity, work, capabilities, experience, about, then contact.
+- Keep the portfolio content sequence independent from the ambient infrastructure lifecycle; evidence remains before principles while the Signal Rail progresses monotonically from SIGNAL through IMPROVE.
 
 ## Accessibility & Inclusion
 

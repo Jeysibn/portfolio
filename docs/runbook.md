@@ -39,7 +39,7 @@ The source repository is authoritative. Do not treat direct edits in the publica
 - Pages publication failed;
 - the dedicated Pages repository was not updated;
 - theme controls behave incorrectly;
-- the selected work spread does not change projects;
+- the System Deck changes projects only through its numbered controls, previous/next buttons, keyboard arrows, or pointer swipe;
 - a project inspection dialog or architecture SVG does not load;
 - the closed chatbot blocks clicks underneath it;
 - the backend health smoke check or project evidence presentation looks incorrect;
@@ -99,7 +99,7 @@ Open the preview URL (normally `http://localhost:4173`), enable **Disable cache*
 
 ### Project architecture behavior
 
-The selected work spread is generated from typed project content and loads the active project's first architecture SVG. The inspection dialog loads the complete SVG set and renders adjacent text summaries.
+The System Deck is generated from typed project content and renders a compact delivery-flow preview. The inspection dialog loads the complete SVG set and renders adjacent text summaries.
 
 If an architecture sheet fails:
 

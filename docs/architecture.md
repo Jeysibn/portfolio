@@ -55,7 +55,7 @@ The frontend is a Vite-built React + TypeScript single-page application. Source 
 The application uses document-anchor navigation instead of client-side routes. The visible flow is:
 
 ```text
-  Hero → Selected work → Experience → Capabilities → Foundations → About → A concise record → Contact
+  Hero → Projects → Experience → Capabilities → Credentials → Principles → Resume → Contact
 ```
 
 Navigation scrolls the selected section to the start of the viewport beneath the sticky header. The hero intentionally has no active navigation item; active-section indication begins when a content section is reached.
@@ -65,19 +65,19 @@ Navigation scrolls the selected section to the start of the viewport beneath the
 - responsive desktop and mobile navigation with active-section tracking;
 - compact Light/Dark theme switching with saved-preference persistence and initial system-preference fallback;
 - typed portfolio content rendering;
-- a name-first editorial hero centered on `Jerome Ibon` with NOC Engineering / DevOps / Cloud positioning;
+- a name-first hero centered on `Jerome Christian Ibon` with Cloud Support / DevOps / Cloud Engineering positioning;
 - backend `/api/health` remains available for deployment verification;
 - visitor-counter display;
 - AI assistant conversation state, starter questions, source links, and session history;
-- a four-project editorial work spread with numbered project selection and keyboard arrows;
-- a large repository-derived architecture sheet paired with typed delivery-flow previews;
+- a four-project System Deck with numbered project selection, keyboard arrows, and pointer swipe support;
+- compact typed delivery-flow previews paired with repository-derived architecture sheets in the inspection dialog;
 - static-host-safe `?project=<slug>` inspection deep links;
 - native project-detail dialogs with full SVG architecture sheets and text equivalents;
 - clickable skill-detail dialogs;
 - restrained certification and education lists;
 - fully visible on-page resume plus direct PDF download;
 - form-less recruiter-focused Contact section with direct email, copy-email, LinkedIn, resume, and GitHub paths;
-- height-aware desktop density and an ambient capability field with slow, low-amplitude desktop drift, focus stability, and a static constrained-width fallback;
+- height-aware desktop density and an in-view Control Plane orbital topology with slow domain/tool motion, focus stability, and a static constrained-width fallback;
 - keyboard focus behavior and reduced-motion support.
 
 The AI interface remains provider-neutral so backend model/provider changes do not require frontend branding changes.
@@ -105,13 +105,13 @@ It does **not** query Cosmos DB or the external AI provider, so an Operational h
 
 ## Project Architecture Delivery
 
-The selected work spread keeps the homepage evidence focused and data-driven:
+The System Deck keeps the homepage evidence focused and data-driven:
 
 ```text
 Project preview data
    |
    v
-typed flow and first architecture sheet in the work spread
+typed flow in the System Deck
    |
    | Read the case study
    v
@@ -127,7 +127,7 @@ Architecture assets live under `frontend/app/public/architecture/`:
 
 Each SVG contains a meaningful `<title>` and `<desc>`. The dialog also renders a text summary so architecture understanding does not depend on image rendering or motion.
 
-Project inspection is static-host safe: opening a project spread updates `?project=<slug>`, while closing removes the query and back/forward events resynchronize the selected project.
+Project inspection is static-host safe: opening a dossier updates `?project=<slug>`, while closing removes the query and back/forward events resynchronize the selected project.
 
 ### Contact handoff
 
