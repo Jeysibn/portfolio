@@ -104,7 +104,7 @@ Current frontend features include:
 - a name-first hero headed by **Jerome Christian Ibon**, with Cloud Support, DevOps, and Cloud Engineering as supporting positioning;
 - an explicit **Available now** state with entry-level role context;
 - visitor counter with loading and unavailable states;
-- AI assistant with session history, rate-limit/error handling, and a closed state that does not block page interaction;
+- AI assistant with session history, rate-limit/error handling, bounded timeout/cancellation, and a closed state that does not block page interaction;
 - assistant starter questions that populate the input without auto-submitting, subtle factual source links, clear/reset behavior, and accessible loading/error states;
 - one four-project System Deck with stacked dossier selection, numbered controls, previous/next navigation, keyboard arrows, and pointer swipe support;
 - compact repository-derived architecture previews on the deck, with full SVG diagrams available in the selected project's inspection dialog;
@@ -157,8 +157,17 @@ Validation and production build:
 
 ```bash
 npm run typecheck
+npm run lint
+npm test -- --run
 npm run build
+npm run perf:budget
+PLAYWRIGHT_SKIP_BUILD=1 npm run test:ui
 ```
+
+The browser suite runs against the production Vite preview and covers 1920×1080,
+1440×900, mobile Chromium, important dialogs/overlays, reduced motion, deep
+links, and targeted axe scans. A clean `npm run test:ui` run can build
+automatically through the Playwright web-server configuration.
 
 Vite writes the deployable artifact to `frontend/app/dist/`.
 
@@ -190,7 +199,10 @@ A push to `dev` or pull request targeting `dev` validates:
 
 - React dependency installation;
 - strict TypeScript typecheck;
+- ESLint and frontend unit tests;
 - Vite production build and artifact verification;
+- the JavaScript performance budget;
+- Playwright browser and axe accessibility tests against the production preview;
 - Python dependency compatibility, syntax, Ruff, and backend tests;
 - canonical knowledge projection validation and offline assistant retrieval evaluations;
 - Terraform formatting, backend-disabled initialization, and validation;
@@ -203,6 +215,12 @@ A `dev → main` pull request runs production-readiness checks including fronten
 No application or infrastructure mutation occurs from the pull request itself.
 
 ### Production
+
+Frontend publication repeats the frontend checks, including the performance
+budget and production-preview Playwright/axe gate, before synchronizing the
+generated artifact to `Jeysibn/jeysibn.github.io`. A deployed Pages smoke test
+remains after publication. Production source maps are not published because no
+private source-map upload or monitoring consumer is configured.
 
 After merge into `main`, path-specific workflows deploy only the affected layer:
 

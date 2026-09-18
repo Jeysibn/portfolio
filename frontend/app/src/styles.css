@@ -13,7 +13,7 @@
   --ink: #171912;
   --muted: #5b5b50;
   --line: rgba(23, 25, 18, 0.22);
-  --signal: #e0522d;
+  --signal: #a93618;
   --signal-text: #a93618;
   --accent-petrol: #275d57;
   --cursor-glow-strong: color-mix(in srgb, var(--accent-petrol) 7%, transparent);
@@ -265,7 +265,7 @@ a {
   color: var(--muted);
   font: 500 10px var(--mono);
   letter-spacing: 0.08em;
-  opacity: 0.38;
+  opacity: 1;
   transition:
     color 180ms,
     opacity 180ms,
@@ -2541,7 +2541,9 @@ a {
   }
 
   .system-deck-stage {
-    min-height: 580px;
+    /* System 02 has the tallest editorial content at 1920×1080. Reserve
+       space for its full card before the selector row begins. */
+    min-height: 660px;
     padding-top: 76px;
   }
 

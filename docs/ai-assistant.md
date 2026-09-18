@@ -35,7 +35,7 @@ Azure Function: AiChatAssistant
     |       +--> source metadata + knowledge version
     |       v
     +--> behavior prompt + retrieved facts + history
-    +--> lazy OpenAI-compatible provider call
+    +--> bounded, no-retry OpenAI-compatible provider call
     +--> response sanitizer
     v
 { reply, sources, usage }
@@ -45,6 +45,22 @@ The route remains thin enough to see the request lifecycle. Retrieval is
 behind `PortfolioRetriever`, so a later keyword, hybrid, or Cosmos-backed
 implementation can replace the current selector without changing the public
 route or frontend contract.
+
+### Request deadlines and cancellation
+
+The browser passes an `AbortSignal` for each request. The frontend aborts the
+request when the visitor selects Cancel, applies a 25-second timeout, restores
+the typed question after cancellation, and keeps existing chat history intact.
+Timeouts and network failures are shown as retryable, human-readable messages;
+an intentional abort is not rendered as a provider failure.
+
+The Azure Function configures the OpenAI-compatible client with a bounded
+provider timeout and `max_retries=0`. Each assistant route invocation also has a
+35-second application deadline shared by the initial completion and the one
+allowed concise regeneration. Timeout responses use HTTP 504 with a generic
+message; provider internals, secrets, prompts, and stack traces are never sent
+to the browser. Provider timeout and provider failure events remain distinct in
+Application Insights telemetry.
 
 ## Knowledge architecture
 

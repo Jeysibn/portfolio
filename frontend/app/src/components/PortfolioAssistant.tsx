@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent, MouseEvent } from "react";
-import { fetchVisitorCount, sendChatMessage } from "../api";
+import { fetchVisitorCount, isChatRequestAborted, sendChatMessage } from "../api";
 import type { ChatMessage } from "../portfolio";
 import { AssistantMessageContent } from "./AssistantMessageContent";
 import { projectNavigationUrl, resolveAssistantLink, type AssistantLink } from "./assistantLinks";
@@ -180,8 +180,11 @@ export function PortfolioAssistant() {
   const trigger = useRef<HTMLButtonElement>(null);
   const end = useRef<HTMLDivElement>(null);
   const input = useRef<HTMLInputElement>(null);
+  const requestController = useRef<AbortController | null>(null);
   const chatSessionId = useRef(loadChatSessionId());
   const wasOpen = useRef(false);
+
+  useEffect(() => () => requestController.current?.abort(), []);
 
   useEffect(() => {
     try {
@@ -227,11 +230,14 @@ export function PortfolioAssistant() {
     setMessages(nextMessages);
     setValue("");
     setSending(true);
+    const controller = new AbortController();
+    requestController.current = controller;
     try {
       const result = await sendChatMessage(
         text,
         previousHistory.slice(-8),
         chatSessionId.current,
+        controller.signal,
       );
       setMessages([
         ...nextMessages,
@@ -243,6 +249,11 @@ export function PortfolioAssistant() {
       ]);
       if (result.usage) setRemaining(result.usage.remaining);
     } catch (err) {
+      if (isChatRequestAborted(err)) {
+        setMessages(nextMessages);
+        setValue(text);
+        return;
+      }
       setMessages([
         ...nextMessages,
         {
@@ -255,8 +266,13 @@ export function PortfolioAssistant() {
         },
       ]);
     } finally {
+      if (requestController.current === controller) requestController.current = null;
       setSending(false);
     }
+  }
+
+  function cancelRequest() {
+    requestController.current?.abort();
   }
 
   return (
@@ -351,9 +367,15 @@ export function PortfolioAssistant() {
               autoComplete="off"
               aria-describedby="assistant-usage"
             />
-            <button type="submit" disabled={!value.trim() || sending}>
-              {sending ? "Sending…" : "Send"}
-            </button>
+            {sending ? (
+              <button type="button" onClick={cancelRequest}>
+                Cancel
+              </button>
+            ) : (
+              <button type="submit" disabled={!value.trim()}>
+                Send
+              </button>
+            )}
           </div>
           <p id="assistant-usage" className="assistant-usage">
             10 assistant questions per hour{remaining === null ? "" : ` · ${remaining} remaining`}

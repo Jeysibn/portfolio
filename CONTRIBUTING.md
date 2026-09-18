@@ -37,7 +37,11 @@ Use Node.js **22.12+**. Node 18 is unsupported by the current Vite toolchain.
 cd frontend/app
 npm install
 npm run typecheck
+npm run lint
+npm test -- --run
 npm run build
+npm run perf:budget
+PLAYWRIGHT_SKIP_BUILD=1 npm run test:ui
 ```
 
 For interactive local review:
@@ -97,8 +101,11 @@ For interactive changes, verify where relevant:
 - the health panel does not imply dependency health that `/api/health` does not test;
 - Release age is described as build/release metadata, not server uptime;
 - the monitoring card remains readable on phone widths;
-- About heading/body spacing and the engineering-principles card remain balanced across breakpoints;
+- Principles heading/body spacing and the engineering-principles card remain balanced across breakpoints;
 - the compact theme control does not cause scroll jumps or focus-related page movement.
+- Playwright browser coverage remains green at 1920×1080, 1440×900, and the configured mobile device;
+- axe scans cover important open states, not only the initial document;
+- assistant requests pass an abort signal, settle after timeout/cancellation, and remain retryable.
 
 When measuring frontend network behavior, test `npm run preview` with browser cache disabled. Treat architecture preview traffic separately from Azure API traffic.
 

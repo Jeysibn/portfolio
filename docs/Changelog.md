@@ -10,6 +10,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and 
 
 ### Added
 
+- **Pre-deployment browser release gate**: Frontend dev, PR, and production workflows now enforce the performance budget and run the production build through Playwright/axe before any Pages publication, while retaining a deployed smoke test afterward.
+- **Targeted browser regression coverage**: Added explicit 1920×1080 and 1440×900 projects, mobile interaction coverage, dialog/navigation/assistant accessibility-state scans, reduced-motion checks, deep-link checks, and a stable 1920px hero visual anchor.
+- **Bounded assistant lifecycle**: Added frontend timeout/cancellation handling and backend provider/application deadlines with no SDK retries and distinct timeout telemetry.
+
 - **Control-surface visual direction**: Retained the editorial infrastructure atlas with paper/ink surfaces, copper signal states, petrol system depth, architecture flows, and restrained motion.
 
 - **Published-site browser smoke coverage**: Added a small Playwright smoke path for the deployed GitHub Pages URL, covering hero rendering, accessibility, navigation, project selection, and the assistant focus boundary.
@@ -25,6 +29,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and 
 - **Certification-state AI guardrail**: Added structured `certifications_in_progress` knowledge, recruiter-facing FAQ coverage, and tests so the portfolio assistant can discuss the Terraform Associate study accurately without presenting it as an earned certification.
 
 ### Changed
+
+- **Canonical metadata**: Vite now derives title, URL, profile name, role, and social identity values in document metadata and JSON-LD from `content/portfolio.json`; public production sourcemaps are disabled because no private upload consumer exists.
 
 - **Project presentation**: Retained the stacked System Deck interaction with compact architecture-flow previews, numbered navigation, and progressive project inspection.
 - **Capabilities**: Retained the spatial Control Plane concept with slow domain/tool orbits, a structured constrained-width fallback, and focus-within pausing for keyboard users.

@@ -44,26 +44,28 @@ The source repository is authoritative. Do not treat direct edits in the publica
 - the closed chatbot blocks clicks underneath it;
 - the backend health smoke check or project evidence presentation looks incorrect;
 - navigation scroll alignment or active-section state is incorrect.
+- the assistant remains in a loading state, times out, or needs cancellation.
 
 ### Checks
 
 1. Open the latest **Publish Frontend to GitHub Pages** workflow run in `Jeysibn/portfolio`.
-2. Confirm dependency installation, TypeScript validation, Vite build, and `dist/` artifact verification passed.
-3. Confirm checkout of `Jeysibn/jeysibn.github.io` succeeded.
-4. Confirm the publish step synchronized `frontend/app/dist/` to the publication repository and pushed a generated commit when content changed.
-5. Confirm `PAGES_DEPLOY_TOKEN` is present as a repository secret if the cross-repository checkout/push fails. Do not print its value.
-6. Confirm the final smoke verification against `https://jeysibn.github.io/` passed.
-7. If the workflow pushed successfully but the live page is stale, inspect the Pages configuration and latest commit in `Jeysibn/jeysibn.github.io`.
-8. Check browser developer tools for static asset failures, architecture-preview failures, and API failures separately.
+2. Confirm dependency installation, TypeScript validation, lint, unit tests, Vite build, performance budget, and `dist/` artifact verification passed.
+3. Confirm the local production preview browser gate passed for 1920×1080, 1440×900, and mobile Chromium, including axe state scans.
+4. Confirm checkout of `Jeysibn/jeysibn.github.io` succeeded.
+5. Confirm the publish step synchronized `frontend/app/dist/` to the publication repository and pushed a generated commit when content changed.
+6. Confirm `PAGES_DEPLOY_TOKEN` is present as a repository secret if the cross-repository checkout/push fails. Do not print its value.
+7. Confirm the final smoke verification against `https://jeysibn.github.io/` and the deployed Chromium smoke test passed.
+8. If the workflow pushed successfully but the live page is stale, inspect the Pages configuration and latest commit in `Jeysibn/jeysibn.github.io`.
+9. Check browser developer tools for static asset failures, architecture-preview failures, and API failures separately.
 
 ### Frontend smoke checklist
 
 After a frontend release, verify:
 
 - `https://jeysibn.github.io/` loads successfully;
-- the hero headline displays **Jerome Ibon** and supporting NOC/Cloud/DevOps role positioning;
+- the hero headline displays **Jerome Christian Ibon** and supporting Cloud Support / DevOps / Cloud Engineering positioning;
 - no navigation item is active while still inside the hero;
-- navigation order is Projects → Experience → Capabilities → About → Contact;
+- navigation order is Projects → Experience → Capabilities → Credentials → Principles → Resume → Contact;
 - navigation lands sections below the sticky header without centering the heading in the viewport;
 - the theme icon toggles Light/Dark and persists the selected value;
 - with no saved theme, initial load follows the browser/OS preference;
@@ -77,8 +79,9 @@ After a frontend release, verify:
 - the resume is visible on-page and the PDF download works;
 - the Contact CTA is reachable from the hero;
 - closing the chatbot leaves underlying page elements clickable;
+- submitting an assistant question shows bounded loading, Cancel aborts safely, timeout feedback is retryable, and a later request works;
 - keyboard focus remains visible on interactive cards and controls;
-- About heading/body spacing and the editorial principles list remain visually balanced at desktop and mobile sizes.
+- Principles heading/body spacing and the editorial principles list remain visually balanced at desktop and mobile sizes.
 
 ## Frontend Network and Performance Checks
 
@@ -310,10 +313,18 @@ Do not commit downloaded `.tfstate` files and do not expose state contents in lo
 
 ```bash
 cd frontend/app
-npm install
+npm ci
 npm run typecheck
+npm run lint
+npm test -- --run
 npm run build
+npm run perf:budget
+PLAYWRIGHT_SKIP_BUILD=1 npm run test:ui
 ```
+
+The browser command expects the preceding production build and serves it via
+Vite preview. A clean local browser run can omit `PLAYWRIGHT_SKIP_BUILD=1`;
+the Playwright config will build before starting preview in that case.
 
 ### Backend lint and tests
 

@@ -10,7 +10,7 @@ import uuid
 import azure.functions as func
 from azure.core import MatchConditions
 from azure.cosmos import CosmosClient, exceptions
-from openai import OpenAI, OpenAIError
+from openai import APITimeoutError, OpenAI, OpenAIError
 
 from assistant.response_sanitizer import sanitize_ai_response
 from assistant.service import build_chat_context
@@ -75,6 +75,23 @@ AI_BASE_URL = os.environ.get("AI_BASE_URL", "https://opencode.ai/zen/v1")
 AI_TEMPERATURE = float(os.environ.get("AI_TEMPERATURE", "0.35"))
 AI_MAX_TOKENS_DEFAULT = 800
 AI_MAX_TOKENS_MAX = 900
+AI_PROVIDER_TIMEOUT_SECONDS_DEFAULT = 20.0
+AI_PROVIDER_TIMEOUT_SECONDS_MAX = 60.0
+AI_APPLICATION_DEADLINE_SECONDS = 35.0
+
+
+def _get_ai_provider_timeout() -> float:
+    """Read a bounded provider timeout so network calls cannot wait forever."""
+    try:
+        configured = float(
+            os.environ.get(
+                "AI_PROVIDER_TIMEOUT_SECONDS",
+                str(AI_PROVIDER_TIMEOUT_SECONDS_DEFAULT),
+            )
+        )
+    except ValueError:
+        configured = AI_PROVIDER_TIMEOUT_SECONDS_DEFAULT
+    return max(1.0, min(configured, AI_PROVIDER_TIMEOUT_SECONDS_MAX))
 
 
 def _get_ai_max_tokens() -> int:
@@ -87,6 +104,7 @@ def _get_ai_max_tokens() -> int:
 
 
 AI_MAX_TOKENS = _get_ai_max_tokens()
+AI_PROVIDER_TIMEOUT_SECONDS = _get_ai_provider_timeout()
 
 LENGTH_FINISH_REASONS = frozenset({"length", "max_tokens", "max_output_tokens", "token_limit"})
 CONTENT_FILTER_FINISH_REASONS = frozenset({"content_filter", "content-filter"})
@@ -155,6 +173,8 @@ def get_ai_client() -> OpenAI:
         ai_client = OpenAI(
             api_key=api_key,
             base_url=AI_BASE_URL,
+            timeout=AI_PROVIDER_TIMEOUT_SECONDS,
+            max_retries=0,
         )
 
     return ai_client
@@ -335,6 +355,30 @@ def is_content_filtered(finish_reason: str | None) -> bool:
     if not finish_reason:
         return False
     return finish_reason.strip().lower() in CONTENT_FILTER_FINISH_REASONS
+
+
+class ProviderDeadlineExceeded(Exception):
+    """Raised when the bounded application deadline is already exhausted."""
+
+
+def request_provider_completion(client, messages, opencode_session_id, deadline):
+    """Make one bounded provider call, accounting for the total route deadline."""
+    remaining = deadline - time.perf_counter()
+    if remaining <= 0:
+        raise ProviderDeadlineExceeded
+
+    return client.chat.completions.create(
+        model=AI_MODEL,
+        messages=messages,
+        temperature=AI_TEMPERATURE,
+        max_tokens=AI_MAX_TOKENS,
+        timeout=min(AI_PROVIDER_TIMEOUT_SECONDS, remaining),
+        extra_headers={
+            OPENCODE_SESSION_HEADER: opencode_session_id,
+            "x-opencode-client": "jeysibn-portfolio-assistant/1.0",
+            "User-Agent": "jeysibn-portfolio-assistant/1.0",
+        },
+    )
 
 
 def is_obviously_out_of_scope(user_message: str) -> bool:
@@ -619,17 +663,10 @@ def AiChatAssistant(req: func.HttpRequest) -> func.HttpResponse:
         retrieval_latency_ms = round((time.perf_counter() - retrieval_started) * 1000)
 
         client = get_ai_client()
+        provider_deadline = time.perf_counter() + AI_APPLICATION_DEADLINE_SECONDS
         provider_started = time.perf_counter()
-        response = client.chat.completions.create(
-            model=AI_MODEL,
-            messages=chat_context.messages,
-            temperature=AI_TEMPERATURE,
-            max_tokens=AI_MAX_TOKENS,
-            extra_headers={
-                OPENCODE_SESSION_HEADER: opencode_session_id,
-                "x-opencode-client": "jeysibn-portfolio-assistant/1.0",
-                "User-Agent": "jeysibn-portfolio-assistant/1.0",
-            },
+        response = request_provider_completion(
+            client, chat_context.messages, opencode_session_id, provider_deadline
         )
         provider_latency_ms = round((time.perf_counter() - provider_started) * 1000)
         finish_reason = get_finish_reason(response)
@@ -648,9 +685,9 @@ def AiChatAssistant(req: func.HttpRequest) -> func.HttpResponse:
                 provider_latency_ms=provider_latency_ms,
             )
             regeneration_started = time.perf_counter()
-            response = client.chat.completions.create(
-                model=AI_MODEL,
-                messages=[
+            response = request_provider_completion(
+                client,
+                [
                     *chat_context.messages,
                     {
                         "role": "user",
@@ -660,13 +697,8 @@ def AiChatAssistant(req: func.HttpRequest) -> func.HttpResponse:
                         ),
                     },
                 ],
-                temperature=AI_TEMPERATURE,
-                max_tokens=AI_MAX_TOKENS,
-                extra_headers={
-                    OPENCODE_SESSION_HEADER: opencode_session_id,
-                    "x-opencode-client": "jeysibn-portfolio-assistant/1.0",
-                    "User-Agent": "jeysibn-portfolio-assistant/1.0",
-                },
+                opencode_session_id,
+                provider_deadline,
             )
             regeneration_latency_ms = round((time.perf_counter() - regeneration_started) * 1000)
             provider_latency_ms += regeneration_latency_ms
@@ -782,6 +814,25 @@ def AiChatAssistant(req: func.HttpRequest) -> func.HttpResponse:
             body=json.dumps({"error": "The AI assistant is temporarily unavailable."}),
             mimetype="application/json",
             status_code=503,
+            headers={**AI_HEADERS, "X-Correlation-ID": request_id},
+        )
+
+    except (APITimeoutError, ProviderDeadlineExceeded):
+        log_event(
+            "ai_chat_provider_timeout",
+            request_id=request_id,
+            provider="openai-compatible",
+            model=AI_MODEL,
+            provider_timeout_seconds=AI_PROVIDER_TIMEOUT_SECONDS,
+            application_deadline_seconds=AI_APPLICATION_DEADLINE_SECONDS,
+        )
+        logger.exception("AI provider request timed out. request_id=%s", request_id)
+        return func.HttpResponse(
+            body=json.dumps(
+                {"error": "The AI service took too long to respond. Please try again."}
+            ),
+            mimetype="application/json",
+            status_code=504,
             headers={**AI_HEADERS, "X-Correlation-ID": request_id},
         )
 

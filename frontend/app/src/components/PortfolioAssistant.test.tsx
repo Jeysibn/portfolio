@@ -7,6 +7,8 @@ const mocks = vi.hoisted(() => ({ sendChatMessage: vi.fn() }));
 vi.mock("../api", () => ({
   fetchVisitorCount: vi.fn(),
   sendChatMessage: mocks.sendChatMessage,
+  isChatRequestAborted: (error: unknown) =>
+    error instanceof DOMException && error.name === "AbortError",
 }));
 
 describe("portfolio assistant", () => {
@@ -100,5 +102,46 @@ describe("portfolio assistant", () => {
     expect(screen.queryByText("A grounded answer.")).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Tell me about MoniKey." })).toBeInTheDocument();
     expect(within(screen.getByRole("log", { name: "Assistant conversation" })).getByText(/Ask about Jerome/)).toBeInTheDocument();
+  });
+
+  it("shows a controlled failure and can recover on a later request", async () => {
+    mocks.sendChatMessage
+      .mockRejectedValueOnce(new Error("The assistant request timed out. Please try again."))
+      .mockResolvedValueOnce({ reply: "A recovered answer.", sources: [] });
+    render(<PortfolioAssistant />);
+    fireEvent.click(screen.getByRole("button", { name: /Ask this portfolio/ }));
+    const input = screen.getByRole("textbox", { name: "Your question" });
+
+    fireEvent.change(input, { target: { value: "First question" } });
+    fireEvent.submit(input.closest("form") as HTMLFormElement);
+    await waitFor(() => expect(screen.getByText("The assistant request timed out. Please try again.")).toBeInTheDocument());
+
+    fireEvent.change(input, { target: { value: "Second question" } });
+    expect(screen.getByRole("button", { name: "Send" })).toBeEnabled();
+    fireEvent.submit(input.closest("form") as HTMLFormElement);
+    await waitFor(() => expect(screen.getByText("A recovered answer.")).toBeInTheDocument());
+  });
+
+  it("cancels an active request without adding a provider error", async () => {
+    let rejectRequest: ((error: unknown) => void) | undefined;
+    mocks.sendChatMessage.mockImplementation(
+      (_message: string, _history: unknown[], _session: string, signal?: AbortSignal) =>
+        new Promise((_resolve, reject) => {
+          rejectRequest = reject;
+          signal?.addEventListener("abort", () => reject(new DOMException("Aborted", "AbortError")), { once: true });
+        }),
+    );
+    render(<PortfolioAssistant />);
+    fireEvent.click(screen.getByRole("button", { name: /Ask this portfolio/ }));
+    const input = screen.getByRole("textbox", { name: "Your question" });
+    fireEvent.change(input, { target: { value: "Cancel this question" } });
+    fireEvent.submit(input.closest("form") as HTMLFormElement);
+    await waitFor(() => expect(screen.getByRole("button", { name: "Cancel" })).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    await waitFor(() => expect(screen.getByRole("button", { name: "Send" })).toBeInTheDocument());
+    expect(screen.queryByText("The assistant request was cancelled.")).not.toBeInTheDocument();
+    expect(input).toHaveValue("Cancel this question");
+    expect(rejectRequest).toBeDefined();
   });
 });
