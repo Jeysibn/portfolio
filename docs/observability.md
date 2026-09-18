@@ -46,30 +46,17 @@ Example response:
 
 Dependency failures remain visible through request failures, exceptions, and the production visitor-counter smoke test. Keeping liveness independent from dependencies avoids declaring the Function host unhealthy solely because an external service is temporarily degraded.
 
-## Frontend Monitoring Panel
+## Frontend health indicator
 
-The deployed React hero surfaces the production health check together with release metadata.
+The deployed React hero surfaces the production health check as a compact
+status indicator. It reports only the result of the browser's `/api/health`
+request and does not present release age or dependency health as live metrics.
 
 ### Operational state
 
 The `Operational`, `Checking`, and `Unavailable` states are driven by the real `/api/health` request made from the browser.
 
 An Operational result means the Function application is live enough to answer the health route. It does **not** mean Cosmos DB, the AI provider, or every backend route has been dependency-checked.
-
-### Release age
-
-The frontend build injects a timestamp through Vite and calculates **Release age** from that value.
-
-Release age:
-
-- resets whenever a new frontend build is deployed;
-- is displayed only as active while the production health check is Operational;
-- is **not** Azure Function uptime;
-- does not imply that a serverless Function instance has been continuously running since deployment.
-
-This distinction is important because Azure Functions can scale and recycle independently of the frontend release lifecycle.
-
-The monitoring card also displays current Manila time as presentation context. That clock is client-side and is not an infrastructure health signal.
 
 ## Deployment Verification
 

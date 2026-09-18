@@ -3,6 +3,28 @@ import type { ChatMessage, ChatSource } from "./portfolio";
 const DEFAULT_API_BASE_URL = "https://func-jeysibn-portfolio.azurewebsites.net/api";
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || DEFAULT_API_BASE_URL).replace(/\/$/, "");
 
+export const CHAT_REQUEST_TIMEOUT_MS = 25_000;
+
+export class ChatRequestTimeoutError extends Error {
+  constructor() {
+    super("The assistant request timed out. Please try again.");
+    this.name = "ChatRequestTimeoutError";
+  }
+}
+
+export class ChatRequestAbortedError extends Error {
+  constructor() {
+    super("The assistant request was cancelled.");
+    this.name = "ChatRequestAbortedError";
+  }
+}
+
+export function isChatRequestAborted(error: unknown): boolean {
+  return error instanceof ChatRequestAbortedError ||
+    (error instanceof DOMException && error.name === "AbortError") ||
+    (error instanceof Error && error.name === "AbortError");
+}
+
 export interface HealthResponse {
   status: string;
   service: string;
@@ -75,31 +97,53 @@ export async function sendChatMessage(
   sessionId: string,
   signal?: AbortSignal,
 ): Promise<ChatResponse> {
-  const payload = await requestJson<ChatResponse>(`${API_BASE_URL}/AiChatAssistant`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-OpenCode-Session": sessionId,
-    },
-    body: JSON.stringify({ message, history }),
-    signal,
-  });
+  const timeoutController = new AbortController();
+  let timedOut = false;
+  const timeout = window.setTimeout(() => {
+    timedOut = true;
+    timeoutController.abort();
+  }, CHAT_REQUEST_TIMEOUT_MS);
+  const abortCaller = () => timeoutController.abort();
+  signal?.addEventListener("abort", abortCaller, { once: true });
+  if (signal?.aborted) abortCaller();
 
-  if (!payload.reply?.trim()) {
-    throw new Error(payload.error || "The AI assistant returned an empty response");
+  try {
+    const payload = await requestJson<ChatResponse>(`${API_BASE_URL}/AiChatAssistant`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-OpenCode-Session": sessionId,
+      },
+      body: JSON.stringify({ message, history }),
+      signal: timeoutController.signal,
+    });
+
+    if (!payload.reply?.trim()) {
+      throw new Error(payload.error || "The AI assistant returned an empty response");
+    }
+
+    return {
+      ...payload,
+      reply: payload.reply.trim(),
+      sources: Array.isArray(payload.sources)
+        ? payload.sources.filter(
+            (source): source is ChatSource =>
+              typeof source?.id === "string" &&
+              typeof source.label === "string" &&
+              typeof source.url === "string" &&
+              /^https:\/\//.test(source.url),
+          )
+        : [],
+    };
+  } catch (error) {
+    if (timedOut) throw new ChatRequestTimeoutError();
+    if (signal?.aborted) throw new ChatRequestAbortedError();
+    if (error instanceof TypeError) {
+      throw new Error("The assistant could not be reached. Please try again.", { cause: error });
+    }
+    throw error;
+  } finally {
+    window.clearTimeout(timeout);
+    signal?.removeEventListener("abort", abortCaller);
   }
-
-  return {
-    ...payload,
-    reply: payload.reply.trim(),
-    sources: Array.isArray(payload.sources)
-      ? payload.sources.filter(
-          (source): source is ChatSource =>
-            typeof source?.id === "string" &&
-            typeof source.label === "string" &&
-            typeof source.url === "string" &&
-            /^https:\/\//.test(source.url),
-        )
-      : [],
-  };
 }

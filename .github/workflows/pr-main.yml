@@ -55,6 +55,17 @@ jobs:
       - name: Build React frontend
         run: npm run build
 
+      - name: Enforce frontend performance budget
+        run: npm run perf:budget
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run browser and accessibility tests on production preview
+        env:
+          PLAYWRIGHT_SKIP_BUILD: "1"
+        run: npm run test:ui
+
       - name: Verify production artifact
         run: |
           test -f dist/index.html

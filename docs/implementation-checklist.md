@@ -19,13 +19,13 @@ Tracked baseline and implementation record for the production portfolio improvem
 
 - [ ] Replace Cosmos and Function storage access keys with managed identity/RBAC after provider-version validation.
 - [ ] Move the third-party AI key from Terraform-managed app settings to Key Vault reference.
-- [ ] Add frontend ESLint, Vitest/RTL, Playwright, axe, and a lightweight performance budget.
+- [x] Add frontend ESLint, Vitest/RTL, Playwright, axe, and a lightweight performance budget.
 - [x] Add a 1200×630 PNG social preview to the Vite public artifact.
 - [ ] Add a legitimate homelab failure/recovery case study once measured evidence exists.
-- [ ] Run browser, accessibility, responsive, and live production visual QA in CI or an interactive browser environment.
+- [x] Run browser, accessibility, responsive, and targeted visual QA in CI or an interactive browser environment.
 
 ## Baseline notes
 
 - The inspected worktree was clean on branch `dev`; the requested `main` branch is not the checked-out branch.
-- Live-site browser inspection was unavailable from the connector and direct HTTP access did not provide a usable page response during the audit.
+- Direct HTTP inspection of `https://jeysibn.github.io/` returned the current Pages document. Interactive browser checks were run against the local production preview; the connector itself could not open the live page.
 - Existing strengths retained: OIDC deployment, Terraform-managed Azure resources, Application Insights/Log Analytics, native dialogs, reduced-motion handling, textual architecture alternatives, and deployment smoke verification.

@@ -82,6 +82,14 @@ Navigation scrolls the selected section to the start of the viewport beneath the
 
 The AI interface remains provider-neutral so backend model/provider changes do not require frontend branding changes.
 
+Assistant requests use a caller-owned `AbortController`, a 25-second frontend
+timeout, and an explicit Cancel action. Cancellation preserves the conversation
+and clears the loading state without adding a provider error. The Function uses
+an OpenAI-compatible client with no SDK retries, a bounded provider timeout, and
+a 35-second total application deadline; timeout, provider, validation, and
+backend failures return controlled public messages while details remain in
+correlation-based server telemetry.
+
 The frontend never receives the AI provider secret or Azure connection strings. Sensitive provider interaction remains server-side.
 
 ## Theme Behavior
@@ -272,7 +280,8 @@ Scoped feature branches may be used for larger changes before integration into `
 ### Development validation
 
 ```text
-React install → TypeScript check → Vite build
+React install → TypeScript check → lint → unit tests → Vite build
+                    → performance budget → preview → Playwright/axe
 Python dependencies → Ruff → tests
 Terraform fmt → init (no backend) → validate
                     |
@@ -297,9 +306,10 @@ Jeysibn/portfolio main
         v
 GitHub Actions frontend-deploy.yml
         |
-        | PAGES_DEPLOY_TOKEN
+        | typecheck -> lint -> unit tests -> build -> performance budget
+        | local preview -> Playwright + axe browser gate
         v
-checkout Jeysibn/jeysibn.github.io@main
+checkout Jeysibn/jeysibn.github.io@main using PAGES_DEPLOY_TOKEN
         |
         | rsync --delete dist/ → repository root
         | create .nojekyll

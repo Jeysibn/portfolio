@@ -24,7 +24,7 @@ The experience is a single-page portfolio deployed at `jeysibn.github.io`. Recru
 
 ## Capabilities and Constraints
 
-- Preserve GitHub Pages deployment, Azure Functions API contracts, visitor counter, assistant history/error behavior, explicit light/dark theme behavior, active-section navigation, project and skill details, resume download, direct external contact links, accessibility behavior, and real release/health metadata.
+- Preserve GitHub Pages deployment, Azure Functions API contracts, visitor counter, assistant history/error behavior including bounded timeout and cancellation, explicit light/dark theme behavior, active-section navigation, project and skill details, resume download, direct external contact links, accessibility behavior, and real health metadata.
 - Keep frontend content data-driven and derived from repository facts.
 - Do not fabricate experience, scale, metrics, employment, certifications, technologies, customers, or achievements.
 - Do not change backend, Terraform, or deployment workflows unless the frontend architecture genuinely requires it.

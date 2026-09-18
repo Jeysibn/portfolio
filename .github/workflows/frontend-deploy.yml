@@ -50,6 +50,20 @@ jobs:
         working-directory: frontend/app
         run: npm run build
 
+      - name: Enforce frontend performance budget
+        working-directory: frontend/app
+        run: npm run perf:budget
+
+      - name: Install Playwright Chromium
+        working-directory: frontend/app
+        run: npx playwright install --with-deps chromium
+
+      - name: Run browser and accessibility validation on production preview
+        working-directory: frontend/app
+        env:
+          PLAYWRIGHT_SKIP_BUILD: "1"
+        run: npm run test:ui
+
       - name: Verify frontend artifact
         run: |
           test -f frontend/app/dist/index.html
@@ -104,15 +118,11 @@ jobs:
           echo "GitHub Pages deployment could not be verified."
           exit 1
 
-      - name: Install Playwright Chromium
-        working-directory: frontend/app
-        run: npx playwright install --with-deps chromium
-
       - name: Smoke test published frontend
         working-directory: frontend/app
         env:
           PLAYWRIGHT_BASE_URL: https://jeysibn.github.io
-        run: npm run test:ui -- --project=chromium tests/ui/portfolio.spec.ts
+        run: npm run test:ui -- --project=desktop-1920 tests/ui/portfolio.spec.ts
 
       - name: Deployment summary
         if: success()

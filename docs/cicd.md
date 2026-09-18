@@ -28,11 +28,18 @@ Working directory: `frontend/app`
 ```text
 npm ci
 -> strict TypeScript typecheck
+-> ESLint
+-> Vitest unit tests
 -> Vite production build
+-> performance budget
+-> local Vite production preview
+-> Playwright browser + axe accessibility tests
 -> dist artifact verification
 ```
 
-The generated build must contain `dist/index.html` plus JavaScript and CSS assets before frontend validation passes.
+The generated build must contain `dist/index.html` plus JavaScript and CSS assets before frontend validation passes. Browser tests run against that build, not Vite development modules. The Playwright matrix covers desktop 1920×1080, desktop 1440×900, and the configured iPhone 13 mobile Chromium project. Accessibility scans cover the initial page, project and capability dialogs, mobile navigation, and the expanded assistant.
+
+The performance check runs after the build and fails if the existing JavaScript gzip budget is exceeded. The current budget is 180 KiB; it is not raised automatically to accommodate regressions.
 
 The current frontend toolchain requires a modern Node runtime. Local development should use Node.js 22.12+; CI uses Node 22.
 
@@ -69,11 +76,13 @@ The pull request pipeline is the production-readiness gate.
 The frontend job:
 
 1. installs React application dependencies;
-2. runs strict TypeScript validation;
+2. runs strict TypeScript validation, ESLint, and Vitest;
 3. creates a Vite production build;
-4. verifies the generated `dist` output;
-5. packages only the static production artifact;
-6. uploads that artifact for review/debugging.
+4. enforces the JavaScript performance budget;
+5. installs Chromium and runs the Playwright/axe matrix against a local production preview;
+6. verifies the generated `dist` output;
+7. packages only the static production artifact;
+8. uploads that artifact for review/debugging.
 
 Source files and development dependencies are not part of the deployable frontend artifact.
 
@@ -150,8 +159,13 @@ checkout Jeysibn/portfolio
 -> canonical content is bundled from content/portfolio.json
 -> npm ci
 -> TypeScript typecheck
+-> lint
+-> unit tests
 -> Vite build
 -> verify frontend/app/dist/
+-> performance budget
+-> local production preview
+-> Playwright + axe browser gate
 -> checkout Jeysibn/jeysibn.github.io@main using PAGES_DEPLOY_TOKEN
 -> rsync --delete dist/ into publication repository root
 -> create .nojekyll
@@ -159,7 +173,10 @@ checkout Jeysibn/portfolio
 -> push publication repository main
 -> curl https://jeysibn.github.io/
 -> verify expected Jerome Ibon page content
+-> deployed Chromium smoke test
 ```
+
+The local browser and accessibility gate completes before the Pages repository is checked out or mutated. The deployed smoke test remains as a second-layer verification after publication.
 
 The Pages repository is treated as generated deployment output. Source edits belong in `Jeysibn/portfolio`, not directly in `Jeysibn/jeysibn.github.io`.
 
@@ -228,6 +245,10 @@ Normal project rendering loads only the active project's first architecture shee
 
 This behavior is application-level optimization rather than a separate deployment job. CI still validates the frontend through the normal TypeScript and Vite build pipeline.
 
+## Frontend source maps
+
+Vite production source-map publication is disabled. The repository has no source-map upload step or private monitoring consumer, and the Pages artifact is public. Application Insights continues to receive runtime request and exception telemetry; if source-level browser diagnostics become necessary, add a private upload path before re-enabling maps.
+
 ## Documentation-Only Releases
 
 Markdown-only changes do not match the frontend, backend, or Terraform deployment path filters, so synchronizing documentation after a successful release does not redeploy the application or mutate Azure infrastructure.
@@ -266,6 +287,8 @@ Production Ready gate
 Merge to protected main
    |
    +--> React build
+   |      -> performance budget
+   |      -> local preview + Playwright/axe gate
    |      -> Jeysibn/jeysibn.github.io
    |      -> https://jeysibn.github.io/ smoke check
    |

@@ -2,6 +2,7 @@ import json
 
 import pytest
 from azure.cosmos import exceptions
+from openai import OpenAIError
 
 import function_app
 from assistant.response_sanitizer import sanitize_ai_response
@@ -175,6 +176,33 @@ def test_get_ai_client_requires_runtime_key(monkeypatch):
 
     with pytest.raises(RuntimeError, match="OPENCODE_API_KEY"):
         function_app.get_ai_client()
+
+
+def test_get_ai_client_uses_bounded_timeout_without_sdk_retries(monkeypatch):
+    captured = {}
+
+    class FakeOpenAI:
+        def __init__(self, **kwargs):
+            captured.update(kwargs)
+
+    monkeypatch.setattr(function_app, "OpenAI", FakeOpenAI)
+    monkeypatch.setattr(function_app, "ai_client", None)
+
+    function_app.get_ai_client()
+
+    assert captured["timeout"] == function_app.AI_PROVIDER_TIMEOUT_SECONDS
+    assert captured["max_retries"] == 0
+
+
+def test_ai_provider_timeout_configuration_is_bounded(monkeypatch):
+    monkeypatch.delenv("AI_PROVIDER_TIMEOUT_SECONDS", raising=False)
+    assert function_app._get_ai_provider_timeout() == function_app.AI_PROVIDER_TIMEOUT_SECONDS_DEFAULT
+
+    monkeypatch.setenv("AI_PROVIDER_TIMEOUT_SECONDS", "500")
+    assert function_app._get_ai_provider_timeout() == function_app.AI_PROVIDER_TIMEOUT_SECONDS_MAX
+
+    monkeypatch.setenv("AI_PROVIDER_TIMEOUT_SECONDS", "invalid")
+    assert function_app._get_ai_provider_timeout() == function_app.AI_PROVIDER_TIMEOUT_SECONDS_DEFAULT
 
 
 def test_ai_output_budget_uses_default_and_server_side_bounds(monkeypatch):
@@ -352,7 +380,10 @@ def configure_chat_provider(monkeypatch, responses):
     class Completions:
         def create(self, **kwargs):
             calls.append(kwargs)
-            content, finish_reason = responses[len(calls) - 1]
+            response = responses[len(calls) - 1]
+            if isinstance(response, BaseException):
+                raise response
+            content, finish_reason = response
             return type(
                 "Response",
                 (),
@@ -400,6 +431,37 @@ def test_length_limited_completion_is_regenerated_once(monkeypatch):
     success = next(fields for event, fields in events if event == "ai_chat_success")
     assert success["regeneration_required"] is True
     assert success["final_completed"] is True
+
+
+def test_provider_failure_returns_controlled_public_error(monkeypatch):
+    configure_chat_provider(monkeypatch, [OpenAIError("provider internals")])
+
+    response = function_app.AiChatAssistant(Request(json.dumps({"message": "Tell me about MoniKey."})))
+
+    assert response.status_code == 503
+    payload = json.loads(response.get_body())
+    assert payload["error"] == "The AI service is temporarily unavailable. Please try again later."
+    assert "provider internals" not in json.dumps(payload)
+
+
+def test_provider_deadline_returns_distinct_timeout_error(monkeypatch):
+    configure_chat_provider(monkeypatch, [function_app.ProviderDeadlineExceeded()])
+
+    response = function_app.AiChatAssistant(Request(json.dumps({"message": "Tell me about MoniKey."})))
+
+    assert response.status_code == 504
+    payload = json.loads(response.get_body())
+    assert payload["error"] == "The AI service took too long to respond. Please try again."
+
+
+def test_malformed_provider_response_returns_controlled_error(monkeypatch):
+    configure_chat_provider(monkeypatch, [(None, "stop")])
+
+    response = function_app.AiChatAssistant(Request(json.dumps({"message": "Tell me about MoniKey."})))
+
+    assert response.status_code == 502
+    payload = json.loads(response.get_body())
+    assert payload["error"] == "The AI assistant did not return a response."
 
 
 def test_length_limited_retry_returns_controlled_error_when_still_incomplete(monkeypatch):
