@@ -59,6 +59,23 @@ test.describe("portfolio release browser gate", () => {
     expect(deckGeometry.cardBottom).toBeLessThanOrEqual(deckGeometry.selectorTop);
   });
 
+  test("freezes the complete capability orbit on pointer hover", async ({ page }, testInfo) => {
+    test.skip(!testInfo.project.name.startsWith("desktop"), "Desktop motion coverage only");
+
+    await page.locator("#skills").scrollIntoViewIfNeeded();
+    const skill = page.locator(".orbit-skill").first();
+    const box = await skill.boundingBox();
+    if (!box) throw new Error("Capability skill is unavailable for hover validation");
+
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await expect.poll(async () => page.locator(".capability-system").evaluate((element) => ({
+      outer: getComputedStyle(element.querySelector(".outer-orbit")!).animationPlayState,
+      counter: getComputedStyle(element.querySelector(".domain-counter-rotation")!).animationPlayState,
+      inner: getComputedStyle(element.querySelector(".orbiting-skills")!).animationPlayState,
+      skill: getComputedStyle(element.querySelector(".orbit-skill")!).animationPlayState,
+    }))).toEqual({ outer: "paused", counter: "paused", inner: "paused", skill: "paused" });
+  });
+
   test("captures the stable 1920px hero anchor", async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== "desktop-1920", "Stable visual anchor only");
 

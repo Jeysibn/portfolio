@@ -33,7 +33,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and 
 - **Canonical metadata**: Vite now derives title, URL, profile name, role, and social identity values in document metadata and JSON-LD from `content/portfolio.json`; public production sourcemaps are disabled because no private upload consumer exists.
 
 - **Project presentation**: Retained the stacked System Deck interaction with compact architecture-flow previews, numbered navigation, and progressive project inspection.
-- **Capabilities**: Retained the spatial Control Plane concept with slow domain/tool orbits, a structured constrained-width fallback, and focus-within pausing for keyboard users.
+- **Capabilities**: Retained the spatial Control Plane concept with slow domain/tool orbits, complete pointer-hover and focus-within pausing for inspection, and a structured constrained-width fallback.
 
 - **Frontend visual hierarchy**: Restored the editorial control-surface balance of warm paper, infrastructure ink, copper state cues, and restrained technical motion.
 

@@ -727,6 +727,13 @@ a {
 .capability-domain:has(.skill-orbit:focus-within) .orbiting-skills {
   animation-play-state: paused;
 }
+.capability-system:has(.capability-domain:hover) .outer-orbit,
+.capability-system:has(.capability-domain:hover) .domain-counter-rotation,
+.capability-system:has(.capability-domain:hover) .orbiting-skills,
+.capability-system:has(.capability-domain:hover) .orbit-skill {
+  /* Keep the whole topology stable while a pointer inspects a capability. */
+  animation-play-state: paused !important;
+}
 .skill-orbit:hover .orbit-skill svg,
 .skill-orbit:focus-within .orbit-skill svg {
   transform: scale(1.12);

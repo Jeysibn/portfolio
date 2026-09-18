@@ -77,7 +77,7 @@ Navigation scrolls the selected section to the start of the viewport beneath the
 - restrained certification and education lists;
 - fully visible on-page resume plus direct PDF download;
 - form-less recruiter-focused Contact section with direct email, copy-email, LinkedIn, resume, and GitHub paths;
-- height-aware desktop density and an in-view Control Plane orbital topology with slow domain/tool motion, focus stability, and a static constrained-width fallback;
+- height-aware desktop density and an in-view Control Plane orbital topology with slow domain/tool motion, complete pointer-hover and keyboard-focus stability, and a static constrained-width fallback;
 - keyboard focus behavior and reduced-motion support.
 
 The AI interface remains provider-neutral so backend model/provider changes do not require frontend branding changes.
