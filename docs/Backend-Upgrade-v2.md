@@ -3,6 +3,11 @@
 ## Overview
 This document outlines the architectural upgrade to the portfolio's visitor tracking system. The initial implementation relied on a naive "increment-on-load" mechanism, which artificially inflated metrics upon page refreshes. The system has been redesigned to track unique visitors at the infrastructure level using **Azure Functions**, **Cosmos DB**, and **Terraform**, while strictly adhering to privacy-by-design principles.
 
+> This is a historical design note. The current Terraform configuration in
+> `terraform/` is authoritative and uses AzureRM 4.x argument names, including
+> `free_tier_enabled` and `partition_key_paths`; use the repository runbook for
+> current deployment and identity procedures.
+
 ## Old vs. New Architecture
 
 | Feature | Previous Implementation | Upgraded Architecture |
@@ -38,7 +43,7 @@ resource "azurerm_cosmosdb_sql_container" "visitor_ips" {
   resource_group_name   = azurerm_resource_group.rg.name
   account_name          = azurerm_cosmosdb_account.db.name
   database_name         = azurerm_cosmosdb_sql_database.sqldb.name
-  partition_key_path    = "/id"
+  partition_key_paths   = ["/id"]
   partition_key_version = 1
   
   # Automated cleanup mechanism

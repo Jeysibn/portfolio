@@ -22,6 +22,27 @@ variable "app_version" {
   default     = "1.0.0"
 }
 
+variable "subscription_id" {
+  type        = string
+  description = "Azure subscription used by the AzureRM provider. Supply via TF_VAR_subscription_id."
+
+  validation {
+    condition     = can(regex("^[0-9a-fA-F-]{36}$", var.subscription_id))
+    error_message = "The Azure subscription ID must be a GUID."
+  }
+}
+
+variable "cosmos_db_auth_mode" {
+  type        = string
+  description = "Cosmos runtime authentication mode. Keep connection_string until managed identity access has been verified in production."
+  default     = "connection_string"
+
+  validation {
+    condition     = contains(["connection_string", "managed_identity"], var.cosmos_db_auth_mode)
+    error_message = "cosmos_db_auth_mode must be connection_string or managed_identity."
+  }
+}
+
 variable "opencode_api_key" {
   type        = string
   description = "OpenCode Zen API key injected into the Azure Function App."

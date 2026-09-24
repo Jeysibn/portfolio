@@ -33,38 +33,21 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Node.js
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: "22"
 
       - name: Install frontend dependencies
         run: npm ci --no-audit --no-fund
 
-      - name: Typecheck React frontend
-        run: npm run typecheck
-
-      - name: Lint React frontend
-        run: npm run lint
-
-      - name: Run frontend unit tests
-        run: npm test -- --run
-
-      - name: Build React frontend
-        run: npm run build
-
-      - name: Enforce frontend performance budget
-        run: npm run perf:budget
-
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
 
-      - name: Run browser and accessibility tests on production preview
-        env:
-          PLAYWRIGHT_SKIP_BUILD: "1"
-        run: npm run test:ui
+      - name: Run frontend validation suite
+        run: npm run validate:ci
 
       - name: Verify production artifact
         run: |
@@ -77,7 +60,7 @@ jobs:
         run: tar -czf ../../frontend-build.tar.gz -C dist .
 
       - name: Upload frontend build
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: frontend-production-build
           path: frontend-build.tar.gz
@@ -97,10 +80,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Python
-        uses: actions/setup-python@v7
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.11"
           cache: pip
@@ -150,10 +133,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Python
-        uses: actions/setup-python@v7
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.11"
           cache: pip
@@ -182,7 +165,7 @@ jobs:
                "tests/*"
 
       - name: Upload backend build
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: azure-function-production-build
           path: backend-function.zip
@@ -202,17 +185,17 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v4
+        uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
 
       - name: Terraform format check
         run: terraform fmt -check -recursive
 
       - name: Login to Azure using OIDC
         if: github.actor != 'dependabot[bot]'
-        uses: azure/login@v3
+        uses: azure/login@a641126d1b8aa4d1fa005f4f92df94a3a4c4c906 # v3.1.0
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
@@ -220,13 +203,19 @@ jobs:
 
       - name: Terraform initialize remote backend
         if: github.actor != 'dependabot[bot]'
+        env:
+          TF_VAR_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         run: terraform init -input=false
 
       - name: Terraform initialize without backend for Dependabot
         if: github.actor == 'dependabot[bot]'
+        env:
+          TF_VAR_subscription_id: 00000000-0000-0000-0000-000000000000
         run: terraform init -backend=false -input=false
 
       - name: Terraform validate
+        env:
+          TF_VAR_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID || '00000000-0000-0000-0000-000000000000' }}
         run: terraform validate
 
       - name: Terraform production plan
@@ -234,6 +223,7 @@ jobs:
         env:
           TF_VAR_opencode_api_key: ${{ secrets.OPENCODE_API_KEY }}
           TF_VAR_visitor_hash_secret: ${{ secrets.VISITOR_HASH_SECRET }}
+          TF_VAR_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         run: |
           terraform plan \
             -input=false \

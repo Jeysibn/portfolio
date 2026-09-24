@@ -40,17 +40,38 @@ Example response:
 {
   "status": "healthy",
   "service": "portfolio-api",
-  "version": "development"
+  "version": "1.0.0",
+  "revision": "<deployed Git commit SHA>",
+  "environment": "production"
 }
 ```
 
-Dependency failures remain visible through request failures, exceptions, and the production visitor-counter smoke test. Keeping liveness independent from dependencies avoids declaring the Function host unhealthy solely because an external service is temporarily degraded.
+`version` is the semantic application version configured by Terraform through
+`APP_VERSION`. `revision` is set from `github.sha` by the backend deployment
+workflow after publishing the package. Terraform ignores that workflow-owned
+setting so an infrastructure apply does not replace the release SHA.
+`environment` is the safe deployment label configured by Terraform. None of
+these fields contains credentials or infrastructure connection details.
+
+Dependency failures remain visible through request failures and exceptions.
+Keeping liveness independent from dependencies avoids declaring the Function
+host unhealthy solely because an external service is temporarily degraded.
+
+There is currently no `/api/ready` route. Health therefore makes no claim that
+Cosmos DB or the AI provider is ready for a successful application operation.
+Dependency-specific checks remain tied to real backend operations and their
+telemetry instead of adding synthetic readiness traffic.
+
+`GetVisitorCount` is user-facing analytics: it may create a visitor record and
+increment the public count for a new visitor identity. It is deliberately
+separate from liveness/readiness checks and is never used by deployment probes.
 
 ## Frontend health indicator
 
 The deployed React hero surfaces the production health check as a compact
-status indicator. It reports only the result of the browser's `/api/health`
-request and does not present release age or dependency health as live metrics.
+`API checking` / `API online` / `API unavailable` status indicator. It reports
+only the result of the browser's `/api/health` request and does not present
+dependency health as a live metric.
 
 ### Operational state
 
@@ -65,9 +86,13 @@ An Operational result means the Function application is live enough to answer th
 The backend production workflow does not treat package upload as sufficient proof of a healthy deployment. After Azure Functions deployment it:
 
 1. retries `/api/health` while the Function host starts;
-2. validates the JSON health contract;
-3. calls `GetVisitorCount` and confirms an integer count;
-4. fails the deployment workflow when verification does not succeed.
+2. validates liveness, service, version, environment, and the exact commit SHA
+   expected from the workflow;
+3. fails the deployment workflow when verification does not succeed.
+
+This check does not call `GetVisitorCount`, which records first-time visitors
+and can increment the public metric. Visitor analytics are exercised by backend
+unit tests and real browser traffic, not deployment runners.
 
 ### Frontend
 

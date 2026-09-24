@@ -328,7 +328,7 @@
         ],
         "ci_cd": "Development validation covers frontend typecheck/build, backend Ruff/pytest, and Terraform validation. Main merges use path-specific frontend, backend, and infrastructure deployment workflows with post-deployment verification.",
         "infrastructure": "GitHub Pages, Azure Functions on the Consumption plan, Azure Cosmos DB, Application Insights, Log Analytics, Azure Blob Storage for Terraform state, and Azure Korea Central resources managed by Terraform.",
-        "observability": "Application Insights and Log Analytics receive Azure Function telemetry and privacy-conscious structured assistant events; deployment workflows also verify the health and visitor-counter endpoints.",
+        "observability": "Application Insights and Log Analytics receive Azure Function telemetry and privacy-conscious structured assistant events; deployment workflows verify health and the deployed revision without writing visitor analytics.",
         "data_storage": "Cosmos DB stores the visitor counter and per-visitor rate-limit records. The frontend stores only the browser chat history and an opaque session routing identifier in sessionStorage.",
         "engineering_decisions": [
           "Serverless consumption hosting avoids an always-on application server for a low-traffic portfolio.",

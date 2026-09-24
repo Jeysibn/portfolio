@@ -26,6 +26,9 @@ jobs:
     environment:
       name: production
 
+    env:
+      TF_VAR_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
     defaults:
       run:
         working-directory: terraform
@@ -35,21 +38,21 @@ jobs:
       # CHECKOUT
       # =====================================================
       - name: Checkout repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
 
       # =====================================================
       # TERRAFORM
       # =====================================================
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v4
+        uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
 
 
       # =====================================================
       # AZURE AUTHENTICATION
       # =====================================================
       - name: Login to Azure using OIDC
-        uses: azure/login@v3
+        uses: azure/login@a641126d1b8aa4d1fa005f4f92df94a3a4c4c906 # v3.1.0
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}

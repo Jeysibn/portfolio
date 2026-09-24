@@ -32,10 +32,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Python
-        uses: actions/setup-python@v7
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
@@ -50,17 +50,29 @@ jobs:
             --target="backend/.python_packages/lib/site-packages"
 
       - name: Login to Azure using OIDC
-        uses: azure/login@v3
+        uses: azure/login@a641126d1b8aa4d1fa005f4f92df94a3a4c4c906 # v3.1.0
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Deploy Azure Function
-        uses: Azure/functions-action@v1
+        uses: Azure/functions-action@c5060b3b8bb1ebbcb531abd00c822ecbaa8ea656 # v1.5.7
         with:
           app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
           package: ./backend
+
+      - name: Set deployed revision metadata
+        run: |
+          set -euo pipefail
+
+          # Azure CLI returns all configured settings from this command. Suppress
+          # its JSON output so existing secret values cannot enter the job log.
+          az functionapp config appsettings set \
+            --resource-group rg-jeysibn-portfolio \
+            --name "$AZURE_FUNCTIONAPP_NAME" \
+            --settings "APP_REVISION=$GITHUB_SHA" \
+            --output none
 
       - name: Verify run-from-package configuration
         run: |
@@ -75,6 +87,7 @@ jobs:
       - name: Verify production health
         env:
           HEALTH_URL: https://${{ env.AZURE_FUNCTIONAPP_NAME }}.azurewebsites.net/api/health
+          EXPECTED_REVISION: ${{ github.sha }}
         run: |
           set -euo pipefail
 
@@ -82,7 +95,7 @@ jobs:
             if response=$(curl --silent --show-error --fail \
               --max-time 15 \
               "$HEALTH_URL"); then
-              if printf '%s' "$response" | python -c 'import json,sys; payload=json.load(sys.stdin); assert payload["status"] == "healthy"; assert payload["service"] == "portfolio-api"; print("Health response validated:", payload)'; then
+              if printf '%s' "$response" | python -c 'import json,os,re,sys; payload=json.load(sys.stdin); assert payload.get("status") == "healthy", "backend is not healthy"; assert payload.get("service") == "portfolio-api", "unexpected backend service"; assert payload.get("revision") == os.environ["EXPECTED_REVISION"], "deployed backend revision does not match workflow commit"; assert re.fullmatch(r"\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?", payload.get("version", "")), "application semantic version is missing or invalid"; assert payload.get("environment") == "production", "unexpected environment"; print("Health and deployed revision validated:", payload["revision"])'; then
                 exit 0
               fi
             fi
@@ -94,18 +107,11 @@ jobs:
           echo "Production health verification failed."
           exit 1
 
-      - name: Smoke test visitor counter API
-        run: |
-          curl --silent --show-error --fail \
-            --max-time 15 \
-            "https://${AZURE_FUNCTIONAPP_NAME}.azurewebsites.net/api/GetVisitorCount" \
-            | python -c 'import json,sys; payload=json.load(sys.stdin); assert isinstance(payload.get("count"), int); print("Visitor counter smoke test passed")'
-
       - name: Deployment summary
         if: success()
         run: |
           echo "## Backend Deployment + Verification ✅" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "Azure Function deployed and production smoke tests passed." >> "$GITHUB_STEP_SUMMARY"
+          echo "Azure Function deployed; non-mutating liveness and revision checks passed." >> "$GITHUB_STEP_SUMMARY"
           echo "**Commit:** ${{ github.sha }}" >> "$GITHUB_STEP_SUMMARY"
           echo "**Health:** https://${AZURE_FUNCTIONAPP_NAME}.azurewebsites.net/api/health" >> "$GITHUB_STEP_SUMMARY"

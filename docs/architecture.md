@@ -66,7 +66,7 @@ Navigation scrolls the selected section to the start of the viewport beneath the
 - compact Light/Dark theme switching with saved-preference persistence and initial system-preference fallback;
 - typed portfolio content rendering;
 - a name-first hero centered on `Jerome Christian Ibon` with Cloud Support / DevOps / Cloud Engineering positioning;
-- backend `/api/health` remains available for deployment verification;
+- compact hero status indicator driven by backend `/api/health` liveness;
 - visitor-counter display;
 - AI assistant conversation state, starter questions, source links, and session history;
 - a four-project System Deck with numbered project selection, keyboard arrows, and pointer swipe support;
@@ -105,11 +105,18 @@ The visible header control toggles between Light and Dark and persists the selec
 
 ## Backend health semantics
 
-### Liveness
+### Liveness and release identity
 
-`GET /api/health` is a lightweight Azure Functions liveness check. A successful response means the Function worker loaded the application and can serve HTTP traffic.
+`GET /api/health` is a non-mutating Azure Functions liveness check. It returns
+`status`, `service`, the semantic `version`, deployed Git `revision`, and safe
+`environment` metadata. Version and environment come from Terraform-managed
+app settings; the backend deployment workflow writes its `github.sha` into the
+revision setting after package deployment. Terraform ignores that dynamic value
+so ordinary infrastructure applies do not replace release identity.
 
-It does **not** query Cosmos DB or the external AI provider, so an Operational health state must not be interpreted as proof that every downstream dependency is healthy.
+The route does not access Cosmos DB, the external AI provider, or visitor
+analytics. The compact hero indicator reports only this liveness result; an
+Operational status does not prove downstream dependencies are healthy.
 
 ## Project Architecture Delivery
 
@@ -155,9 +162,12 @@ The backend runs as an Azure Functions Python 3.11 application using the Python 
 
 ### Health
 
-`GET /api/health` verifies that the Function worker loaded and can serve HTTP without making dependency calls to Cosmos DB or the AI provider.
-
-The backend deployment workflow uses the same route as a post-deployment gate. The portfolio presentation keeps that operational endpoint available without promoting live health widgets into the hero.
+`GET /api/health` verifies that the Function worker loaded and can serve HTTP
+without dependency calls. The backend deployment workflow checks the returned
+release revision against the workflow's commit SHA. It does not call
+`GetVisitorCount`, because that endpoint records new visitors and may increment
+the public count. The compact hero status indicator reports the same liveness
+result and does not make a readiness claim.
 
 ### Visitor Counter
 
@@ -170,6 +180,9 @@ The backend deployment workflow uses the same route as a post-deployment gate. T
 5. stores the hashed visitor identifier.
 
 Raw IP addresses are not intentionally persisted.
+
+Deployment liveness checks do not call the counter route, so GitHub-hosted
+runners do not create visitor records or affect the public metric.
 
 ### AI Assistant
 
@@ -225,6 +238,15 @@ Azure Cosmos DB for NoSQL stores application state.
 - `VisitorIPs` — hashed visitor identifiers and chat rate-limit records
 
 The `VisitorIPs` container uses a 24-hour default TTL so temporary visitor records are automatically removed.
+
+The Function App has a system-assigned managed identity and a Cosmos DB native
+data-plane role assignment. Runtime authentication is selected by
+`COSMOS_DB_AUTH_MODE`: `managed_identity` uses `DefaultAzureCredential` and
+custom `Portfolio Runtime Data Access` role; the default remains `connection_string`
+until the production identity path has been verified. The connection-string
+setting remains available as a staged rollback path. Azure Function host
+storage continues to use its platform storage credential and is a separate
+migration.
 
 ## Observability
 

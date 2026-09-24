@@ -1,3 +1,4 @@
 azure-functions==1.25.0
 azure-cosmos==4.16.4
+azure-identity==1.25.3
 openai==3.4.0
