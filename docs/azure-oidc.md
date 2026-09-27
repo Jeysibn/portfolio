@@ -59,7 +59,7 @@ and authenticates with:
 
 ```yaml
 - name: Login to Azure using OIDC
-  uses: azure/login@v3
+  uses: azure/login@a641126d1b8aa4d1fa005f4f92df94a3a4c4c906 # v3.1.0
   with:
     client-id: ${{ secrets.AZURE_CLIENT_ID }}
     tenant-id: ${{ secrets.AZURE_TENANT_ID }}
@@ -87,6 +87,11 @@ Pull-request Terraform planning uses:
 ```text
 repo:Jeysibn@184398348/portfolio@1312957789:pull_request
 ```
+
+Terraform's AzureRM 4.x provider also requires an explicit subscription ID.
+Authenticated jobs pass `AZURE_SUBSCRIPTION_ID` as `TF_VAR_subscription_id`;
+the Dependabot static validation job uses a placeholder and never authenticates
+or contacts production state.
 
 This allows the PR workflow to authenticate and inspect real infrastructure state while keeping `terraform apply` out of the PR pipeline.
 

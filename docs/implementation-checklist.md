@@ -17,7 +17,9 @@ Tracked baseline and implementation record for the production portfolio improvem
 
 ## Remaining / intentionally deferred
 
-- [ ] Replace Cosmos and Function storage access keys with managed identity/RBAC after provider-version validation.
+- [x] Add a Cosmos `DefaultAzureCredential` path and a database-scoped custom data role while preserving connection-string rollback.
+- [ ] Complete the Cosmos production identity cutover after the production plan, RBAC propagation, and live read/write verification; remove the fallback only after stability is confirmed.
+- [ ] Replace the Function Consumption host storage key only through a separately validated Azure Files/hosting-plan migration.
 - [ ] Move the third-party AI key from Terraform-managed app settings to Key Vault reference.
 - [x] Add frontend ESLint, Vitest/RTL, Playwright, axe, and a lightweight performance budget.
 - [x] Add a 1200×630 PNG social preview to the Vite public artifact.
@@ -26,6 +28,6 @@ Tracked baseline and implementation record for the production portfolio improvem
 
 ## Baseline notes
 
-- The inspected worktree was clean on branch `dev`; the requested `main` branch is not the checked-out branch.
+- The repository default branch is `main`; the production hardening review was based on its fetched current state.
 - Direct HTTP inspection of `https://jeysibn.github.io/` returned the current Pages document. Interactive browser checks were run against the local production preview; the connector itself could not open the live page.
 - Existing strengths retained: OIDC deployment, Terraform-managed Azure resources, Application Insights/Log Analytics, native dialogs, reduced-motion handling, textual architecture alternatives, and deployment smoke verification.

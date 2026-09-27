@@ -23,10 +23,10 @@ jobs:
 
     steps:
       - name: Checkout source repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Node.js
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: "22"
 
@@ -34,35 +34,13 @@ jobs:
         working-directory: frontend/app
         run: npm ci --no-audit --no-fund
 
-      - name: Typecheck frontend
-        working-directory: frontend/app
-        run: npm run typecheck
-
-      - name: Lint frontend
-        working-directory: frontend/app
-        run: npm run lint
-
-      - name: Run frontend unit tests
-        working-directory: frontend/app
-        run: npm test -- --run
-
-      - name: Build frontend
-        working-directory: frontend/app
-        run: npm run build
-
-      - name: Enforce frontend performance budget
-        working-directory: frontend/app
-        run: npm run perf:budget
-
       - name: Install Playwright Chromium
         working-directory: frontend/app
         run: npx playwright install --with-deps chromium
 
-      - name: Run browser and accessibility validation on production preview
+      - name: Run frontend validation suite
         working-directory: frontend/app
-        env:
-          PLAYWRIGHT_SKIP_BUILD: "1"
-        run: npm run test:ui
+        run: npm run validate:ci
 
       - name: Verify frontend artifact
         run: |
@@ -70,7 +48,7 @@ jobs:
           test -d frontend/app/dist/assets
 
       - name: Checkout GitHub Pages repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: Jeysibn/jeysibn.github.io
           ref: main

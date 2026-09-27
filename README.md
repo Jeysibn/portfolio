@@ -259,6 +259,7 @@ Key security decisions include:
 
 - GitHub OIDC federation with Microsoft Entra ID for Azure Actions authentication;
 - no reusable Azure service-principal client secret in GitHub;
+- a system-assigned Function App identity with a Cosmos DB native RBAC role assignment; connection-string mode remains the Terraform default until production identity cutover is verified;
 - protected `main` branch with required PR validation;
 - separate OIDC trust subjects for pull-request planning and production environment deployment;
 - a scoped `PAGES_DEPLOY_TOKEN` used only to publish the generated frontend into `Jeysibn/jeysibn.github.io`;
@@ -316,6 +317,7 @@ Create `backend/local.settings.json` locally with the required application setti
   "Values": {
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "FUNCTIONS_WORKER_RUNTIME": "python",
+    "COSMOS_DB_AUTH_MODE": "connection_string",
     "CosmosDbConnectionString": "<local-or-development-connection-string>",
     "OPENCODE_API_KEY": "<api-key>"
   }
@@ -338,8 +340,14 @@ Terraform validation without touching shared remote state:
 cd terraform
 terraform fmt -check -recursive
 terraform init -backend=false
-terraform validate
+TF_VAR_subscription_id=00000000-0000-0000-0000-000000000000 terraform validate
 ```
+
+Terraform constrains AzureRM to `~> 5.0` and commits the provider lockfile.
+The 3.x → 4.x → 5.x upgrade was reviewed in sequence, with the matching
+provider migration guides and a production-state plan required before apply.
+Weekly Terraform updates are opened for review through Dependabot. Do not use a
+production `terraform apply` as a local validation step.
 
 ## Terraform Remote State
 
@@ -366,6 +374,7 @@ Terraform currently provisions:
 - `VisitorIPs` container with TTL;
 - Linux Consumption App Service Plan;
 - Python 3.11 Azure Function App;
+- system-assigned Function identity and Cosmos DB native data-plane role assignment;
 - Log Analytics workspace with cost guardrails;
 - workspace-based Application Insights;
 - Function App configuration, telemetry connection, and CORS settings.
@@ -375,12 +384,12 @@ Terraform currently provisions:
 Production visibility includes:
 
 - `GET /api/health` liveness endpoint;
+- safe health release metadata (`version`, deployment `revision`, environment);
 - Application Insights request, failure, exception, and latency telemetry;
 - structured application events and correlation IDs;
 - Log Analytics with 30-day retention and a `0.1 GB/day` ingestion cap;
-- backend health and visitor-counter post-deployment smoke checks;
+- non-mutating backend liveness and revision post-deployment verification;
 - frontend root-site post-publication verification;
-- backend health endpoint with explicit liveness semantics for deployment verification;
 - initial SLI/SLO targets and KQL troubleshooting queries.
 
 See [`docs/observability.md`](docs/observability.md) and [`docs/runbook.md`](docs/runbook.md).

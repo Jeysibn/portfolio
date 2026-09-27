@@ -29,6 +29,8 @@ export interface HealthResponse {
   status: string;
   service: string;
   version: string;
+  revision: string;
+  environment: string;
 }
 
 export interface VisitorCountResponse {

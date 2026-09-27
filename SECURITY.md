@@ -72,6 +72,25 @@ Because Terraform manages the Function App application setting, the secret value
 
 Terraform's `sensitive = true` marking reduces accidental CLI/output disclosure but does not remove the value from state.
 
+### Cosmos DB runtime identity
+
+The Function App has a system-assigned managed identity, and Terraform grants it
+the custom `Portfolio Runtime Data Access` role scoped to the application's
+`PortfolioDB` database. It grants only Cosmos metadata reads and document
+point-read/create/replace actions. The backend supports both
+`managed_identity` mode using
+`DefaultAzureCredential` and the existing `connection_string` fallback. The
+Terraform default remains `connection_string` until the live role assignment
+and Function runtime path have been verified; both settings are provisioned
+during that staged migration. The Cosmos connection string remains sensitive
+data in Function configuration and Terraform state during this period.
+
+The Function App's Consumption host storage still uses its storage account
+access key. Azure Functions Consumption has separate host and Azure Files
+requirements, so that credential is not changed as part of the Cosmos cutover.
+The external AI provider key and visitor HMAC key also remain application
+secrets. Do not log these settings while troubleshooting.
+
 ## Production Controls
 
 - `main` is protected and accepts changes through pull requests.
@@ -85,11 +104,11 @@ Terraform's `sensitive = true` marking reduces accidental CLI/output disclosure 
 
 ## Frontend Asset Security
 
-Large architecture diagrams are public portfolio assets. Normal project browsing uses resized WebP previews from `wsrv.nl`, while the original public GitHub-hosted PNG is used for explicit full-resolution zoom.
-
-Only public image URLs are sent to the image-resize service. No API keys, Azure tokens, connection strings, visitor identifiers, prompts, or other private application data should be included in preview URLs.
-
-If the preview service becomes unavailable or untrusted, the application should be able to move to locally generated previews without changing backend security boundaries.
+Project architecture diagrams are local SVG assets served from
+`frontend/app/public/architecture/`. The browser does not send architecture
+image requests to an external image-processing service. These SVGs are public
+repository content and must not contain secrets, private visitor data, or
+unapproved infrastructure details.
 
 ## Application Data
 

@@ -27,15 +27,20 @@ Working directory: `frontend/app`
 
 ```text
 npm ci
--> strict TypeScript typecheck
--> ESLint
--> Vitest unit tests
--> Vite production build
--> performance budget
--> local Vite production preview
--> Playwright browser + axe accessibility tests
+-> npm run validate:ci
+   -> strict TypeScript typecheck
+   -> ESLint
+   -> Vitest unit tests
+   -> Vite production build
+   -> performance budget
+   -> local Vite production preview
+   -> Playwright browser + axe accessibility tests
 -> dist artifact verification
 ```
+
+Development CI, pull request validation, and frontend production release call
+the same `validate:ci` npm script. The workflows still install Chromium and
+verify the deployable artifact around that shared gate.
 
 The generated build must contain `dist/index.html` plus JavaScript and CSS assets before frontend validation passes. Browser tests run against that build, not Vite development modules. The Playwright matrix covers desktop 1920×1080, desktop 1440×900, and the configured iPhone 13 mobile Chromium project. Accessibility scans cover the initial page, project and capability dialogs, mobile navigation, and the expanded assistant.
 
@@ -115,6 +120,22 @@ For normal pull requests, the Terraform job:
 7. writes the plan to the GitHub Actions step summary.
 
 The PR workflow never runs `terraform apply`.
+
+AzureRM is constrained to the supported 5.x major (`~> 5.0`); the selected
+provider build is recorded in `terraform/.terraform.lock.hcl`. The upgrade was
+reviewed in sequence from 3.x to 4.x, then 4.x to 5.x. For 3.x to 4.x, resource
+names remain unchanged; the configuration now uses Cosmos `free_tier_enabled`
+and SQL container `partition_key_paths`, and supplies the subscription ID
+required by 4.x. The 4.x to 5.x guide's removed properties are not used by the
+current resources. The one relevant behavior change is Storage Account's
+default `allow_nested_items_to_be_public = false`; the Function storage account
+now sets this explicitly to deny public blob access. The production-state plan
+must confirm any resulting update is in-place and contains no unexpected
+storage drift. Authenticated jobs supply `TF_VAR_subscription_id` from
+`AZURE_SUBSCRIPTION_ID`; Dependabot uses a non-deployed placeholder for static
+validation only. Dependabot checks Terraform weekly against `dev`. Review
+provider upgrades with the [AzureRM 4.0 upgrade guide](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/guides/4.0-upgrade-guide)
+and the [AzureRM 5.0 upgrade guide](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/guides/5.0-upgrade-guide), then run a real-state plan before production apply. Dependabot does not automatically apply infrastructure.
 
 ### Dependabot Terraform validation
 
@@ -202,11 +223,15 @@ Azure authentication uses GitHub OIDC.
 
 After package deployment, the workflow:
 
-1. retries `GET /api/health` while the Function host starts;
-2. validates the health JSON contract;
-3. calls `GetVisitorCount`;
-4. verifies that the response contains an integer count;
-5. fails the deployment if runtime verification fails.
+1. injects the current `github.sha` as `APP_REVISION` without printing existing
+   application settings;
+2. retries `GET /api/health` while the Function host starts;
+3. verifies liveness, version, environment, service, and the exact deployed
+   revision;
+4. fails the deployment if runtime verification fails.
+
+The health route does not mutate Cosmos data. Deployment verification never
+calls `GetVisitorCount`, which remains reserved for actual portfolio traffic.
 
 The deployment package includes the generated allow-listed assistant projection.
 The workflow checks it with `python backend/tools/build_knowledge.py --check`

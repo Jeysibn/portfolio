@@ -5,11 +5,12 @@ resource "azurerm_resource_group" "rg" {
 
 # Storage Account for the Azure Function
 resource "azurerm_storage_account" "function_sa" {
-  name                     = "st${var.project_prefix}func"
-  resource_group_name      = azurerm_resource_group.rg.name
-  location                 = azurerm_resource_group.rg.location
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
+  name                            = "st${var.project_prefix}func"
+  resource_group_name             = azurerm_resource_group.rg.name
+  location                        = azurerm_resource_group.rg.location
+  account_tier                    = "Standard"
+  account_replication_type        = "LRS"
+  allow_nested_items_to_be_public = false
 }
 
 # Cosmos DB Account (Free Tier Enabled)
@@ -21,7 +22,7 @@ resource "azurerm_cosmosdb_account" "db" {
   kind                = "GlobalDocumentDB"
 
   # Protects your student credits
-  enable_free_tier = true
+  free_tier_enabled = true
 
   consistency_policy {
     consistency_level = "Session"
@@ -40,13 +41,18 @@ resource "azurerm_cosmosdb_sql_database" "sqldb" {
   account_name        = azurerm_cosmosdb_account.db.name
 }
 
+# Stage 1 of the managed-identity migration intentionally enables the Function
+# identity before creating Cosmos DB native RBAC resources. The role definition
+# and assignment are added in stage 2 after Azure has materialized the Function
+# principal ID and Terraform can read it from state.
+
 # Container for the Visitor Counter
 resource "azurerm_cosmosdb_sql_container" "counter_container" {
   name                  = "Counter"
   resource_group_name   = azurerm_resource_group.rg.name
   account_name          = azurerm_cosmosdb_account.db.name
   database_name         = azurerm_cosmosdb_sql_database.sqldb.name
-  partition_key_path    = "/id"
+  partition_key_paths   = ["/id"]
   partition_key_version = 1
 }
 
@@ -88,6 +94,10 @@ resource "azurerm_linux_function_app" "function" {
   storage_account_name       = azurerm_storage_account.function_sa.name
   storage_account_access_key = azurerm_storage_account.function_sa.primary_access_key
 
+  identity {
+    type = "SystemAssigned"
+  }
+
   site_config {
     application_stack {
       python_version = "3.11"
@@ -98,7 +108,11 @@ resource "azurerm_linux_function_app" "function" {
   }
 
   app_settings = {
+    # Keep the connection-string path available for an immediate rollback while
+    # managed-identity data-plane access is verified in production.
     "CosmosDbConnectionString"              = azurerm_cosmosdb_account.db.primary_sql_connection_string
+    "CosmosDbEndpoint"                      = azurerm_cosmosdb_account.db.endpoint
+    "COSMOS_DB_AUTH_MODE"                   = var.cosmos_db_auth_mode
     "AzureWebJobsFeatureFlags"              = "EnableWorkerIndexing"
     "OPENCODE_API_KEY"                      = var.opencode_api_key
     "VISITOR_HASH_SECRET"                   = var.visitor_hash_secret
@@ -106,15 +120,19 @@ resource "azurerm_linux_function_app" "function" {
     # Mirrors the platform-level CORS origin above so the Function code's own
     # Access-Control-Allow-Origin header (see backend/function_app.py) can never
     # drift into a wider policy (e.g. "*") than what the platform allows.
-    "ALLOWED_ORIGIN" = var.production_frontend_origin
-    "APP_VERSION"    = var.app_version
+    "ALLOWED_ORIGIN"  = var.production_frontend_origin
+    "APP_VERSION"     = var.app_version
+    "APP_ENVIRONMENT" = "production"
   }
 
   lifecycle {
     # The backend deployment action writes this dynamic package URL. Preserve it
     # during infrastructure-only Terraform applies so the app cannot fall back
     # to an older package after a restart.
-    ignore_changes = [app_settings["WEBSITE_RUN_FROM_PACKAGE"]]
+    ignore_changes = [
+      app_settings["WEBSITE_RUN_FROM_PACKAGE"],
+      app_settings["APP_REVISION"],
+    ]
   }
 }
 
@@ -123,7 +141,7 @@ resource "azurerm_cosmosdb_sql_container" "visitor_ips" {
   resource_group_name   = azurerm_resource_group.rg.name
   account_name          = azurerm_cosmosdb_account.db.name
   database_name         = azurerm_cosmosdb_sql_database.sqldb.name
-  partition_key_path    = "/id"
+  partition_key_paths   = ["/id"]
   partition_key_version = 1
 
   # The DevOps flex: Automatically delete records after 24 hours (86400 seconds)

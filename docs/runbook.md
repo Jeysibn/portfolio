@@ -69,7 +69,7 @@ After a frontend release, verify:
 - navigation lands sections below the sticky header without centering the heading in the viewport;
 - the theme icon toggles Light/Dark and persists the selected value;
 - with no saved theme, initial load follows the browser/OS preference;
-- the backend health endpoint remains available to deployment smoke checks without a dashboard-style hero widget;
+- the compact hero `API online/checking/unavailable` indicator reflects only backend liveness;
 - the work spread shows one real architecture diagram and the selector can reach all four projects;
 - previous/next, numbered selector, and ArrowLeft/ArrowRight change the active project;
 - `?project=<slug>` opens the matching inspection dialog and browser back/forward updates it;
@@ -146,13 +146,42 @@ npm run dev
 
 ## Backend Health Interpretation
 
-The portfolio's editorial UI does not present a live operations dashboard. The
-backend health endpoint remains available for deployment verification.
+The portfolio has a compact hero API status indicator, not an operations
+dashboard. It reflects the same dependency-free liveness route used for
+deployment verification.
 
-- `GET /api/health` is a Function App liveness check only.
+- `GET /api/health` is a non-mutating Function App liveness check and returns
+  application version, deployed Git revision, and environment metadata.
 - An operational result does not prove Cosmos DB or the AI provider is healthy.
+- The backend deployment workflow verifies the health response revision against
+  the workflow commit and never calls `GetVisitorCount`.
 - Use Application Insights and Log Analytics for dependency and request-level
   operational evidence.
+
+### Cosmos managed identity rollout
+
+Terraform provisions the Function App's system-assigned identity and grants the
+custom `Portfolio Runtime Data Access` data-plane role. `COSMOS_DB_AUTH_MODE` stays
+at `connection_string` by default while this change is introduced, and the
+current connection setting remains available for rollback.
+
+For the production cutover:
+
+1. Review the Terraform PR plan and confirm the Function identity, Cosmos role
+   assignment, endpoint, and fallback connection setting are present.
+2. Apply that infrastructure change through the normal protected production
+   workflow and allow the Cosmos role assignment time to propagate.
+3. In a separate reviewed Terraform change, change the default
+   `cosmos_db_auth_mode` in `terraform/variables.tf` to `managed_identity`.
+4. Confirm visitor reads/writes and assistant rate-limit reads/writes succeed
+   in Application Insights and through real application behavior.
+5. If runtime data access fails, revert the mode to `connection_string` through
+   Terraform; do not remove the fallback credential until the identity path has
+   been stable and state/configuration cleanup is planned.
+
+This Cosmos migration does not remove the Function host's storage access key.
+The current Linux Consumption plan has separate Azure Files/host-storage
+requirements that need an independent, plan-specific migration.
 
 ## Backend Incident
 
@@ -170,7 +199,10 @@ backend health endpoint remains available for deployment verification.
 3. Confirm the Function package was built and deployed.
 4. Check Azure Function application logs.
 5. Confirm required application settings exist:
-   - `CosmosDbConnectionString`
+   - `COSMOS_DB_AUTH_MODE` (`connection_string` during the verified migration period);
+   - `CosmosDbConnectionString` for connection-string mode, or `CosmosDbEndpoint`
+     plus the Function system identity's Cosmos DB data-plane role in
+     `managed_identity` mode;
    - `AzureWebJobsFeatureFlags=EnableWorkerIndexing`
    - `OPENCODE_API_KEY`
 6. Confirm Cosmos DB and the Function App are available.
