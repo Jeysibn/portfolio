@@ -41,10 +41,24 @@ resource "azurerm_cosmosdb_sql_database" "sqldb" {
   account_name        = azurerm_cosmosdb_account.db.name
 }
 
-# Stage 1 of the managed-identity migration intentionally enables the Function
-# identity before creating Cosmos DB native RBAC resources. The role definition
-# and assignment are added in stage 2 after Azure has materialized the Function
-# principal ID and Terraform can read it from state.
+# The application only point-reads and creates/replaces documents. Keep the
+# Cosmos native role narrower than the built-in Data Contributor role.
+resource "azurerm_cosmosdb_sql_role_definition" "function_runtime" {
+  role_definition_id  = uuidv5("dns", "${azurerm_cosmosdb_account.db.id}|portfolio-runtime-data")
+  resource_group_name = azurerm_resource_group.rg.name
+  account_name        = azurerm_cosmosdb_account.db.name
+  name                = "Portfolio Runtime Data Access"
+  assignable_scopes   = ["${azurerm_cosmosdb_account.db.id}/dbs/${azurerm_cosmosdb_sql_database.sqldb.name}"]
+
+  permissions {
+    data_actions = [
+      "Microsoft.DocumentDB/databaseAccounts/readMetadata",
+      "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/items/read",
+      "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/items/create",
+      "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/items/replace",
+    ]
+  }
+}
 
 # Container for the Visitor Counter
 resource "azurerm_cosmosdb_sql_container" "counter_container" {
@@ -134,6 +148,22 @@ resource "azurerm_linux_function_app" "function" {
       app_settings["APP_REVISION"],
     ]
   }
+}
+
+# Cosmos DB native data-plane RBAC. Scope access to this application's database;
+# the role grants item/container data operations, not Azure control-plane rights.
+# The Function identity was materialized during stage 1, so its principal ID is
+# now available from Terraform state when planning this assignment.
+resource "azurerm_cosmosdb_sql_role_assignment" "function_runtime" {
+  name = uuidv5(
+    "dns",
+    "${azurerm_cosmosdb_account.db.id}|${azurerm_linux_function_app.function.identity[0].principal_id}|${azurerm_cosmosdb_sql_role_definition.function_runtime.role_definition_id}"
+  )
+  resource_group_name = azurerm_resource_group.rg.name
+  account_name        = azurerm_cosmosdb_account.db.name
+  role_definition_id  = azurerm_cosmosdb_sql_role_definition.function_runtime.id
+  principal_id        = azurerm_linux_function_app.function.identity[0].principal_id
+  scope               = "${azurerm_cosmosdb_account.db.id}/dbs/${azurerm_cosmosdb_sql_database.sqldb.name}"
 }
 
 resource "azurerm_cosmosdb_sql_container" "visitor_ips" {
