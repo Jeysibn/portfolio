@@ -10,7 +10,6 @@ import uuid
 import azure.functions as func
 from azure.core import MatchConditions
 from azure.cosmos import CosmosClient, exceptions
-from azure.identity import DefaultAzureCredential
 from openai import APITimeoutError, OpenAI, OpenAIError
 
 from assistant.response_sanitizer import sanitize_ai_response
@@ -38,6 +37,7 @@ DATABASE_NAME = "PortfolioDB"
 COUNTER_CONTAINER_NAME = "Counter"
 VISITOR_IPS_CONTAINER_NAME = "VisitorIPs"
 SERVICE_NAME = "portfolio-api"
+SERVICE_VERSION = os.environ.get("APP_VERSION", "development")
 
 MAX_MESSAGES = 10
 MAX_API_REQUESTS = 30
@@ -52,9 +52,6 @@ MAX_SESSION_ID_CHARS = 128
 VISITOR_HASH_SECRET_ENV = "VISITOR_HASH_SECRET"
 OPENCODE_SESSION_HEADER = "x-opencode-session"
 SESSION_ID_PATTERN = re.compile(r"^[A-Za-z0-9._:-]+$")
-SEMVER_PATTERN = re.compile(r"^\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$")
-REVISION_PATTERN = re.compile(r"^[0-9a-fA-F]{7,64}$")
-SAFE_ENVIRONMENTS = frozenset({"development", "staging", "production", "local"})
 
 RATE_LIMIT_MESSAGE = (
     "You've reached the limit of 10 assistant questions per hour. "
@@ -153,22 +150,12 @@ ai_client = None
 
 
 def get_cosmos_client() -> CosmosClient:
-    """Create and reuse the Cosmos DB client using the configured auth mode."""
+    """Create and reuse the Cosmos DB client."""
     global cosmos_client
 
     if cosmos_client is None:
-        auth_mode = os.environ.get("COSMOS_DB_AUTH_MODE", "connection_string").strip().lower()
-        if auth_mode == "managed_identity":
-            endpoint = os.environ["CosmosDbEndpoint"]
-            cosmos_client = CosmosClient(
-                endpoint,
-                credential=DefaultAzureCredential(exclude_interactive_browser_credential=True),
-            )
-        elif auth_mode == "connection_string":
-            connection_string = os.environ["CosmosDbConnectionString"]
-            cosmos_client = CosmosClient.from_connection_string(connection_string)
-        else:
-            raise RuntimeError("COSMOS_DB_AUTH_MODE must be connection_string or managed_identity.")
+        connection_string = os.environ["CosmosDbConnectionString"]
+        cosmos_client = CosmosClient.from_connection_string(connection_string)
 
     return cosmos_client
 
@@ -242,19 +229,6 @@ def json_response(body: dict, status_code: int, headers: dict, request_id: str):
         status_code=status_code,
         headers={**headers, "X-Correlation-ID": request_id},
     )
-
-
-def get_release_metadata() -> dict[str, str]:
-    """Expose only bounded release identifiers, never arbitrary settings."""
-    version = os.environ.get("APP_VERSION", "development").strip()
-    revision = os.environ.get("APP_REVISION", "unknown").strip()
-    environment = os.environ.get("APP_ENVIRONMENT", "unknown").strip().lower()
-
-    return {
-        "version": version if SEMVER_PATTERN.fullmatch(version) else "unknown",
-        "revision": revision if REVISION_PATTERN.fullmatch(revision) else "unknown",
-        "environment": environment if environment in SAFE_ENVIRONMENTS else "unknown",
-    }
 
 
 def parse_chat_request(req: func.HttpRequest, request_id: str):
@@ -428,7 +402,7 @@ def is_obviously_out_of_scope(user_message: str) -> bool:
 # =========================================================
 @app.route(route="health", methods=["GET"])
 def Health(req: func.HttpRequest) -> func.HttpResponse:
-    """Return non-mutating liveness and safe application release metadata."""
+    """Return lightweight liveness information without calling dependencies."""
     request_id = get_request_id(req)
     log_event("health_check", request_id, status="healthy")
 
@@ -437,7 +411,7 @@ def Health(req: func.HttpRequest) -> func.HttpResponse:
             {
                 "status": "healthy",
                 "service": SERVICE_NAME,
-                **get_release_metadata(),
+                "version": SERVICE_VERSION,
             }
         ),
         mimetype="application/json",

@@ -41,10 +41,15 @@ jobs:
           cache: pip
           cache-dependency-path: backend/requirements.txt
 
-      - name: Validate backend source
+      - name: Build Azure Function package
         run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
           python backend/tools/build_knowledge.py --check
           python -m py_compile backend/function_app.py
+          pip install \
+            -r backend/requirements.txt \
+            --target="backend/.python_packages/lib/site-packages"
 
       - name: Login to Azure using OIDC
         uses: azure/login@a641126d1b8aa4d1fa005f4f92df94a3a4c4c906 # v3.1.0
@@ -53,39 +58,21 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      # PR #102 introduced azure-identity, which pulls native cryptography
-      # dependencies. Building .python_packages on the GitHub Ubuntu image can
-      # produce wheels that do not match the Azure Functions Linux runtime.
-      # Remove the old local-build package setting and let Oryx resolve the
-      # dependencies inside Azure's runtime-compatible build environment.
-      - name: Prepare Python remote build
-        run: |
-          set -euo pipefail
-          az functionapp config appsettings delete \
-            --resource-group rg-jeysibn-portfolio \
-            --name "$AZURE_FUNCTIONAPP_NAME" \
-            --setting-names WEBSITE_RUN_FROM_PACKAGE \
-            --output none || true
-
       - name: Deploy Azure Function
         uses: Azure/functions-action@c5060b3b8bb1ebbcb531abd00c822ecbaa8ea656 # v1.5.7
         with:
           app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
           package: ./backend
-          scm-do-build-during-deployment: true
-          enable-oryx-build: true
 
-      - name: Set deployed revision metadata
+      - name: Verify run-from-package configuration
         run: |
           set -euo pipefail
 
-          # Azure CLI returns all configured settings from this command. Suppress
-          # its JSON output so existing secret values cannot enter the job log.
-          az functionapp config appsettings set \
+          az functionapp config appsettings list \
             --resource-group rg-jeysibn-portfolio \
             --name "$AZURE_FUNCTIONAPP_NAME" \
-            --settings "APP_REVISION=$GITHUB_SHA" \
-            --output none
+            --output json \
+            | python -c 'import json,sys; settings={item["name"]: item.get("value", "") for item in json.load(sys.stdin)}; package_value=str(settings.get("WEBSITE_RUN_FROM_PACKAGE", "")).strip().lower(); valid=package_value in {"1", "true"} or package_value.startswith("https://"); assert valid, "WEBSITE_RUN_FROM_PACKAGE is missing or invalid"; print("Run-from-package configuration validated:", package_value if package_value in {"1", "true"} else "https URL")'
 
       - name: Verify Azure indexed the functions
         run: |
@@ -113,7 +100,6 @@ jobs:
       - name: Verify production health
         env:
           HEALTH_URL: https://${{ env.AZURE_FUNCTIONAPP_NAME }}.azurewebsites.net/api/health
-          EXPECTED_REVISION: ${{ github.sha }}
         run: |
           set -euo pipefail
 
@@ -121,7 +107,7 @@ jobs:
             if response=$(curl --silent --show-error --fail \
               --max-time 15 \
               "$HEALTH_URL"); then
-              if printf '%s' "$response" | python -c 'import json,os,re,sys; payload=json.load(sys.stdin); assert payload.get("status") == "healthy", "backend is not healthy"; assert payload.get("service") == "portfolio-api", "unexpected backend service"; assert payload.get("revision") == os.environ["EXPECTED_REVISION"], "deployed backend revision does not match workflow commit"; assert re.fullmatch(r"\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?", payload.get("version", "")), "application semantic version is missing or invalid"; assert payload.get("environment") == "production", "unexpected environment"; print("Health and deployed revision validated:", payload["revision"])'; then
+              if printf '%s' "$response" | python -c 'import json,sys; payload=json.load(sys.stdin); assert payload.get("status") == "healthy", "backend is not healthy"; assert payload.get("service") == "portfolio-api", "unexpected backend service"; print("Health response validated")'; then
                 exit 0
               fi
             fi
@@ -138,6 +124,6 @@ jobs:
         run: |
           echo "## Backend Deployment + Verification ✅" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "Azure Function remote build, indexing, liveness, and revision checks passed." >> "$GITHUB_STEP_SUMMARY"
+          echo "Azure Function package deployment, indexing, and liveness checks passed." >> "$GITHUB_STEP_SUMMARY"
           echo "**Commit:** ${{ github.sha }}" >> "$GITHUB_STEP_SUMMARY"
           echo "**Health:** https://${AZURE_FUNCTIONAPP_NAME}.azurewebsites.net/api/health" >> "$GITHUB_STEP_SUMMARY"
