@@ -13,6 +13,21 @@
 
 ---
 
+## Implementation status (updated 2026-10-26)
+
+This table is the only part of the plan that tracks progress; the rest is the original specification. Decisions that depart from it are in [`DECISIONS.md`](DECISIONS.md), which wins on conflict. Everything below was verified locally only; nothing is deployed.
+
+| Milestone | Status | Notes |
+| --- | --- | --- |
+| P0 Baseline and contract | Done | `BASELINE.md`, `DECISIONS.md`, `AGENTS.md`. |
+| P1 Content integrity | Partly done | BB Wave and TrendAI facts confirmed and applied. Resume PDF, certifications, education, profile spelling, project status wording and `last_updated` still need Jerome (see the evidence table). |
+| P2 Monochrome foundations and hero | Done | Visual direction later changed to the grayscale-collective look (D19). |
+| P3 Selected work | Done | Static project index; case-study dialog and deep links preserved. |
+| P4 Experience, toolkit, credentials, resume, contact | Done, with a deviation | About section removed at Jerome's request (D21); `#about` links redirect to `#top` (D22). |
+| P5 Quiet Motion | Done except the portrait | Hero entrance, scroll reveal, card lift, case-study flow trace and nav/button/dialog transitions implemented (D23 to D25; "M1 to M5" in the 2026-10-26 refinement brief). Portrait interaction (M6 there) deferred: no approved portrait exists. |
+| P6 QA and deployment readiness | Not started | Local gate passes; CI, live-site checks and the release blockers in `DECISIONS.md` remain. |
+| P7 Production release | Not started | Needs explicit human approval. |
+
 ## 1. Executive decision
 
 Redesign the **presentation layer**, not the cloud architecture. The result is a calm, distinctive, monochrome personal portfolio that helps a recruiter understand Jerome's professional background within seconds and allows an engineer to explore evidence-backed Cloud/DevOps case studies. Motion is purposeful, small, interruptible, and never required to read content.

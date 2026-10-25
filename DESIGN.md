@@ -85,7 +85,16 @@ Pills (999px) for buttons, tags and chips; 16px radius on cards and dialogs; 8px
 
 ## Motion
 
-Quiet and optional. Today there is only color, border and underline feedback on hover and focus. Tokens: `--motion-fast` 180ms, `--motion-medium` 420ms, `--motion-enter` 650ms, `--ease-out` `cubic-bezier(.22,1,.36,1)`. Animate `transform` and `opacity` only. Prohibited by default: continuous animation of any kind, particles, parallax, cursor effects, scroll-jacking, pinned sections and loaders. Content must be readable before any animation, with JavaScript delayed, and under `prefers-reduced-motion`.
+Quiet and optional; nothing loops. Tokens: `--motion-fast` 180ms, `--motion-medium` 420ms, `--motion-enter` 650ms, `--ease-out` `cubic-bezier(.22,1,.36,1)`. Animate `transform` and `opacity` only.
+
+- **Hero entrance:** eyebrow, name, statement, actions and facts rise 16px and fade in over 650ms with an 80ms stagger, once per load (CSS keyframes, `backwards` fill).
+- **Scroll reveal:** section headings, project groups and experience entries rise 10px over 480ms the first time they appear (`data-reveal`, `useScrollReveal` in `hooks.ts`). Hidden only after the hook has confirmed IntersectionObserver and no reduced-motion preference; anything on screen is revealed.
+- **Project cards:** lift 3px with a brighter border in 180ms on hover (pointer devices) and on keyboard focus (`:has(:focus-visible)`). Link arrows (`Arrow` component) nudge in their own direction.
+- **Navigation and controls:** the active underline scales in; the theme glyph turns; buttons press 1px; the dialog and its backdrop fade in over 220ms.
+- **Case-study flow:** an ordered list of steps from the project's `architectureFlows` with hairline connectors that trace in over about one second, once, when the dialog opens.
+- **Reduced motion:** every rule that moves lives in `prefers-reduced-motion: no-preference`; with reduced motion all content is in its final state and only colour and border feedback remains.
+
+Prohibited: continuous animation of any kind, particles, parallax, cursor effects, scroll-jacking, pinned sections and loaders. Content must be readable with JavaScript delayed or absent and with reduced motion.
 
 ## Components
 
