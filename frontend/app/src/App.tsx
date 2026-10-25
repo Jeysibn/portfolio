@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import type { Project } from "./portfolio";
 import { navigation } from "./portfolio";
-import { useActiveSection, useTheme } from "./hooks";
+import { useActiveSection, useScrollReveal, useTheme } from "./hooks";
+import { useLegacyHashRedirect } from "./legacyHash";
 import { SiteHeader, SiteFooter } from "./components/SiteChrome";
 import {
   Hero,
@@ -26,6 +27,8 @@ function projectFromLocation() {
 export default function App() {
   const activeSection = useActiveSection(navigation.map((item) => item.id));
   const { preference, setPreference } = useTheme();
+  useScrollReveal();
+  useLegacyHashRedirect();
   const [project, setProject] = useState<Project | null>(projectFromLocation);
   const [skill, setSkill] = useState<SkillSelection | null>(null);
   useEffect(() => {

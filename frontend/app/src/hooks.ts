@@ -99,3 +99,48 @@ export function useActiveSection(sectionIds: readonly string[]) {
 
   return activeSection;
 }
+
+/**
+ * Reveals `[data-reveal]` elements once as they enter the viewport. Content is
+ * only hidden (via `html.reveal-on`) after this hook has confirmed that
+ * IntersectionObserver exists and reduced motion is off, so without JavaScript,
+ * with reduced motion, or if anything here fails, the page stays fully visible.
+ * Anything on screen, even a sliver, is revealed, so visible content is never
+ * left hidden at the edge of the viewport.
+ */
+export function useScrollReveal() {
+  useEffect(() => {
+    if (typeof IntersectionObserver === "undefined" || !window.matchMedia) return;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (reduced.matches) return;
+
+    const root = document.documentElement;
+    const targets = Array.from(
+      document.querySelectorAll<HTMLElement>("[data-reveal]"),
+    );
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          entry.target.classList.add("is-revealed");
+          observer.unobserve(entry.target);
+        }
+      },
+      { threshold: 0 },
+    );
+
+    const stop = () => {
+      observer.disconnect();
+      root.classList.remove("reveal-on");
+    };
+    reduced.addEventListener("change", stop);
+    root.classList.add("reveal-on");
+    targets.forEach((target) => observer.observe(target));
+
+    return () => {
+      reduced.removeEventListener("change", stop);
+      stop();
+      targets.forEach((target) => target.classList.remove("is-revealed"));
+    };
+  }, []);
+}

@@ -13,6 +13,7 @@ import {
 import type { Project } from "../portfolio";
 import { SkillGroups } from "../components/capabilities/SkillGroups";
 import type { SkillSelection } from "../components/capabilities/SkillGroups";
+import { Arrow } from "../components/Arrow";
 import { ProjectIndex } from "../components/projects/ProjectIndex";
 
 function Section({
@@ -36,7 +37,7 @@ function Section({
       className={`section ${className}`}
       aria-labelledby={`${id}-title`}
     >
-      <header className="section-heading" data-number={number}>
+      <header className="section-heading" data-number={number} data-reveal>
         <p className="section-eyebrow">{eyebrow}</p>
         <h2 id={`${id}-title`}>{title}</h2>
       </header>
@@ -58,7 +59,7 @@ export function Hero() {
       </p>
       <div className="hero-actions">
         <a className="action-primary" href="#projects">
-          View work <span aria-hidden="true">↓</span>
+          View work <Arrow dir="down" />
         </a>
         <a className="action-secondary" href="#resume">
           Resume
@@ -70,7 +71,7 @@ export function Hero() {
           rel="noopener noreferrer"
           aria-label="GitHub (opens in a new tab)"
         >
-          GitHub <span aria-hidden="true">↗</span>
+          GitHub <Arrow dir="out" />
         </a>
         <a
           className="hero-link"
@@ -79,7 +80,7 @@ export function Hero() {
           rel="noopener noreferrer"
           aria-label="LinkedIn (opens in a new tab)"
         >
-          LinkedIn <span aria-hidden="true">↗</span>
+          LinkedIn <Arrow dir="out" />
         </a>
       </div>
       <dl className="hero-facts">
@@ -117,13 +118,18 @@ export function Experience() {
   return (
     <Section id="experience" title="Experience" eyebrow="Career" number="02">
       <div className="experience-list">
-        {experience.map((item) => (
-          <article key={item.role}>
+        {experience.map((item) => {
+          const [, title, scope] = item.role.match(/^(.*?)\s*(\(.*\))$/) ?? [null, item.role, ""];
+          return (
+          <article key={item.role} data-reveal>
             <aside>
               <time>{item.period}</time>
             </aside>
             <div>
-              <h3>{item.role}</h3>
+              <h3>
+                {title}
+                {scope ? <> <span className="role-scope">{scope}</span></> : null}
+              </h3>
               <p className="org">
                 {item.organization} · {item.location}
               </p>
@@ -135,7 +141,8 @@ export function Experience() {
               </ul>
             </div>
           </article>
-        ))}
+          );
+        })}
       </div>
     </Section>
   );
@@ -349,7 +356,7 @@ export function Contact() {
           </a>
           <div className="contact-actions">
             <a className="action-primary" href={`mailto:${profile.email}`}>
-              Send email <span aria-hidden="true">→</span>
+              Send email <Arrow dir="right" />
             </a>
             <button
               className="action-secondary"
@@ -383,10 +390,10 @@ export function Contact() {
             rel="noopener noreferrer"
             aria-label="LinkedIn (opens in a new tab)"
           >
-            LinkedIn <span aria-hidden="true">↗</span>
+            LinkedIn <Arrow dir="out" />
           </a>
           <a href="./resume.pdf" download="Jerome-Ibon-Resume.pdf">
-            Resume <span aria-hidden="true">↓</span>
+            Resume <Arrow dir="down" />
           </a>
           <a
             href={profile.github}
@@ -394,7 +401,7 @@ export function Contact() {
             rel="noopener noreferrer"
             aria-label="GitHub (opens in a new tab)"
           >
-            GitHub <span aria-hidden="true">↗</span>
+            GitHub <Arrow dir="out" />
           </a>
         </div>
       </nav>

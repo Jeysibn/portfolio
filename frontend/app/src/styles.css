@@ -16,7 +16,7 @@
   --color-sheet-text: #171717;
   --color-sheet-rule: #8a8a86;
   --shadow-overlay: 0 12px 40px rgba(0, 0, 0, 0.14);
-  --grain-opacity: 0.6;
+  --grain-opacity: 0.45;
 
   --atlas-max: 1200px;
   --atlas-gutter: clamp(16px, 4vw, 72px);
@@ -57,7 +57,7 @@
   --color-strong: #f4f1ec;
   --color-focus: #f0ede8;
   --shadow-overlay: 0 16px 48px rgba(0, 0, 0, 0.6);
-  --grain-opacity: 0.65;
+  --grain-opacity: 0.5;
   color-scheme: dark;
 }
 @media (min-width: 1200px) and (max-height: 1150px) {
@@ -177,7 +177,6 @@ body::after {
 .section-eyebrow,
 .hero-facts dt,
 .project-meta,
-.project-label,
 .experience-list time,
 .credential-layout time,
 .contact-label,
@@ -244,7 +243,7 @@ body::after {
 .site-nav a[aria-current="location"] {
   color: var(--color-strong);
 }
-.site-nav a[aria-current="location"]::after {
+.site-nav a::after {
   content: "";
   position: absolute;
   left: 0;
@@ -252,6 +251,16 @@ body::after {
   bottom: -10px;
   height: 1px;
   background: var(--color-strong);
+  opacity: 0.45;
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+.site-nav a:hover::after,
+.site-nav a[aria-current="location"]::after {
+  transform: scaleX(1);
+}
+.site-nav a[aria-current="location"]::after {
+  opacity: 1;
 }
 .nav-resume {
   display: none;
@@ -478,6 +487,10 @@ body::after {
   line-height: 1.5;
 }
 @media (max-width: 600px) {
+  .hero {
+    min-height: auto;
+    padding: calc(var(--header-h) + 40px) 0 96px;
+  }
   .hero-facts {
     grid-template-columns: 1fr;
     gap: 16px;
@@ -523,7 +536,11 @@ body::after {
   transition:
     background var(--motion-fast) var(--ease-out),
     color var(--motion-fast) var(--ease-out),
-    border-color var(--motion-fast) var(--ease-out);
+    border-color var(--motion-fast) var(--ease-out),
+    transform var(--motion-fast) var(--ease-out);
+}
+.action-primary:hover {
+  background: color-mix(in srgb, var(--color-strong) 85%, var(--color-bg));
 }
 .action-secondary {
   border-color: var(--color-rule-strong);
@@ -573,11 +590,13 @@ body::after {
   border: 1px solid var(--color-rule);
   border-radius: 16px;
   background: var(--color-surface);
-  transition: border-color var(--motion-fast) var(--ease-out);
+  transition:
+    border-color var(--motion-fast) var(--ease-out),
+    transform var(--motion-fast) var(--ease-out);
 }
 .project-card:hover,
-.project-card:focus-within {
-  border-color: var(--color-rule-strong);
+.project-card:has(:focus-visible) {
+  border-color: color-mix(in srgb, var(--color-muted) 55%, var(--color-rule));
 }
 .project-meta {
   margin: 0;
@@ -588,22 +607,18 @@ body::after {
   letter-spacing: -0.01em;
 }
 .project-summary,
-.project-proof,
-.project-flow {
+.project-proof {
   margin: 0;
   line-height: 1.6;
 }
 .project-summary {
   color: var(--color-text);
 }
-.project-proof,
-.project-flow {
+.project-proof {
+  padding-top: 12px;
+  border-top: 1px solid var(--color-rule);
   color: var(--color-muted);
   font-size: 15px;
-}
-.project-label {
-  margin-right: 8px;
-  color: var(--color-text);
 }
 .project-tech {
   display: flex;
@@ -666,9 +681,17 @@ body::after {
   letter-spacing: -0.01em;
   text-wrap: balance;
 }
-.experience-list .org {
+.experience-list .role-scope {
+  display: block;
+  margin-top: 6px;
   color: var(--color-muted);
-  font-weight: 700;
+  font: 500 0.55em/1.2 var(--body);
+  letter-spacing: 0.02em;
+}
+.experience-list .org {
+  margin: 8px 0 14px;
+  color: var(--color-text);
+  font-weight: 600;
 }
 .experience-list article > div > p,
 .experience-list li {
@@ -1508,6 +1531,194 @@ body:has(.inspection-dialog[open]) {
   }
   .portfolio-assistant-trigger {
     padding: 11px 14px;
+  }
+}
+
+/* Arrows and the case-study flow ------------------------------------------ */
+.arrow {
+  display: inline-block;
+  transition: transform var(--motion-fast) var(--ease-out);
+}
+.flow-trace {
+  display: grid;
+  gap: 24px;
+  padding-bottom: 40px;
+}
+.flow-trace-note {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.flow-trace-label {
+  margin: 0 0 12px;
+  font: 500 11px/1.5 var(--body);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+.flow-steps {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.flow-steps li {
+  position: relative;
+  padding: 8px 14px;
+  border: 1px solid var(--color-rule-strong);
+  border-radius: 999px;
+  font: 500 13px/1.2 var(--body);
+}
+.flow-steps li + li {
+  margin-left: 28px;
+}
+.flow-steps li + li::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 100%;
+  width: 28px;
+  height: 1px;
+  background: var(--color-rule-strong);
+  transform-origin: left center;
+}
+@media (max-width: 600px) {
+  .flow-steps {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+  }
+  .flow-steps li + li {
+    margin: 16px 0 0;
+  }
+  .flow-steps li + li::before {
+    top: auto;
+    right: auto;
+    bottom: 100%;
+    left: 18px;
+    width: 1px;
+    height: 16px;
+    transform-origin: center top;
+  }
+}
+
+/* Quiet motion: one-shot entrances and small interaction feedback. Every rule
+   that moves something lives in a no-preference query, so reduced motion gets
+   the final, fully visible state with no translation. ----------------------- */
+@media (prefers-reduced-motion: no-preference) {
+  /* Hero entrance (plays once per page load, CSS only). */
+  .hero > * {
+    animation: rise var(--motion-enter) var(--ease-out) backwards;
+  }
+  .hero > :nth-child(2) {
+    animation-delay: 80ms;
+  }
+  .hero > :nth-child(3) {
+    animation-delay: 160ms;
+  }
+  .hero > :nth-child(4) {
+    animation-delay: 240ms;
+  }
+  .hero > :nth-child(5) {
+    animation-delay: 320ms;
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+  }
+
+  /* Scroll reveal: hidden only after useScrollReveal() marks the page. */
+  [data-reveal] {
+    transition:
+      opacity 480ms var(--ease-out),
+      transform 480ms var(--ease-out);
+  }
+  .reveal-on [data-reveal]:not(.is-revealed) {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  /* Project cards and controls. */
+  .project-card:has(:focus-visible) {
+    transform: translateY(-3px);
+  }
+  .action-primary:active,
+  .action-secondary:active {
+    transform: translateY(1px);
+  }
+  :is(a, button):is(:hover, :focus-visible) > .arrow[data-dir="right"] {
+    transform: translateX(3px);
+  }
+  :is(a, button):is(:hover, :focus-visible) > .arrow[data-dir="down"] {
+    transform: translateY(3px);
+  }
+  :is(a, button):is(:hover, :focus-visible) > .arrow[data-dir="out"] {
+    transform: translate(2px, -2px);
+  }
+
+  /* Navigation underline and theme glyph. */
+  .site-nav a::after {
+    transition:
+      transform var(--motion-fast) var(--ease-out),
+      opacity var(--motion-fast) var(--ease-out);
+  }
+  .theme-switch span {
+    transition: transform var(--motion-medium) var(--ease-out);
+  }
+  :root[data-theme="dark"] .theme-switch span {
+    transform: rotate(180deg);
+  }
+
+  /* Dialog backdrop fades in with the dialog. */
+  .inspection-dialog[open]::backdrop {
+    animation: backdrop-in 220ms var(--ease-out) both;
+  }
+  @keyframes backdrop-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  /* Case-study flow: connectors trace in, then each step settles (about 1s, once). */
+  .flow-steps li {
+    animation: flow-step 300ms var(--ease-out) backwards;
+    animation-delay: calc(var(--i) * 700ms / var(--n) + 100ms);
+  }
+  .flow-steps li + li::before {
+    animation: flow-connector 200ms var(--ease-out) backwards;
+    animation-delay: calc(var(--i) * 700ms / var(--n));
+  }
+  @keyframes flow-step {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+  }
+  @keyframes flow-connector {
+    from {
+      transform: scaleX(0);
+    }
+  }
+  @media (max-width: 600px) {
+    .flow-steps li + li::before {
+      animation-name: flow-connector-v;
+    }
+    @keyframes flow-connector-v {
+      from {
+        transform: scaleY(0);
+      }
+    }
+  }
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .project-card:hover {
+    transform: translateY(-3px);
   }
 }
 

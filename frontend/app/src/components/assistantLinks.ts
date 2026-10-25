@@ -17,6 +17,7 @@ const SECTION_IDS = new Set([
 ]);
 
 const LEGACY_SECTION_IDS: Record<string, string> = {
+  about: "top",
   "credentials-title": "credentials",
 };
 

@@ -1,4 +1,5 @@
 import type { Project } from "../../portfolio";
+import { Arrow } from "../Arrow";
 
 /**
  * Presentation only: which canonical projects get the larger treatment. The
@@ -23,9 +24,6 @@ function ProjectCard({
         <h4 id={titleId}>{project.title}</h4>
         <p className="project-summary">{project.preview.summary}</p>
         <p className="project-proof">{project.preview.primaryOutcome}</p>
-        <p className="project-flow">
-          <span className="project-label">Flow</span> {project.preview.flow.label}
-        </p>
         <ul className="project-tech" aria-label={`${project.title} technologies`}>
           {project.preview.technologies.map((technology) => (
             <li key={technology}>{technology}</li>
@@ -38,7 +36,7 @@ function ProjectCard({
             onClick={() => onInspect(project)}
             aria-label={`View case study: ${project.title}`}
           >
-            View case study
+            View case study <Arrow dir="right" />
           </button>
           <a
             className="project-link"
@@ -47,7 +45,7 @@ function ProjectCard({
             rel="noopener noreferrer"
             aria-label={`${project.title} source repository (opens in a new tab)`}
           >
-            Source <span aria-hidden="true">↗</span>
+            Source <Arrow dir="out" />
           </a>
           {project.liveUrl ? (
             <a
@@ -57,7 +55,7 @@ function ProjectCard({
               rel="noopener noreferrer"
               aria-label={`${project.title} live site (opens in a new tab)`}
             >
-              Live site <span aria-hidden="true">↗</span>
+              Live site <Arrow dir="out" />
             </a>
           ) : null}
         </div>
@@ -80,14 +78,18 @@ export function ProjectIndex({
 
   return (
     <div className="project-index">
-      <h3 className="project-group-title">Selected work</h3>
-      <ul className="project-list project-list-featured">
+      <h3 className="project-group-title" data-reveal>
+        Selected work
+      </h3>
+      <ul className="project-list project-list-featured" data-reveal>
         {featured.map((project) => (
           <ProjectCard key={project.id} project={project} onInspect={onInspect} />
         ))}
       </ul>
-      <h3 className="project-group-title">Currently building</h3>
-      <ul className="project-list project-list-building">
+      <h3 className="project-group-title" data-reveal>
+        Currently building
+      </h3>
+      <ul className="project-list project-list-building" data-reveal>
         {building.map((project) => (
           <ProjectCard key={project.id} project={project} onInspect={onInspect} />
         ))}
