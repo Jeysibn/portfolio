@@ -2,6 +2,8 @@
 
 <!-- impeccable:product-schema 1 -->
 
+> **Status:** the visual concept is now **JEYSIBN / Engineered Simplicity, Quiet Motion** ([`docs/redesign/MASTER_PLAN.md`](docs/redesign/MASTER_PLAN.md), `DESIGN.md`). The earlier "Infrastructure in Motion" concept, signal path, Signal Rail, project deck and orbital capability map have been removed.
+
 ## Platform
 
 web
@@ -33,9 +35,9 @@ The experience is a single-page portfolio deployed at `jeysibn.github.io`. Recru
 ## Brand Commitments
 
 - Name: Jerome Christian Ibon / Jeysibn.
-- Visual concept: “Infrastructure in Motion.”
-- Persistent signature: a signal path that transforms from cloud nodes through provisioning, delivery, runtime, telemetry, and human/operator handoff.
-- Editorial, cinematic, diagrammatic, spatial, and typography-led—not terminal-themed, cyberpunk, generic SaaS, or template-like.
+- Visual concept: “Engineered Simplicity, Quiet Motion.”
+- Signature: a small `JI` lettermark and `JEYSIBN` wordmark, condensed uppercase display type, near-black grain and a soft light pool.
+- Monochrome, poster-like and personal, not terminal-themed, cyberpunk, generic SaaS, or template-like.
 - Both light and dark modes must be intentionally designed.
 
 ## Evidence on Hand
@@ -43,18 +45,17 @@ The experience is a single-page portfolio deployed at `jeysibn.github.io`. Recru
 - Portfolio facts and structured content: `frontend/app/src/portfolio.ts` and `frontend/app/src/skill-details.ts`.
 - API behavior: `frontend/app/src/api.ts`, `frontend/app/src/hooks.ts`, and backend routes.
 - Cloud portfolio architecture diagram: `frontend/assets/architectural-diagram-cloudbacked-portfolio.svg` and `.png`.
-- Resume generation and published PDF: `frontend/app/scripts/generate-static-assets.mjs` and `frontend/app/public/resume.pdf`.
+- Published resume PDF: `frontend/app/public/resume.pdf` (a static file; no generation script exists in the repository, and its content has not yet been compared with Jerome's latest approved resume, see `docs/redesign/DECISIONS.md`).
 - Deployment and infrastructure evidence: `.github/workflows/`, `docs/`, `backend/`, and `terraform/`.
 
 ## Product Principles
 
 - Prove engineering judgment through real systems and truthful detail.
 - Make essential information immediately scannable, then provide progressive depth.
-- Use motion to explain relationships and system state, never to gate facts.
+- Use motion sparingly to support entrance, focus and user action, never to gate facts.
 - Treat performance, accessibility, and graceful degradation as part of the portfolio's engineering message.
 - Preserve one factual source of truth for portfolio content.
-- Keep the recruiter scan path readable on 1920×1080 displays: use height-aware desktop density, restrained display type, and motion that supports hierarchy rather than decorating every section.
-- Keep the portfolio content sequence independent from the ambient infrastructure lifecycle; evidence remains before principles while the Signal Rail progresses monotonically from SIGNAL through IMPROVE.
+- Keep the recruiter scan path readable from 320px to 1920×1080: identity, work, experience, toolkit, then contact, without opening any dialog.
 
 ## Accessibility & Inclusion
 

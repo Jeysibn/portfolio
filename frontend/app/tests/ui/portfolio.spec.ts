@@ -48,32 +48,21 @@ test.describe("portfolio release browser gate", () => {
     await expect(page.locator("#contact")).toBeAttached();
     await expectNoHorizontalOverflow(page);
 
-    await page.getByRole("button", { name: "Select system 02: Homelab GitOps Environment", exact: true }).click();
-    await page.waitForTimeout(800);
-    const deckGeometry = await page.evaluate(() => {
-      const card = document.querySelector<HTMLElement>(".system-dossier.is-active");
-      const selector = document.querySelector<HTMLElement>(".system-selector");
-      if (!card || !selector) throw new Error("Project deck geometry is unavailable");
-      return { cardBottom: card.getBoundingClientRect().bottom, selectorTop: selector.getBoundingClientRect().top };
-    });
-    expect(deckGeometry.cardBottom).toBeLessThanOrEqual(deckGeometry.selectorTop);
+    for (const title of ["Homelab GitOps Environment", "Cloud-Backed Portfolio", "MoniKey", "NOC Report Builder"]) {
+      await expect(page.getByRole("heading", { level: 4, name: title })).toBeVisible();
+    }
   });
 
-  test("freezes the complete capability orbit on pointer hover", async ({ page }, testInfo) => {
+  test("has no continuous decorative animation by default", async ({ page }, testInfo) => {
     test.skip(!testInfo.project.name.startsWith("desktop"), "Desktop motion coverage only");
 
-    await page.locator("#skills").scrollIntoViewIfNeeded();
-    const skill = page.locator(".orbit-skill").first();
-    const box = await skill.boundingBox();
-    if (!box) throw new Error("Capability skill is unavailable for hover validation");
-
-    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-    await expect.poll(async () => page.locator(".capability-system").evaluate((element) => ({
-      outer: getComputedStyle(element.querySelector(".outer-orbit")!).animationPlayState,
-      counter: getComputedStyle(element.querySelector(".domain-counter-rotation")!).animationPlayState,
-      inner: getComputedStyle(element.querySelector(".orbiting-skills")!).animationPlayState,
-      skill: getComputedStyle(element.querySelector(".orbit-skill")!).animationPlayState,
-    }))).toEqual({ outer: "paused", counter: "paused", inner: "paused", skill: "paused" });
+    await page.waitForTimeout(500);
+    const infinite = await page.evaluate(
+      () =>
+        document.getAnimations().filter((animation) => animation.effect?.getComputedTiming().iterations === Infinity)
+          .length,
+    );
+    expect(infinite).toBe(0);
   });
 
   test("captures the stable 1920px hero anchor", async ({ page }, testInfo) => {
@@ -87,14 +76,10 @@ test.describe("portfolio release browser gate", () => {
     });
   });
 
-  test("keeps the project deck keyboard-accessible and dialogs labeled", async ({ page }) => {
-    const deck = page.getByLabel(/System deck\./);
-    await deck.focus();
-    await page.keyboard.press("ArrowRight");
-    await expect(page.locator(".system-dossier.is-active h3")).toHaveText("Homelab GitOps Environment");
-
-    const caseStudy = page.getByRole("button", { name: "Open case study" });
-    await caseStudy.click();
+  test("opens a case study from the static project index and restores focus", async ({ page }) => {
+    const caseStudy = page.getByRole("button", { name: "View case study: Homelab GitOps Environment" });
+    await caseStudy.focus();
+    await page.keyboard.press("Enter");
     const dialog = page.getByRole("dialog");
     await expect(dialog).toBeVisible();
     await expect(dialog).toHaveAccessibleName("Homelab GitOps Environment");
@@ -107,10 +92,10 @@ test.describe("portfolio release browser gate", () => {
     await expect(caseStudy).toBeFocused();
   });
 
-  test("opens a capability inspection state with keyboard and passes axe", async ({ page }) => {
+  test("opens a skill inspection state with keyboard and passes axe", async ({ page }) => {
     await page.locator("#skills").scrollIntoViewIfNeeded();
-    const firstDomain = page.locator(".domain-anchor").first();
-    await firstDomain.focus();
+    const skill = page.getByRole("button", { name: "Azure — inspect Cloud & virtualization" });
+    await skill.focus();
     await page.keyboard.press("Enter");
     const dialog = page.getByRole("dialog");
     await expect(dialog).toBeVisible();
@@ -119,7 +104,7 @@ test.describe("portfolio release browser gate", () => {
     expect(dialogAxe.violations).toEqual([]);
     await page.keyboard.press("Escape");
     await expect(dialog).toBeHidden();
-    await expect(firstDomain).toBeFocused();
+    await expect(skill).toBeFocused();
   });
 
   test("switches theme and persists the choice", async ({ page }) => {
@@ -143,18 +128,16 @@ test.describe("mobile portfolio interactions", () => {
     await page.goto("/", { waitUntil: "domcontentloaded" });
   });
 
-  test("supports navigation, static capabilities, contact, and no page overflow", async ({ page }) => {
+  test("supports navigation, static skills, contact, and no page overflow", async ({ page }) => {
     const menu = page.getByRole("button", { name: "Menu" });
     await menu.click();
     await expect(page.getByRole("navigation", { name: "Primary navigation" })).toBeVisible();
     const navAxe = await new AxeBuilder({ page }).include("#primary-nav").analyze();
     expect(navAxe.violations).toEqual([]);
 
-    await page.getByRole("link", { name: "Capabilities", exact: true }).click();
-    await expect(page.locator(".capability-system")).toBeVisible();
-    await expect(page.locator(".outer-orbit")).toBeVisible();
-    await expect(page.locator(".orbit-skill").first()).toBeVisible();
-    await expect(page.locator(".outer-orbit")).toHaveCSS("display", "contents");
+    await page.getByRole("link", { name: "Toolkit", exact: true }).click();
+    await expect(page.locator(".skill-group")).toHaveCount(6);
+    await expect(page.locator(".skill-group").first()).toBeVisible();
     await page.locator("#contact").scrollIntoViewIfNeeded();
     await expect(page.getByRole("link", { name: "Email jeysibn@gmail.com" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Send email" })).toBeVisible();
@@ -169,7 +152,7 @@ test.describe("mobile portfolio interactions", () => {
     await page.getByRole("button", { name: "Close system inspection" }).click();
     await expect(page).toHaveURL(/\/$/);
 
-    await page.locator(".system-dossier.is-active").getByRole("button", { name: "Open case study" }).click();
+    await page.getByRole("button", { name: "View case study: Cloud-Backed Portfolio" }).click();
     await expect(page).toHaveURL(/\/\?project=cloud-portfolio$/);
     await page.goBack();
     await expect(page.getByRole("dialog")).toBeHidden();
@@ -196,14 +179,10 @@ test.describe("mobile portfolio interactions", () => {
     await expect(trigger).toBeFocused();
   });
 
-  test("simplifies motion while preserving capability content", async ({ page }) => {
+  test("keeps skills content readable with reduced motion", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.reload({ waitUntil: "domcontentloaded" });
-    await expect(page.locator(".capability-system")).toBeAttached();
-    const animations = await page.locator(".capability-system .outer-orbit").evaluate((element) =>
-      getComputedStyle(element).animationName,
-    );
-    expect(animations).toBe("none");
-    await expect(page.getByText(/Select a domain, then a tool/)).toBeVisible();
+    await expect(page.locator(".skill-group")).toHaveCount(6);
+    await expect(page.getByText(/Select any skill/)).toBeVisible();
   });
 });

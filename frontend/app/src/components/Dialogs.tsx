@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import type { Project } from "../portfolio";
 import { skillDetails } from "../skill-details";
-import type { SkillSelection } from "./capabilities/CapabilityMap";
+import type { SkillSelection } from "./capabilities/SkillGroups";
 
 function useDialog(open: boolean, onClose: () => void) {
   const ref = useRef<HTMLDialogElement>(null);

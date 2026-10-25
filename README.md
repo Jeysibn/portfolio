@@ -7,7 +7,7 @@
 
 A production-oriented Cloud and DevOps portfolio built as an end-to-end engineering project. The deployed system combines a React + TypeScript single-page frontend, Python Azure Functions APIs, Azure Cosmos DB, Terraform-managed infrastructure, Azure-native observability, a provider-neutral AI portfolio assistant, and GitHub Actions CI/CD using OpenID Connect (OIDC) authentication to Azure.
 
-The current frontend uses an editorial control-surface visual system: warm paper, infrastructure ink, copper signal states, petrol system depth, architecture flows, a persistent lifecycle rail, and restrained motion. It keeps interactive project details, detailed capability inspection, credentials, resume download, the visitor counter, the AI assistant, and an opportunity-focused contact experience while remaining portfolio-first.
+The frontend uses a monochrome "Engineered Simplicity, Quiet Motion" system modelled on a near-black, grainy poster look: condensed uppercase display type (Big Shoulders Display) over Barlow, tracked eyebrow labels, rounded charcoal cards, pill controls, and a name-first hero. Light and dark themes are both designed and follow the visitor's system preference until they choose. It keeps interactive project details, skill explanations, credentials, resume download, the visitor counter, the AI assistant, and an opportunity-focused contact experience while remaining portfolio-first. The redesign is staged; see [`docs/redesign/MASTER_PLAN.md`](docs/redesign/MASTER_PLAN.md).
 
 The assistant uses the same canonical project facts as the website. It currently
 answers about all four visible projects with deterministic lightweight retrieval,
@@ -28,7 +28,7 @@ ingestion.
 
 | Layer | Technology | Responsibility |
 |---|---|---|
-| Frontend | React, TypeScript, Vite, GitHub Pages | Single-page editorial portfolio UI, visitor counter, AI chat, project evidence, capabilities, credentials, resume |
+| Frontend | React, TypeScript, Vite, GitHub Pages | Single-page portfolio UI, visitor counter, AI chat, project evidence, toolkit, credentials, resume |
 | Backend | Azure Functions, Python 3.11 | Health, visitor-counter, and AI-assistant APIs |
 | Database | Azure Cosmos DB for NoSQL | Persistent visitor count, hashed visitor records, chat rate-limit records |
 | AI | OpenAI-compatible external API | Portfolio-specific conversational assistant with provider-neutral frontend branding |
@@ -102,38 +102,35 @@ Current frontend features include:
 - responsive desktop and mobile navigation with active-section tracking;
 - a compact saved Light/Dark theme control with system preference used as the initial fallback;
 - a name-first hero headed by **Jerome Christian Ibon**, with Cloud Support, DevOps, and Cloud Engineering as supporting positioning;
-- an explicit **Available now** state with entry-level role context;
-- visitor counter with loading and unavailable states;
+- an explicit open-to-opportunities status with entry-level role context;
+- API status and visitor counter in the footer, each with loading and unavailable states;
 - AI assistant with session history, rate-limit/error handling, bounded timeout/cancellation, and a closed state that does not block page interaction;
 - assistant starter questions that populate the input without auto-submitting, subtle factual source links, clear/reset behavior, and accessible loading/error states;
-- one four-project System Deck with stacked dossier selection, numbered controls, previous/next navigation, keyboard arrows, and pointer swipe support;
-- compact repository-derived architecture previews on the deck, with full SVG diagrams available in the selected project's inspection dialog;
+- a static project index showing all four projects at once, with Homelab GitOps and the Cloud-Backed Portfolio featured and MoniKey and NOC Report Builder listed as currently building, each with a case-study button and public repository link;
+- full SVG architecture diagrams with text equivalents in each project's case-study dialog;
 - static-host-safe project inspection links using `?project=<slug>` and browser history synchronization;
-- keyboard- and touch-accessible capability domains with detailed modal explanations;
+- skills grouped by domain as plain buttons, each opening a detailed explanation dialog;
 - restrained certification and education lists with canonical issuer/status links;
 - a concise on-page resume with direct PDF download and a form-less recruiter handoff;
-- restrained reveal motion and `prefers-reduced-motion` support;
-- an in-view Control Plane orbital topology on supported desktop layouts with slow upright domain/tool orbits and a structured static fallback for constrained widths;
-- height-aware desktop density for 1920×1080 workstations, with restrained motion elsewhere.
+- no continuous decorative animation, and full `prefers-reduced-motion` support;
+- a responsive layout checked from 320px to 1920×1080.
 
 The primary page flow is:
 
 ```text
-Hero → Projects → Experience → Capabilities → Credentials → Principles → Resume → Contact
+Hero → Work → Experience → Toolkit → Credentials → Resume → Contact
 ```
 
 Navigation scrolls the requested section to the top of the content viewport beneath the sticky header, and no navigation entry is forced active while the user remains in the hero.
-
-The hero copy is applied during the initial browser render task so the current name-first headline is not preceded by a visible stale headline during rapid reloads.
 
 ### Project architecture loading
 
 Projects use two presentation levels:
 
-1. The System Deck renders a lightweight flow from each project's typed preview data.
-2. The selected project's inspection dialog loads the complete SVG architecture set and exposes a text equivalent for each diagram.
+1. Each project card shows a one-line flow taken from the project's typed preview data.
+2. The case-study dialog loads the complete SVG architecture set and exposes a text equivalent for each diagram.
 
-The deck preview keeps the first project interaction compact while preserving detailed evidence on demand.
+The cards keep the first scan compact while preserving detailed evidence on demand.
 
 ### Local frontend development
 

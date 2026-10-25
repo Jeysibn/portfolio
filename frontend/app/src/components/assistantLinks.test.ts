@@ -22,7 +22,7 @@ describe("assistant link resolution", () => {
         { id: "profile", label: "Portfolio profile", url: "https://jeysibn.github.io/" },
         "https://jeysibn.github.io/",
       ),
-    ).toEqual({ type: "section", label: "Portfolio profile", target: "about" });
+    ).toEqual({ type: "section", label: "Portfolio profile", target: "top" });
   });
 
   it("maps approved project source IDs to canonical portfolio projects", () => {

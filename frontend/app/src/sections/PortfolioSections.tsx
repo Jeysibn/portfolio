@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import { fetchHealth } from "../api";
 import { useEffect, useRef, useState } from "react";
 import {
   career,
@@ -12,37 +11,22 @@ import {
   skillGroups,
 } from "../portfolio";
 import type { Project } from "../portfolio";
-import { CapabilityMap } from "../components/capabilities/CapabilityMap";
-import type { SkillSelection } from "../components/capabilities/CapabilityMap";
-import { SystemDeck } from "../components/projects/SystemDeck";
-
-const principles = [
-  [
-    "Automate the repeatable",
-    "CI/CD and infrastructure as code replace fragile manual steps.",
-  ],
-  [
-    "Observe before guessing",
-    "Health checks, logs, metrics, and traces make behavior measurable.",
-  ],
-  [
-    "Design for recovery",
-    "Small blast radius, reproducible configuration, and clear runbooks reduce incident friction.",
-  ],
-  [
-    "Keep cost visible",
-    "Serverless and free-tier-aware choices keep experimentation sustainable.",
-  ],
-] as const;
+import { SkillGroups } from "../components/capabilities/SkillGroups";
+import type { SkillSelection } from "../components/capabilities/SkillGroups";
+import { ProjectIndex } from "../components/projects/ProjectIndex";
 
 function Section({
   id,
   title,
+  eyebrow,
+  number,
   children,
   className = "",
 }: {
   id: string;
   title: string;
+  eyebrow: string;
+  number: string;
   children: ReactNode;
   className?: string;
 }) {
@@ -52,103 +36,63 @@ function Section({
       className={`section ${className}`}
       aria-labelledby={`${id}-title`}
     >
-      <header className="section-heading">
+      <header className="section-heading" data-number={number}>
+        <p className="section-eyebrow">{eyebrow}</p>
         <h2 id={`${id}-title`}>{title}</h2>
-        <span className="section-rule" aria-hidden="true" />
       </header>
       {children}
     </section>
   );
 }
 
-function SystemStatus() {
-  const [status, setStatus] = useState("checking");
-  useEffect(() => {
-    const c = new AbortController();
-    fetchHealth(c.signal)
-      .then(() => setStatus("online"))
-      .catch((e: unknown) => {
-        if (!(e instanceof DOMException && e.name === "AbortError"))
-          setStatus("unavailable");
-      });
-    return () => c.abort();
-  }, []);
-  return (
-    <div className="system-status" aria-live="polite">
-      <span className={`status-light ${status}`} />
-      API {status}
-    </div>
-  );
-}
-
 export function Hero() {
   return (
-    <section
-      id="top"
-      className="hero"
-      aria-labelledby="hero-title"
-    >
-      <div className="hero-meta">
-        <span>Malolos · Philippines</span>
-        <SystemStatus />
-        <span>Open to opportunities</span>
-      </div>
+    <section id="top" className="hero" aria-labelledby="hero-title">
+      <p className="hero-eyebrow">Cloud Support · DevOps · Cloud Engineering</p>
       <h1 className="hero-name" id="hero-title">
-        <span>Jerome</span>
-        <span>Christian</span>
-        <span>Ibon</span>
+        Jerome Christian Ibon
       </h1>
-      <div className="hero-foot">
-        <p>Cloud Support · DevOps · Cloud Engineering</p>
-        <p>
-          Computer Engineering graduate building cloud infrastructure, automated
-          delivery pipelines, Kubernetes environments, and observable systems.
-        </p>
-        <a href="#projects">
-          View engineering projects <i aria-hidden="true">↓</i>
+      <p className="hero-statement">
+        Computer Engineering graduate building cloud infrastructure, automated
+        delivery pipelines, Kubernetes environments, and observable systems.
+      </p>
+      <div className="hero-actions">
+        <a className="action-primary" href="#projects">
+          View work <span aria-hidden="true">↓</span>
+        </a>
+        <a className="action-secondary" href="#resume">
+          Resume
+        </a>
+        <a
+          className="hero-link"
+          href={profile.github}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="GitHub (opens in a new tab)"
+        >
+          GitHub <span aria-hidden="true">↗</span>
+        </a>
+        <a
+          className="hero-link"
+          href={profile.linkedin}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="LinkedIn (opens in a new tab)"
+        >
+          LinkedIn <span aria-hidden="true">↗</span>
         </a>
       </div>
-      <svg className="hero-topology" viewBox="0 0 700 600" aria-hidden="true">
-        <path d="M55 142 C190 142 160 310 312 310 S420 106 620 106 M312 310 C312 420 485 382 596 500" />
-        <circle className="node" cx="55" cy="142" r="8" />
-        <circle className="node" cx="312" cy="310" r="11" />
-        <circle className="node" cx="620" cy="106" r="7" />
-        <circle className="node" cx="596" cy="500" r="9" />
-        <circle className="pulse" cx="312" cy="310" r="30" />
-      </svg>
+      <dl className="hero-facts">
+        <div>
+          <dt>Based in</dt>
+          <dd>Malolos · Philippines</dd>
+        </div>
+        <div>
+          <dt>Status</dt>
+          <dd>Open to opportunities. {career.availability}</dd>
+        </div>
+      </dl>
     </section>
-  );
-}
-
-export function Principles() {
-  return (
-    <Section
-      id="about"
-      title="Operating principles"
-      className="principles-section"
-    >
-      <div className="about-lead">
-        <p>
-          Supporting real users taught me that infrastructure diagrams only
-          matter when the system still makes sense under pressure. Manual fixes
-          may solve one incident, but they don’t scale into reliable operations.
-        </p>
-        <p>
-          That pushed me toward DevOps and cloud engineering: provisioning with
-          Terraform, delivering through GitHub Actions and GitOps, operating
-          Kubernetes, and instrumenting services so failures leave evidence.
-        </p>
-      </div>
-      <ol className="principle-list">
-        {principles.map(([title, text], i) => (
-          <li key={title}>
-            <span>{String(i + 1).padStart(2, "0")}</span>
-            <h3>{title}</h3>
-            <p>{text}</p>
-          </li>
-        ))}
-      </ol>
-    </Section>
   );
 }
 
@@ -156,25 +100,26 @@ export function Projects({ onOpen }: { onOpen: (p: Project) => void }) {
   return (
     <Section
       id="projects"
-      title="Projects"
+      title="Work"
+      eyebrow="Projects"
+      number="01"
       className="projects-section"
     >
       <p className="projects-intro">
         Selected engineering work, presented as working systems rather than isolated screenshots.
       </p>
-      <SystemDeck projects={projects} onInspect={onOpen} />
+      <ProjectIndex projects={projects} onInspect={onOpen} />
     </Section>
   );
 }
 
 export function Experience() {
   return (
-    <Section id="experience" title="Experience">
+    <Section id="experience" title="Experience" eyebrow="Career" number="02">
       <div className="experience-list">
-        {experience.map((item, i) => (
+        {experience.map((item) => (
           <article key={item.role}>
             <aside>
-              <span>{String(i + 1).padStart(2, "0")}</span>
               <time>{item.period}</time>
             </aside>
             <div>
@@ -202,13 +147,12 @@ export function Skills({
   onOpen: (selection: SkillSelection) => void;
 }) {
   return (
-    <Section id="skills" title="Capabilities" className="skills-section">
+    <Section id="skills" title="Toolkit" eyebrow="Skills" number="03" className="skills-section">
       <p className="skills-copy">
-        Select a domain, then a tool, to connect each capability to practical
-        project and operational evidence. Every detail remains keyboard
-        accessible.
+        Skills grouped by domain. Select any skill to see how it is used in
+        practice.
       </p>
-      <CapabilityMap onOpen={onOpen} />
+      <SkillGroups onOpen={onOpen} />
     </Section>
   );
 }
@@ -218,6 +162,8 @@ export function Credentials() {
     <Section
       id="credentials"
       title="Credentials"
+      eyebrow="Education and certifications"
+      number="04"
       className="credentials-section"
     >
       <div className="credential-layout">
@@ -230,9 +176,8 @@ export function Credentials() {
           <p className="thesis">Thesis — {education.thesis}</p>
         </article>
         <ol>
-          {certifications.map((certification, i) => (
+          {certifications.map((certification) => (
             <li key={certification.name}>
-              <span>{String(i + 1).padStart(2, "0")}</span>
               <div>
                 {certification.name}
                 <small className="credential-meta">
@@ -260,7 +205,7 @@ export function Credentials() {
 
 export function Resume() {
   return (
-    <Section id="resume" title="Resume">
+    <Section id="resume" title="Resume" eyebrow="Download" number="05">
       <div className="resume-band">
         <div>
           <h3>Everything important, ready to take with you.</h3>
@@ -378,10 +323,9 @@ export function Contact() {
   }[copyState];
 
   return (
-    <Section id="contact" title="Contact" className="contact-section">
+    <Section id="contact" title="Contact" eyebrow="Get in touch" number="06" className="contact-section">
       <div className="contact-handoff">
         <div className="contact-intent">
-          <p className="contact-kicker">IMPROVE / SYSTEM HANDOFF</p>
           <h3>Interested in working together?</h3>
           <p>
             I&apos;m open to entry-level Cloud Engineering, DevOps and Cloud
