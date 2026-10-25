@@ -271,19 +271,24 @@
               "Visitor",
               "GitHub Pages",
               "Azure Functions",
-              "Cosmos DB",
-              "AI provider",
-              "Application Insights"
+              "Cosmos DB"
             ]
           },
           {
-            "label": "Delivery path",
+            "label": "Frontend delivery",
+            "nodes": [
+              "Git",
+              "GitHub Actions",
+              "GitHub Pages"
+            ]
+          },
+          {
+            "label": "Backend and infrastructure delivery",
             "nodes": [
               "Git",
               "GitHub Actions",
               "OIDC",
-              "Azure infrastructure",
-              "GitHub Pages"
+              "Azure infrastructure"
             ]
           }
         ]
@@ -441,8 +446,7 @@
               "LAN client",
               "Pi-hole / Unbound",
               "MetalLB / Traefik",
-              "k3s workloads",
-              "Longhorn / telemetry"
+              "k3s workloads"
             ]
           }
         ]
@@ -588,8 +592,7 @@
               "Browser",
               "nginx / React",
               "Fastify API",
-              "PostgreSQL",
-              "Worker"
+              "PostgreSQL"
             ]
           },
           {
@@ -741,8 +744,7 @@
               "Operator",
               "React web",
               "FastAPI",
-              "PostgreSQL / MinIO",
-              "Web preview / DOCX"
+              "PostgreSQL / MinIO"
             ]
           },
           {

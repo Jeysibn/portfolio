@@ -45,7 +45,7 @@ The experience is a single-page portfolio deployed at `jeysibn.github.io`. Recru
 - Portfolio facts and structured content: `frontend/app/src/portfolio.ts` and `frontend/app/src/skill-details.ts`.
 - API behavior: `frontend/app/src/api.ts`, `frontend/app/src/hooks.ts`, and backend routes.
 - Cloud portfolio architecture diagram: `frontend/assets/architectural-diagram-cloudbacked-portfolio.svg` and `.png`.
-- Published resume PDF: `frontend/app/public/resume.pdf` (a static file; no generation script exists in the repository, and its content has not yet been compared with Jerome's latest approved resume, see `docs/redesign/DECISIONS.md`).
+- Published resume PDF: `frontend/app/public/resume.pdf` (a static file; no generation script exists in the repository, and its content was compared on 2026-10-26 and conflicts with the page on role titles; it awaits Jerome's approved replacement, see `docs/redesign/DECISIONS.md`).
 - Deployment and infrastructure evidence: `.github/workflows/`, `docs/`, `backend/`, and `terraform/`.
 
 ## Product Principles
