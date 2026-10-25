@@ -33,10 +33,6 @@
       "id": "credentials"
     },
     {
-      "label": "Principles",
-      "id": "about"
-    },
-    {
       "label": "Resume",
       "id": "resume"
     },
@@ -66,9 +62,9 @@
       "Junior Site Reliability Engineer",
       "Entry-Level Cloud Engineer"
     ],
-    "professional_summary": "Computer Engineering graduate and OCI-certified engineer building production-style cloud and Kubernetes infrastructure from provisioning through GitOps delivery and observability. Brings enterprise SaaS technical-support experience in cloud-based security environments and is pursuing entry-level Cloud Support, DevOps, and Cloud Engineering roles.",
+    "professional_summary": "Computer Engineering graduate and OCI-certified engineer building production-style cloud and Kubernetes infrastructure from provisioning through GitOps delivery and observability. Brings enterprise SaaS technical-support experience in cloud-based security environments plus current NOC monitoring and escalation experience, and is pursuing entry-level Cloud Support, DevOps, and Cloud Engineering roles.",
     "direction": "Jerome is moving from technical support toward Cloud and DevOps engineering, applying troubleshooting, automation, repeatable infrastructure, and observability in personal projects.",
-    "experience_boundary": "Professional experience is enterprise SaaS technical support and an IT helpdesk internship. Kubernetes, GitOps, Terraform, and production-oriented cloud architecture are primarily demonstrated through personal projects."
+    "experience_boundary": "Professional experience is enterprise SaaS technical support (official title DevOps Platform Engineer, with technical-support duties), an IT helpdesk internship, and a current NOC Engineer role at BB Wave Inc. covering operational monitoring, escalation, and triggering existing Jenkins pipelines for UAT and production deployments on morning shifts. Jerome does not claim to have designed or owned those pipelines. Kubernetes, GitOps, Terraform, and production-oriented cloud architecture are primarily demonstrated through personal projects."
   },
   "education": {
     "degree": "Bachelor of Science in Computer Engineering",
@@ -168,11 +164,22 @@
   ],
   "experience": [
     {
-      "role": "Technical Support Engineer, Endpoint Security SaaS",
+      "role": "NOC Engineer",
+      "organization": "BB Wave Inc.",
+      "location": "Taguig City",
+      "period": "July 2026 – Present",
+      "summary": "NOC operations role focused on operational monitoring and issue escalation, plus supporting UAT and production deployments on morning shifts.",
+      "highlights": [
+        "Performs operational monitoring and escalates issues.",
+        "On morning shifts, assists UAT and production deployments by triggering existing Jenkins pipelines."
+      ]
+    },
+    {
+      "role": "DevOps Platform Engineer (technical support scope)",
       "organization": "TrendAI",
       "location": "Pasig City",
       "period": "August 2025 – February 2026",
-      "summary": "Enterprise technical support across endpoint-security SaaS, hybrid Windows/Linux environments, networking, and cloud infrastructure.",
+      "summary": "Official title was DevOps Platform Engineer; the assigned work was enterprise technical support across endpoint-security SaaS, hybrid Windows/Linux environments, networking, and cloud infrastructure.",
       "highlights": [
         "Resolved 80+ enterprise technical cases across network, system, and cloud infrastructure issues while working within SLA expectations.",
         "Provisioned AWS environments including EC2, VPCs, security groups, subnets, and routing to reproduce customer scenarios.",

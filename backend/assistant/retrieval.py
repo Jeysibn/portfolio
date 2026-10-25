@@ -155,7 +155,9 @@ class PortfolioRetriever:
             signal_projects = ["cloud-portfolio"]
         if "infrastructure automation" in query:
             signal_projects = ["cloud-portfolio", "homelab-gitops"]
-        if any(term in query for term in ("trendai", "professional experience")) and not explicit_projects:
+        if any(
+            term in query for term in ("trendai", "bb wave", "bbwave", "noc engineer", "professional experience")
+        ) and not explicit_projects:
             signal_projects = []
 
         ranked: list[tuple[int, dict[str, Any]]] = []
