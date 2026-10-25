@@ -2,13 +2,12 @@ import { describe, expect, it } from "vitest";
 import { navigation, projects } from "./portfolio";
 
 describe("portfolio content contract", () => {
-  it("puts evidence-led sections before operating principles", () => {
+  it("keeps the section order and no longer has an About section", () => {
     expect(navigation.map((item) => item.id)).toEqual([
       "projects",
       "experience",
       "skills",
       "credentials",
-      "about",
       "resume",
       "contact",
     ]);

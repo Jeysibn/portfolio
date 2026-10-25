@@ -6,7 +6,7 @@ This roadmap tracks intentionally deferred improvements. Items listed here are n
 
 ### Future: continuously refreshed service health
 
-Upgrade the hero `Live service check` from a one-time page-load probe into a lightweight client-side service monitor.
+Upgrade the footer API status from a one-time page-load probe into a lightweight client-side service monitor.
 
 Current behavior:
 
@@ -44,7 +44,7 @@ Probe again and update automatically
 Planned scope:
 
 - poll `GET /api/health` on a conservative interval, initially targeting 60 seconds;
-- update the hero health state automatically when the Azure Functions API becomes unavailable or recovers;
+- update the footer health state automatically when the Azure Functions API becomes unavailable or recovers;
 - display a small `Last checked` timestamp so visitors can judge how fresh the displayed status is;
 - retain the existing `checking`, `healthy`, and `degraded` visual states;
 - perform an immediate probe when the page first loads rather than waiting for the first interval;
@@ -83,7 +83,7 @@ remain outside the approved knowledge boundary.
 
 ### Completed: evaluations and diagnostics
 
-`backend/evals/assistant_evals.json` contains 49 deterministic cases spanning
+`backend/evals/assistant_evals.json` contains 54 deterministic cases spanning
 the four projects, recruiter questions, project isolation, follow-ups,
 certification and professional-experience boundaries, missing information,
 out-of-scope use, and prompt injection. CI runs dataset, consistency, and

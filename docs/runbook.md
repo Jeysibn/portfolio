@@ -39,7 +39,7 @@ The source repository is authoritative. Do not treat direct edits in the publica
 - Pages publication failed;
 - the dedicated Pages repository was not updated;
 - theme controls behave incorrectly;
-- the System Deck changes projects only through its numbered controls, previous/next buttons, keyboard arrows, or pointer swipe;
+- a project card is missing, or its case-study button or repository link does not work;
 - a project inspection dialog or architecture SVG does not load;
 - the closed chatbot blocks clicks underneath it;
 - the backend health smoke check or project evidence presentation looks incorrect;
@@ -65,7 +65,7 @@ After a frontend release, verify:
 - `https://jeysibn.github.io/` loads successfully;
 - the hero headline displays **Jerome Christian Ibon** and supporting Cloud Support / DevOps / Cloud Engineering positioning;
 - no navigation item is active while still inside the hero;
-- navigation order is Projects → Experience → Capabilities → Credentials → Principles → Resume → Contact;
+- navigation order is Work → Experience → Toolkit → Credentials → Resume → Contact;
 - navigation lands sections below the sticky header without centering the heading in the viewport;
 - the theme icon toggles Light/Dark and persists the selected value;
 - with no saved theme, initial load follows the browser/OS preference;
@@ -81,7 +81,7 @@ After a frontend release, verify:
 - closing the chatbot leaves underlying page elements clickable;
 - submitting an assistant question shows bounded loading, Cancel aborts safely, timeout feedback is retryable, and a later request works;
 - keyboard focus remains visible on interactive cards and controls;
-- Principles heading/body spacing and the editorial principles list remain visually balanced at desktop and mobile sizes.
+- Section heading, eyebrow and ghost-numeral spacing remain balanced at desktop and mobile sizes.
 
 ## Frontend Network and Performance Checks
 
@@ -102,7 +102,7 @@ Open the preview URL (normally `http://localhost:4173`), enable **Disable cache*
 
 ### Project architecture behavior
 
-The System Deck is generated from typed project content and renders a compact delivery-flow preview. The inspection dialog loads the complete SVG set and renders adjacent text summaries.
+The project cards are generated from typed project content and show a one-line delivery flow. The inspection dialog loads the complete SVG set and renders adjacent text summaries.
 
 If an architecture sheet fails:
 

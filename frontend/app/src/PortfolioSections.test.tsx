@@ -79,10 +79,10 @@ describe("Credential metadata", () => {
 });
 
 describe("Section headings", () => {
-  it("keeps lifecycle stages out of content headings", () => {
+  it("keeps lifecycle stages out of content headings and removed signal markup out of the page", () => {
     render(<Projects onOpen={vi.fn()} />);
 
-    expect(screen.getByRole("heading", { name: "Projects" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Work" })).toBeInTheDocument();
     expect(document.querySelectorAll(".chapter-signal")).toHaveLength(0);
     expect(document.querySelectorAll("[data-signal-stage]")).toHaveLength(0);
   });

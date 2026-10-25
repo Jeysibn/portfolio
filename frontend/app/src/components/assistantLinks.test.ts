@@ -22,7 +22,16 @@ describe("assistant link resolution", () => {
         { id: "profile", label: "Portfolio profile", url: "https://jeysibn.github.io/" },
         "https://jeysibn.github.io/",
       ),
-    ).toEqual({ type: "section", label: "Portfolio profile", target: "about" });
+    ).toEqual({ type: "section", label: "Portfolio profile", target: "top" });
+  });
+
+  it("sends links to the removed #about section to the top of the page", () => {
+    expect(
+      resolveAssistantLink(
+        { id: "approach", label: "Approach", url: "https://jeysibn.github.io/#about" },
+        "https://jeysibn.github.io/",
+      ),
+    ).toEqual({ type: "section", label: "Approach", target: "top" });
   });
 
   it("maps approved project source IDs to canonical portfolio projects", () => {

@@ -55,7 +55,7 @@ The frontend is a Vite-built React + TypeScript single-page application. Source 
 The application uses document-anchor navigation instead of client-side routes. The visible flow is:
 
 ```text
-  Hero → Projects → Experience → Capabilities → Credentials → Principles → Resume → Contact
+  Hero → Work → Experience → Toolkit → Credentials → Resume → Contact
 ```
 
 Navigation scrolls the selected section to the start of the viewport beneath the sticky header. The hero intentionally has no active navigation item; active-section indication begins when a content section is reached.
@@ -66,18 +66,18 @@ Navigation scrolls the selected section to the start of the viewport beneath the
 - compact Light/Dark theme switching with saved-preference persistence and initial system-preference fallback;
 - typed portfolio content rendering;
 - a name-first hero centered on `Jerome Christian Ibon` with Cloud Support / DevOps / Cloud Engineering positioning;
-- compact hero status indicator driven by backend `/api/health` liveness;
+- footer API status indicator driven by backend `/api/health` liveness;
 - visitor-counter display;
 - AI assistant conversation state, starter questions, source links, and session history;
-- a four-project System Deck with numbered project selection, keyboard arrows, and pointer swipe support;
-- compact typed delivery-flow previews paired with repository-derived architecture sheets in the inspection dialog;
+- a static four-project index (Homelab GitOps and the Cloud-Backed Portfolio featured, MoniKey and NOC Report Builder currently building);
+- one-line typed flows on each project card, paired with repository-derived architecture sheets in the case-study dialog;
 - static-host-safe `?project=<slug>` inspection deep links;
 - native project-detail dialogs with full SVG architecture sheets and text equivalents;
-- clickable skill-detail dialogs;
+- skills grouped by domain, each opening a detail dialog;
 - restrained certification and education lists;
 - fully visible on-page resume plus direct PDF download;
 - form-less recruiter-focused Contact section with direct email, copy-email, LinkedIn, resume, and GitHub paths;
-- height-aware desktop density and an in-view Control Plane orbital topology with slow domain/tool motion, complete pointer-hover and keyboard-focus stability, and a static constrained-width fallback;
+- no continuous decorative animation;
 - keyboard focus behavior and reduced-motion support.
 
 The AI interface remains provider-neutral so backend model/provider changes do not require frontend branding changes.
@@ -115,18 +115,18 @@ revision setting after package deployment. Terraform ignores that dynamic value
 so ordinary infrastructure applies do not replace release identity.
 
 The route does not access Cosmos DB, the external AI provider, or visitor
-analytics. The compact hero indicator reports only this liveness result; an
+analytics. The footer indicator reports only this liveness result; an
 Operational status does not prove downstream dependencies are healthy.
 
 ## Project Architecture Delivery
 
-The System Deck keeps the homepage evidence focused and data-driven:
+The project index keeps the homepage evidence focused and data-driven:
 
 ```text
 Project preview data
    |
    v
-typed flow in the System Deck
+typed flow on the project card
    |
    | Read the case study
    v
