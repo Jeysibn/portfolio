@@ -411,8 +411,8 @@ def test_length_limited_completion_is_regenerated_once(monkeypatch):
     calls = configure_chat_provider(
         monkeypatch,
         [
-            ("MoniKey demonstrates durable background work, but the answer is cut", "length"),
-            ("MoniKey demonstrates PostgreSQL-backed durable background work.", "stop"),
+            ("MoniKey demonstrates exact finance accounting, but the answer is cut", "length"),
+            ("MoniKey demonstrates exact decimal money handling in PostgreSQL.", "stop"),
         ],
     )
     events = []
@@ -424,7 +424,7 @@ def test_length_limited_completion_is_regenerated_once(monkeypatch):
     assert len(calls) == 2
     assert calls[1]["messages"][-1]["content"].startswith("Rewrite your previous answer more concisely")
     payload = json.loads(response.get_body())
-    assert payload["reply"] == "MoniKey demonstrates PostgreSQL-backed durable background work."
+    assert payload["reply"] == "MoniKey demonstrates exact decimal money handling in PostgreSQL."
     truncation = next(fields for event, fields in events if event == "ai_chat_output_truncated")
     assert truncation["finish_reason"] == "length"
     assert truncation["output_token_limit"] == function_app.AI_MAX_TOKENS
@@ -484,7 +484,7 @@ def test_project_skills_question_can_return_all_projects_completely(monkeypatch)
         "Jerome's projects demonstrate different skill areas.\n\n"
         "- Cloud-Backed Portfolio — Azure delivery and observability.\n"
         "- Homelab GitOps Environment — Kubernetes and GitOps operations.\n"
-        "- MoniKey — full-stack application and durable worker design.\n"
+        "- MoniKey — full-stack finance tracker with FastAPI and PostgreSQL.\n"
         "- NOC Report Builder — evidence-aware operations automation.\n\n"
         "Homelab GitOps is the clearest fit for a Kubernetes-focused role."
     )

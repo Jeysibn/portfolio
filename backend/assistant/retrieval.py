@@ -31,7 +31,7 @@ PROJECT_SIGNALS = {
         "kubernetes", "k3s", "argo cd", "argocd", "calico", "proxmox", "longhorn", "gitops", "homelab",
     ),
     "monikey": (
-        "monikey", "postgresql-backed", "skip locked", "bigint", "personal finance", "fastify", "ledger",
+        "monikey", "personal finance", "finance tracker", "credit card payment", "card payment", "ledger",
     ),
     "noc-report": (
         "noc report", "rabbitmq", "reportsnapshot", "reportdocument", "minio", "evidence provenance",

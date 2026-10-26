@@ -55,7 +55,7 @@ The frontend is a Vite-built React + TypeScript single-page application. Source 
 The application uses document-anchor navigation instead of client-side routes. The visible flow is:
 
 ```text
-  Hero → Work → Experience → Toolkit → Credentials → Resume → Contact
+  Hero → Work → Experience → Toolkit → Credentials → Contact
 ```
 
 Navigation scrolls the selected section to the start of the viewport beneath the sticky header. The hero intentionally has no active navigation item; active-section indication begins when a content section is reached.
@@ -75,7 +75,7 @@ Navigation scrolls the selected section to the start of the viewport beneath the
 - native project-detail dialogs with full SVG architecture sheets and text equivalents;
 - skills grouped by domain, each opening a detail dialog;
 - restrained certification and education lists;
-- fully visible on-page resume plus direct PDF download;
+- direct resume PDF download from the header, hero and Contact (no separate resume section);
 - form-less recruiter-focused Contact section with direct email, copy-email, LinkedIn, resume, and GitHub paths;
 - no continuous decorative animation;
 - keyboard focus behavior and reduced-motion support.
@@ -137,7 +137,7 @@ Architecture assets live under `frontend/app/public/architecture/`:
 
 - `portfolio/runtime.svg` and `portfolio/delivery.svg`;
 - `homelab/system.svg` and `homelab/gitops.svg`;
-- `monikey/system.svg` and `monikey/delivery.svg`;
+- `monikey/application.svg`, `monikey/gitops.svg` and `monikey/database.svg` (copied from the MoniKey repository's `docs/architecture/`, with a title and description added);
 - `noc-report/system.svg` and `noc-report/ai-report-pipeline.svg`.
 
 Each SVG contains a meaningful `<title>` and `<desc>`. The dialog also renders a text summary so architecture understanding does not depend on image rendering or motion.

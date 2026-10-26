@@ -97,7 +97,7 @@ The current corpus is small, so retrieval is deterministic and in-process:
 
 - an explicit project name or recent-history reference selects that project;
 - exact technology identifiers select their owning project(s), such as
-  Terraform → Cloud Portfolio and Homelab, SKIP LOCKED → MoniKey, or RabbitMQ
+  Terraform → Cloud Portfolio and Homelab, card payments → MoniKey, or RabbitMQ
   → NOC Report Builder;
 - recruiter/fit questions receive profile, experience, certification, and
   relevant project evidence;
@@ -123,7 +123,7 @@ The behavior prompt in `backend/assistant/assistant_prompt.md` requires:
 - clear status language for active development, planned work, observations,
   and limitations;
 - project isolation between Azure Functions, K3s/Argo CD, MoniKey's
-  PostgreSQL worker, and NOC Report Builder's RabbitMQ/report pipeline;
+  FastAPI/PostgreSQL deployment, and NOC Report Builder's RabbitMQ/report pipeline;
 - technical explanations only when they explain Jerome's documented work;
 - natural “I don't have a verified detail for that” responses for gaps;
 - brief redirects for coding help, tutorials, calculations, interview answers,

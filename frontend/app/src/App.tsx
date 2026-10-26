@@ -10,7 +10,6 @@ import {
   Experience,
   Skills,
   Credentials,
-  Resume,
   Contact,
   PrintResume,
 } from "./sections/PortfolioSections";
@@ -68,7 +67,6 @@ export default function App() {
         <Experience />
         <Skills onOpen={setSkill} />
         <Credentials />
-        <Resume />
         <Contact />
       </main>
       <SiteFooter />

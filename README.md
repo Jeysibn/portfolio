@@ -111,16 +111,16 @@ Current frontend features include:
 - static-host-safe project inspection links using `?project=<slug>` and browser history synchronization;
 - skills grouped by domain as plain buttons, each opening a detailed explanation dialog;
 - restrained certification and education lists with canonical issuer/status links;
-- a concise on-page resume with direct PDF download and a form-less recruiter handoff;
+- no separate resume section: the resume PDF downloads from the header, the hero and Contact; Contact is the email address, availability, send and copy buttons, and LinkedIn, GitHub and resume links;
 - quiet, one-shot motion (hero entrance, scroll reveal, card lift, link arrows, a case-study flow trace) built with CSS and a small IntersectionObserver hook, no animation library, no continuous decorative animation, and full `prefers-reduced-motion` support;
 - an ordered flow trace at the top of each case study, taken from the canonical `architectureFlows`;
-- old `#about` links redirect to the top of the page;
+- old `#about` links redirect to the top of the page and old `#resume` links to Contact;
 - a responsive layout checked from 320px to 1920×1080.
 
 The primary page flow is:
 
 ```text
-Hero → Work → Experience → Toolkit → Credentials → Resume → Contact
+Hero → Work → Experience → Toolkit → Credentials → Contact
 ```
 
 Navigation scrolls the requested section to the top of the content viewport beneath the sticky header, and no navigation entry is forced active while the user remains in the hero.
