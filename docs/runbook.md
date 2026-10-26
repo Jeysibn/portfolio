@@ -54,7 +54,7 @@ The source repository is authoritative. Do not treat direct edits in the publica
 4. Confirm checkout of `Jeysibn/jeysibn.github.io` succeeded.
 5. Confirm the publish step synchronized `frontend/app/dist/` to the publication repository and pushed a generated commit when content changed.
 6. Confirm `PAGES_DEPLOY_TOKEN` is present as a repository secret if the cross-repository checkout/push fails. Do not print its value.
-7. Confirm the final smoke verification against `https://jeysibn.github.io/` and the deployed Chromium smoke test passed.
+7. Confirm the "Wait for GitHub Pages to serve the new build" step passed, which proves `https://jeysibn.github.io/` serves every file of the build byte for byte.
 8. If the workflow pushed successfully but the live page is stale, inspect the Pages configuration and latest commit in `Jeysibn/jeysibn.github.io`.
 9. Check browser developer tools for static asset failures, architecture-preview failures, and API failures separately.
 

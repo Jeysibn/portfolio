@@ -192,12 +192,11 @@ checkout Jeysibn/portfolio
 -> create .nojekyll
 -> commit generated site if changed
 -> push publication repository main
--> curl https://jeysibn.github.io/
--> verify expected Jerome Ibon page content
--> deployed Chromium smoke test
+-> poll https://jeysibn.github.io/ until every built file matches its SHA-256
+   (frontend/app/scripts/verify-published.sh, up to 5 minutes)
 ```
 
-The local browser and accessibility gate completes before the Pages repository is checked out or mutated. The deployed smoke test remains as a second-layer verification after publication.
+The local browser and accessibility gate completes before the Pages repository is checked out or mutated. The same suite is deliberately not rerun against the live site: it already passed against the exact build that is published, and GitHub Pages takes a short time to start serving a push, so a live run started too early tested the previous build and failed. The post-publish step instead waits until the site serves the new build, comparing every file by SHA-256 and retrying every 10 seconds for up to 5 minutes.
 
 The Pages repository is treated as generated deployment output. Source edits belong in `Jeysibn/portfolio`, not directly in `Jeysibn/jeysibn.github.io`.
 
@@ -315,7 +314,7 @@ Merge to protected main
    |      -> performance budget
    |      -> local preview + Playwright/axe gate
    |      -> Jeysibn/jeysibn.github.io
-   |      -> https://jeysibn.github.io/ smoke check
+   |      -> wait until Pages serves the build
    |
    +--> Azure Functions deploy
    |      -> health/API smoke checks

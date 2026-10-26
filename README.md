@@ -34,7 +34,7 @@ ingestion.
 | AI | OpenAI-compatible external API | Portfolio-specific conversational assistant with provider-neutral frontend branding |
 | Observability | Application Insights + Log Analytics | Requests, latency, failures, exceptions, structured operational events, deployment troubleshooting |
 | Infrastructure | Terraform + AzureRM | Azure resource provisioning and lifecycle management |
-| CI/CD | GitHub Actions | Typechecking, builds, tests, security checks, Terraform planning, production deployment, smoke verification |
+| CI/CD | GitHub Actions | Typechecking, builds, tests, security checks, Terraform planning, production deployment, post-deploy verification |
 | Cloud authentication | GitHub OIDC + Microsoft Entra ID | Short-lived Azure authentication without stored client secrets |
 
 For the full system walkthrough, see [`docs/architecture.md`](docs/architecture.md).
@@ -217,14 +217,14 @@ No application or infrastructure mutation occurs from the pull request itself.
 
 Frontend publication repeats the frontend checks, including the performance
 budget and production-preview Playwright/axe gate, before synchronizing the
-generated artifact to `Jeysibn/jeysibn.github.io`. A deployed Pages smoke test
-remains after publication. Production source maps are not published because no
+generated artifact to `Jeysibn/jeysibn.github.io`. After publication the workflow
+waits until GitHub Pages serves every built file byte for byte. Production source maps are not published because no
 private source-map upload or monitoring consumer is configured.
 
 After merge into `main`, path-specific workflows deploy only the affected layer:
 
 ```text
-frontend/** or content/** → Vite build → Jeysibn/jeysibn.github.io → root-site smoke check
+frontend/** or content/** → Vite build → Jeysibn/jeysibn.github.io → wait for Pages to serve the build
 backend/** or content/**  → Azure Functions → health + visitor API smoke tests
 terraform/** → Terraform plan + apply
 ```

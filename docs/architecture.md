@@ -343,7 +343,7 @@ push main
 https://jeysibn.github.io/
         |
         v
-live-page smoke verification
+wait until Pages serves the new build (SHA-256 file match)
 ```
 
 `Jeysibn/portfolio` remains the source of truth. `Jeysibn/jeysibn.github.io` is treated as the generated publication repository.
