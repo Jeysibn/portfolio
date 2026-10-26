@@ -83,7 +83,7 @@ remain outside the approved knowledge boundary.
 
 ### Completed: evaluations and diagnostics
 
-`backend/evals/assistant_evals.json` contains 54 deterministic cases spanning
+`backend/evals/assistant_evals.json` contains 56 deterministic cases spanning
 the four projects, recruiter questions, project isolation, follow-ups,
 certification and professional-experience boundaries, missing information,
 out-of-scope use, and prompt injection. CI runs dataset, consistency, and

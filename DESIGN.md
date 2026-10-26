@@ -59,7 +59,7 @@ Two static layers on `body`: a soft radial light pool behind the hero (`body::be
 
 ## Typography
 
-- **Display:** Big Shoulders Display 700, uppercase, tight negative tracking, very large. Used for the hero name, section headings, resume and contact statements, dialog titles, and (mixed-case) card and role titles.
+- **Display:** Big Shoulders Display 700, uppercase, tight negative tracking, very large. Used for the hero name, section headings, the contact email, dialog titles, and (mixed-case) card and role titles.
 - **Body and labels:** Barlow. Labels are 11px, 500, uppercase, 0.22em tracked and muted; they sit above headings and on metadata.
 - Ghost numerals (`01` to `06`) sit at the right of each section heading at about 9% opacity. They are CSS generated content and hidden from assistive technology.
 - Body copy stays near 60 to 72 characters per line.
@@ -68,9 +68,10 @@ Two static layers on `body`: a soft radial light pool behind the hero (`body::be
 
 Content sits in a 1200px maximum column with a fluid gutter; the header aligns to the same edges. Vertical rhythm is 8px based; sections use `--space-section` (72 to 112px). Everything stacks on narrow screens, and nothing depends on hover.
 
-- **Header:** `JI` lettermark and `JEYSIBN`, four uppercase tracked destinations (Work, Experience, Toolkit, Contact), a pill Resume link and the theme switch. Below 900px the destinations collapse into a menu that also lists Resume. Toolkit is current for both `#skills` and `#credentials`; every section keeps its own anchor ID.
-- **Hero:** tracked eyebrow (Cloud Support, DevOps, Cloud Engineering), the name in display type, one statement, pill actions (View work, Resume, GitHub, LinkedIn) and a two-fact row (Based in, Status).
-- **Sections:** tracked eyebrow, uppercase display heading, ghost numeral. Work, Experience, Toolkit, Credentials, Resume, Contact.
+- **Header:** `JI` lettermark and `JEYSIBN`, four uppercase tracked destinations (Work, Experience, Toolkit, Contact), a pill Resume link that downloads the PDF, and the theme switch. Below 900px the destinations collapse into a menu that also lists Resume. Toolkit is current for both `#skills` and `#credentials`; every section keeps its own anchor ID.
+- **Hero:** tracked eyebrow (Cloud Support, DevOps, Cloud Engineering), the name in display type, one statement, pill actions (View work, Resume download, GitHub, LinkedIn) and a two-fact row (Based in, Status).
+- **Sections:** tracked eyebrow, uppercase display heading, ghost numeral. Work, Experience, Toolkit, Credentials, Contact (ghost numerals 01 to 05). There is no Resume section: the PDF downloads from the header, the hero and Contact.
+- **Contact:** no headline or lead-in copy. The email address in display type, one availability line, Send email and Copy email pills, and a ruled row of LinkedIn, GitHub and Resume links.
 - **Work:** all four projects at once as rounded charcoal cards: Homelab GitOps Environment and Cloud-Backed Portfolio under "Selected work", MoniKey and NOC Report Builder under "Currently building". Each card shows category and status, summary, outcome, a one-line flow, pill technology tags, a "View case study" pill and public links. The case study opens the native dialog with the full architecture diagrams and their text equivalents.
 - **Toolkit:** six skill groups of pill buttons; each skill opens a detail dialog, and each group has a "Group details" button.
 - **Footer:** brand line, technical signature, API status and visitor count.

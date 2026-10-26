@@ -65,7 +65,7 @@ After a frontend release, verify:
 - `https://jeysibn.github.io/` loads successfully;
 - the hero headline displays **Jerome Christian Ibon** and supporting Cloud Support / DevOps / Cloud Engineering positioning;
 - no navigation item is active while still inside the hero;
-- navigation order is Work → Experience → Toolkit → Credentials → Resume → Contact;
+- navigation order is Work → Experience → Toolkit → Credentials → Contact;
 - navigation lands sections below the sticky header without centering the heading in the viewport;
 - the theme icon toggles Light/Dark and persists the selected value;
 - with no saved theme, initial load follows the browser/OS preference;
@@ -76,7 +76,7 @@ After a frontend release, verify:
 - the spread uses a typed flow preview and a real architecture sheet; inspection loads the selected project's full SVG sheets and text summaries;
 - capability domains and tools open their detail dialogs;
 - certification issuer/status links are readable and keyboard accessible;
-- the resume is visible on-page and the PDF download works;
+- the resume PDF downloads from the header, hero and Contact;
 - the Contact CTA is reachable from the hero;
 - closing the chatbot leaves underlying page elements clickable;
 - submitting an assistant question shows bounded loading, Cancel aborts safely, timeout feedback is retryable, and a later request works;

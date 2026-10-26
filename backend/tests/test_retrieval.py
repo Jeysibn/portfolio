@@ -3,12 +3,12 @@ from copy import deepcopy
 from assistant.retrieval import PortfolioRetriever, get_relevant_context, load_knowledge_base
 
 
-def test_exact_project_match_retrieves_only_monikey_for_worker_question():
+def test_exact_project_match_retrieves_only_monikey_for_broker_question():
     result = get_relevant_context("What message broker does MoniKey use?")
 
     assert [project["slug"] for project in result.context["projects"]] == ["monikey"]
     assert result.sources[0].id == "project-monikey"
-    assert "PostgreSQL-backed durable jobs" in result.context["projects"][0]["architecture"]["worker"]
+    assert "no message broker" in result.context["projects"][0]["architecture"]["background_work"].lower()
 
 
 def test_multi_project_query_retrieves_both_boundaries():
