@@ -8,7 +8,6 @@ export type AssistantLink =
 
 const SECTION_IDS = new Set([
   "top",
-  "about",
   "projects",
   "experience",
   "skills",
@@ -18,11 +17,12 @@ const SECTION_IDS = new Set([
 ]);
 
 const LEGACY_SECTION_IDS: Record<string, string> = {
+  about: "top",
   "credentials-title": "credentials",
 };
 
 const SOURCE_SECTION_TARGETS: Record<string, string> = {
-  profile: "about",
+  profile: "top",
   "professional-experience": "experience",
   education: "credentials",
   certifications: "credentials",

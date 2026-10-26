@@ -1,43 +1,125 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-09-11T00:00:00+08:00",
-  "title": "Design System: Jerome Ibon Portfolio",
+  "generatedAt": "2026-10-26T00:00:00+08:00",
+  "title": "Design System: Jerome Ibon Portfolio (Engineered Simplicity, Quiet Motion)",
   "extensions": {
     "colorMeta": {
-      "copper-signal": { "role": "primary", "displayName": "Copper Signal", "canonical": "#e0522d" },
-      "copper-text": { "role": "primary", "displayName": "Accessible Copper Text", "canonical": "#a93618" },
-      "petrol": { "role": "secondary", "displayName": "Infrastructure Petrol", "canonical": "#275d57" },
-      "paper": { "role": "neutral", "displayName": "Warm Paper", "canonical": "#eee9de" },
-      "ink": { "role": "neutral", "displayName": "Infrastructure Ink", "canonical": "#171912" }
+      "bg": {
+        "role": "neutral",
+        "displayName": "Page",
+        "canonical": "#0a0a0a",
+        "light": "#f2efe9"
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Card surface",
+        "canonical": "#171717",
+        "light": "#faf8f4"
+      },
+      "text": {
+        "role": "neutral",
+        "displayName": "Text",
+        "canonical": "#f0ede8",
+        "light": "#0a0a0a"
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted text",
+        "canonical": "#9b9892",
+        "light": "#55524d"
+      },
+      "rule": {
+        "role": "neutral",
+        "displayName": "Border",
+        "canonical": "#262626",
+        "light": "#d9d4cb"
+      },
+      "strong": {
+        "role": "primary",
+        "displayName": "Strong",
+        "canonical": "#f4f1ec",
+        "light": "#0a0a0a"
+      }
     },
     "typographyMeta": {
-      "display": { "displayName": "Editorial Display", "purpose": "Identity and chapter headings." },
-      "body": { "displayName": "Humanist Body", "purpose": "Narrative and technical detail." },
-      "data": { "displayName": "Operational Data", "purpose": "State, periods, counts, and metadata only." }
+      "display": {
+        "displayName": "Big Shoulders Display",
+        "purpose": "Uppercase condensed headings and statements; mixed-case card and role titles."
+      },
+      "body": {
+        "displayName": "Barlow",
+        "purpose": "Narrative and technical detail."
+      },
+      "label": {
+        "displayName": "Barlow label",
+        "purpose": "11px uppercase tracked eyebrows and metadata."
+      }
     },
     "shadows": [
-      { "name": "protected-focus", "value": "0 22px 70px rgba(32,28,18,.16)", "purpose": "Dialogs and assistant only." }
+      {
+        "name": "overlay",
+        "value": "0 12px 40px rgba(0,0,0,.14)",
+        "purpose": "Dialogs and assistant only."
+      }
     ],
     "motion": [
-      { "name": "resolve", "value": "cubic-bezier(.16,1,.3,1)", "purpose": "Structural elements resolve into their final composition." },
-      { "name": "connect-transfer", "value": "scroll-linked", "purpose": "Signal and architecture relationships track continuous scroll progress." },
-      { "name": "reduced", "value": "static topology", "purpose": "All states remain visible without spatial animation." }
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(.22,1,.36,1)",
+        "purpose": "All transitions."
+      },
+      {
+        "name": "fast",
+        "value": "180ms",
+        "purpose": "Hover, focus and button feedback."
+      },
+      {
+        "name": "reduced",
+        "value": "static",
+        "purpose": "All content remains visible without motion."
+      }
     ],
     "breakpoints": [
-      { "name": "structural", "value": "900px" },
-      { "name": "mobile", "value": "600px" }
+      {
+        "name": "header-collapse",
+        "value": "900px"
+      },
+      {
+        "name": "mobile",
+        "value": "600px"
+      }
     ]
   },
   "components": [],
   "narrative": {
-    "northStar": "The Editorial Control-Plane Atlas",
-    "overview": "An editorial, cinematic system where one signal changes meaning as it moves through infrastructure and toward a human handoff.",
-    "keyCharacteristics": ["Asymmetric editorial typography", "Diagrammatic project chapters", "Semantic signal motion", "Quiet and dense pacing"],
-    "rules": [
-      { "name": "Signal Means State", "body": "Copper is reserved for state, transfer, and focus.", "section": "colors" },
-      { "name": "Content Before Motion", "body": "Essential facts remain visible before animation initializes.", "section": "motion" }
+    "northStar": "Engineered Simplicity, Quiet Motion",
+    "overview": "A near-black, grainy, monochrome portfolio with condensed uppercase display type and credible engineering evidence.",
+    "keyCharacteristics": [
+      "Near-black and warm off-white themes",
+      "Condensed uppercase display type",
+      "Static grain and hero light pool",
+      "Rounded charcoal cards and pill controls"
     ],
-    "dos": ["Use real architecture and factual project detail.", "Let typography and rules carry composition."],
-    "donts": ["Do not add terminal clichés or generic cards.", "Do not make essential content hover-only."]
+    "rules": [
+      {
+        "name": "Content Before Motion",
+        "body": "Essential facts remain visible before animation initializes and under reduced motion.",
+        "section": "motion"
+      },
+      {
+        "name": "No Color Accents",
+        "body": "Hierarchy comes from type, rules and surface shifts; state is carried by text and shape.",
+        "section": "colors"
+      }
+    ],
+    "dos": [
+      "Use real architecture and factual project detail.",
+      "Let typography and rules carry composition."
+    ],
+    "donts": [
+      "Do not add color accents, glass, gradients or terminal clichés.",
+      "Do not make essential content hover-only.",
+      "Do not animate the grain or light pool."
+    ]
   }
 }

@@ -1,100 +1,115 @@
 ---
 name: Jerome Ibon Portfolio
-description: An editorial control-plane atlas for infrastructure engineering in motion.
+description: Engineered Simplicity, Quiet Motion. A near-black, grainy, monochrome portfolio with condensed uppercase display type and credible engineering evidence.
 colors:
-  paper: "#eee9de"
-  ink: "#171912"
-  panel: "#ded8ca"
-  copper-signal: "#e0522d"
-  copper-text: "#a93618"
-  petrol: "#275d57"
-  paper-dark: "#10130f"
-  ink-dark: "#e8e6da"
+  bg-dark: "#0a0a0a"
+  surface-dark: "#171717"
+  text-dark: "#f0ede8"
+  muted-dark: "#9b9892"
+  rule-dark: "#262626"
+  bg-light: "#f2efe9"
+  surface-light: "#faf8f4"
+  text-light: "#0a0a0a"
+  muted-light: "#55524d"
+  rule-light: "#d9d4cb"
 typography:
   display:
-    fontFamily: "Bodoni Moda, Georgia, serif"
-    fontSize: "clamp(3.25rem, 6.6vw, 6.25rem)"
-    fontWeight: 400
-    lineHeight: 0.82
+    fontFamily: "Big Shoulders Display, Arial Narrow, Impact, sans-serif"
+    fontSize: "clamp(3.5rem, 11vw, 9rem)"
+    fontWeight: 700
+    lineHeight: 0.9
     letterSpacing: "-0.03em"
   body:
-    fontFamily: "Manrope, Arial, sans-serif"
+    fontFamily: "Barlow, system-ui, sans-serif"
     fontSize: "1rem"
     fontWeight: 400
     lineHeight: 1.65
-  data:
-    fontFamily: "IBM Plex Mono, monospace"
-    fontSize: "0.75rem"
+  label:
+    fontFamily: "Barlow, system-ui, sans-serif"
+    fontSize: "0.6875rem"
     fontWeight: 500
-    lineHeight: 1.5
+    letterSpacing: "0.22em"
 spacing:
-  xs: "0.5rem"
-  sm: "1rem"
-  md: "1.5rem"
-  lg: "2.5rem"
-  xl: "4rem"
-  section: "clamp(110px, 6.5vw, 130px)"
+  section: "clamp(72px, 8vw, 112px)"
 components:
   button-primary:
-    backgroundColor: "{colors.ink}"
-    textColor: "{colors.paper}"
-    padding: "16px 20px"
+    backgroundColor: "{colors.text-dark}"
+    textColor: "{colors.bg-dark}"
+    rounded: "999px"
+    padding: "16px 28px"
 ---
 
 # Design System: Jerome Ibon Portfolio
 
+> The visual direction follows the monochrome look of grayscale-collective.com (checked 2026-10-26): near-black field, warm off-white text, film grain, a soft light pool in the hero, huge condensed uppercase headings, tiny tracked labels, ghost numerals, charcoal rounded cards and pill controls. The execution plan is [`docs/redesign/MASTER_PLAN.md`](docs/redesign/MASTER_PLAN.md); decisions that depart from it are in `docs/redesign/DECISIONS.md`.
+
 ## Overview
 
-**Creative North Star: “The Editorial Control-Plane Atlas”**
+**Creative North Star: "Engineered Simplicity, Quiet Motion."**
 
-Infrastructure in Motion combines magazine-scale typography with precise system notation. One copper signal travels through the page as an ambient infrastructure lifecycle—signal, provision, deploy, run, observe, improve—while the portfolio chapters remain ordered for recruiter comprehension. Quiet paper sections alternate with dense ink and petrol system chapters.
-
-Key characteristics: asymmetric composition, hairline rules, open whitespace, explicit architecture flows, restrained operational color, and motion that communicates relationships.
+A monochrome portfolio with poster-like type and a quiet, grainy atmosphere. A recruiter should identify who Jerome is, what roles he seeks and how to reach him within seconds; engineers can then inspect evidence-backed case studies.
 
 ## Colors
 
-Warm Paper and Infrastructure Ink form the reading surface. Copper Signal marks live state and Petrol marks systems depth. Dark mode uses a green-black field and warm off-white ink rather than simple inversion.
+Strictly neutral, with both themes designed on purpose. Semantic tokens in `styles.css` (`--color-bg`, `--color-surface`, `--color-surface-hover`, `--color-text`, `--color-muted`, `--color-rule`, `--color-rule-strong`, `--color-strong`, `--color-focus`) are the source of truth. Dark is near-black (`#0a0a0a`) with warm off-white text (`#f0ede8`); light is a warm off-white (`#f2efe9`) with near-black text. The saved theme wins, then the operating-system preference; dark is not forced. Errors and states are always carried by text and shape, never by color alone. Legacy token names (`--ink`, `--paper`, `--signal`, ...) are aliases onto these tokens; delete one when nothing uses it.
+
+## Atmosphere
+
+Two static layers on `body`: a soft radial light pool behind the hero (`body::before`) and a fixed, non-interactive film-grain overlay (`body::after`, an inline SVG noise tile, `mix-blend-mode: overlay`, opacity from `--grain-opacity`). Neither animates or affects contrast checks.
 
 ## Typography
 
-Bodoni Moda carries identity and chapter scale; Manrope carries readable detail; IBM Plex Mono is reserved for state, counts, periods, and technical metadata. Display tracking never exceeds `-0.04em`; body copy stays near 65–75 characters where layout permits.
+- **Display:** Big Shoulders Display 700, uppercase, tight negative tracking, very large. Used for the hero name, section headings, resume and contact statements, dialog titles, and (mixed-case) card and role titles.
+- **Body and labels:** Barlow. Labels are 11px, 500, uppercase, 0.22em tracked and muted; they sit above headings and on metadata.
+- Ghost numerals (`01` to `06`) sit at the right of each section heading at about 9% opacity. They are CSS generated content and hidden from assistive technology.
+- Body copy stays near 60 to 72 characters per line.
 
 ## Layout
 
-Content uses a fluid maximum-width atlas with strongly asymmetric offsets. Projects are represented as stacked system dossiers rather than generic cards. The active dossier becomes the current inspection plane while background dossiers retain visible technical identity. The capability map is a topology-inspired Control Plane: supported desktop layouts use a slow outer domain orbit whose visible guide is tied to the same radius as the moving domains, plus independently paced inner technology orbits. Wrappers counter-rotate content so labels remain upright. Domain cards stay quiet; hovering or keyboard-focusing an individual technology pauses its local orbit and reveals only that technology's name. Constrained widths use a structured static domain list. At 900px, wide structures collapse; at 600px, the narrative becomes a vertical stack, architecture becomes a two-column sequence, and interactive topology becomes a one-column domain list.
+Content sits in a 1200px maximum column with a fluid gutter; the header aligns to the same edges. Vertical rhythm is 8px based; sections use `--space-section` (72 to 112px). Everything stacks on narrow screens, and nothing depends on hover.
 
-Desktop density is height-aware as well as width-aware. On wide displays with limited vertical space, display type, section padding, and project dossier geometry use a compact treatment so a 1920×1080 workstation remains scanable. The Control Plane is the portfolio's one intentional ambient motion system: CSS transforms run only while it is near the viewport, pause during interaction, and stop completely under reduced motion. Hero, signal, and dialog transitions remain restrained.
-
-The fixed Signal Rail is not a second navigation menu and does not map one lifecycle stage to one portfolio section. Its progress line and active/completed nodes derive from one monotonic document-scroll progress model, so the infrastructure metaphor never moves backward when the content order changes. Full labels are reserved for wide gutters; medium desktop uses marker-only presentation.
+- **Header:** `JI` lettermark and `JEYSIBN`, four uppercase tracked destinations (Work, Experience, Toolkit, Contact), a pill Resume link and the theme switch. Below 900px the destinations collapse into a menu that also lists Resume. Toolkit is current for both `#skills` and `#credentials`; every section keeps its own anchor ID.
+- **Hero:** tracked eyebrow (Cloud Support, DevOps, Cloud Engineering), the name in display type, one statement, pill actions (View work, Resume, GitHub, LinkedIn) and a two-fact row (Based in, Status).
+- **Sections:** tracked eyebrow, uppercase display heading, ghost numeral. Work, Experience, Toolkit, Credentials, Resume, Contact.
+- **Work:** all four projects at once as rounded charcoal cards: Homelab GitOps Environment and Cloud-Backed Portfolio under "Selected work", MoniKey and NOC Report Builder under "Currently building". Each card shows category and status, summary, outcome, a one-line flow, pill technology tags, a "View case study" pill and public links. The case study opens the native dialog with the full architecture diagrams and their text equivalents.
+- **Toolkit:** six skill groups of pill buttons; each skill opens a detail dialog, and each group has a "Group details" button.
+- **Footer:** brand line, technical signature, API status and visitor count.
 
 ## Elevation & Depth
 
-The system is flat by default. Hairline rules, surface shifts, and scale create hierarchy. Ambient shadows are reserved for protected-focus layers: dialogs and the assistant.
+Flat. Borders and surface shifts only. One soft shadow is reserved for dialogs and the assistant.
 
 ## Shapes
 
-Rectilinear editorial frames dominate. Circular forms belong only to topology or state. Pills are not a container pattern. Signal states use circle, square, chevron, core, aperture, and handoff geometries.
+Pills (999px) for buttons, tags and chips; 16px radius on cards and dialogs; 8px on the lettermark. Circles only for status and the theme glyph.
+
+## Motion
+
+Quiet and optional; nothing loops. Tokens: `--motion-fast` 180ms, `--motion-medium` 420ms, `--motion-enter` 650ms, `--ease-out` `cubic-bezier(.22,1,.36,1)`. Animate `transform` and `opacity` only.
+
+- **Hero entrance:** eyebrow, name, statement, actions and facts rise 16px and fade in over 650ms with an 80ms stagger, once per load (CSS keyframes, `backwards` fill).
+- **Scroll reveal:** section headings, project groups and experience entries rise 10px over 480ms the first time they appear (`data-reveal`, `useScrollReveal` in `hooks.ts`). Hidden only after the hook has confirmed IntersectionObserver and no reduced-motion preference; anything on screen is revealed.
+- **Project cards:** lift 3px with a brighter border in 180ms on hover (pointer devices) and on keyboard focus (`:has(:focus-visible)`). Link arrows (`Arrow` component) nudge in their own direction.
+- **Navigation and controls:** the active underline scales in; the theme glyph turns; buttons press 1px; the dialog and its backdrop fade in over 220ms.
+- **Case-study flow:** an ordered list of steps from the project's `architectureFlows` with hairline connectors that trace in over about one second, once, when the dialog opens.
+- **Reduced motion:** every rule that moves lives in `prefers-reduced-motion: no-preference`; with reduced motion all content is in its final state and only colour and border feedback remains.
+
+Prohibited: continuous animation of any kind, particles, parallax, cursor effects, scroll-jacking, pinned sections and loaders. Content must be readable with JavaScript delayed or absent and with reduced motion.
 
 ## Components
 
-Buttons are square-edged, text-forward, and high contrast. Project dossiers use hairline overlap, controlled translation, scale, and surface shifts to create physical paper depth. Native dialogs provide focus protection. Navigation uses a restrained active underline, while the mobile navigation becomes a compact two-column sheet.
-
-### System Deck
-
-The Projects chapter uses one interactive System Deck. A circular logical order keeps the active dossier at depth zero and exposes the remaining dossiers behind it with useful system number, title, and category labels. Selecting a dossier is a deliberate reorder: the active sheet lifts and moves toward the back while the selected sheet settles into the front plane. GSAP owns this state-change motion; idle dossiers remain still.
-
-The deck preview uses a compact repository-derived topology, short summary, and primary technology line. Full outcomes and architecture evidence stay in the native inspection dialog, with a text equivalent beside every SVG. Reduced-motion users receive immediate deck reordering without translation, rotation, parallax, or dramatic scaling. On phones, exposed dossiers become top-edge sheets and the preview flow becomes a readable two-column sequence rather than a shrunken desktop diagram.
+Primary button: strong fill, inverse text, uppercase tracked 12px, pill. Secondary: outlined pill. Native dialogs provide focus protection. Navigation uses a one-pixel active underline.
 
 ## Do's and Don'ts
 
 ### Do:
 
-- **Do** use copper sparingly to mark state and transfer.
 - **Do** keep essential content visible before motion initializes.
-- **Do** vary quiet and dense chapters within the same rule system.
+- **Do** keep every claim traceable to `content/portfolio.json`.
+- **Do** keep text at AA contrast; labels use `--color-muted`, never lighter.
 
 ### Don't:
 
-- **Don't** introduce terminal chrome, generic dashboards, glass cards, or decorative gradients.
-- **Don't** use monospace as a general display voice.
+- **Don't** add color accents, glass, gradients or terminal chrome.
 - **Don't** hide technical proof behind hover or animation.
+- **Don't** animate the grain or the light pool.

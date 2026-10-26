@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
 import type { Project } from "./portfolio";
 import { navigation } from "./portfolio";
-import { useActiveSection, useTheme } from "./hooks";
+import { useActiveSection, useScrollReveal, useTheme } from "./hooks";
+import { useLegacyHashRedirect } from "./legacyHash";
 import { SiteHeader, SiteFooter } from "./components/SiteChrome";
-import { MotionDirector, SignalPath } from "./components/MotionSystem";
 import {
   Hero,
-  Principles,
   Projects,
   Experience,
   Skills,
@@ -17,8 +16,7 @@ import {
 } from "./sections/PortfolioSections";
 import { ProjectDialog, SkillDialog } from "./components/Dialogs";
 import { PortfolioAssistant } from "./components/PortfolioAssistant";
-import type { SkillSelection } from "./components/capabilities/CapabilityMap";
-import { CursorGlow } from "./components/CursorGlow";
+import type { SkillSelection } from "./components/capabilities/SkillGroups";
 import { projectFromSearch } from "./projectNavigation";
 
 function projectFromLocation() {
@@ -29,6 +27,8 @@ function projectFromLocation() {
 export default function App() {
   const activeSection = useActiveSection(navigation.map((item) => item.id));
   const { preference, setPreference } = useTheme();
+  useScrollReveal();
+  useLegacyHashRedirect();
   const [project, setProject] = useState<Project | null>(projectFromLocation);
   const [skill, setSkill] = useState<SkillSelection | null>(null);
   useEffect(() => {
@@ -57,9 +57,6 @@ export default function App() {
       <a className="skip-link" href="#main-content">
         Skip navigation
       </a>
-      <CursorGlow />
-      <MotionDirector />
-      <SignalPath />
       <SiteHeader
         activeSection={activeSection}
         theme={preference}
@@ -71,7 +68,6 @@ export default function App() {
         <Experience />
         <Skills onOpen={setSkill} />
         <Credentials />
-        <Principles />
         <Resume />
         <Contact />
       </main>

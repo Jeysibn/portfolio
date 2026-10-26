@@ -1,7 +1,18 @@
 import { useEffect, useRef, useState } from "react";
+import { fetchHealth } from "../api";
 import type { ThemePreference } from "../portfolio";
-import { navigation } from "../portfolio";
 import { VisitorCounter } from "./PortfolioAssistant";
+
+/**
+ * Header destinations group the page anchors; every section keeps its own
+ * anchor ID. A destination is current while any of its sections is active.
+ */
+const primaryNav = [
+  { label: "Work", ids: ["projects"] },
+  { label: "Experience", ids: ["experience"] },
+  { label: "Toolkit", ids: ["skills", "credentials"] },
+  { label: "Contact", ids: ["contact"] },
+] as const;
 
 export function SiteHeader({
   activeSection,
@@ -44,25 +55,42 @@ export function SiteHeader({
     <header className="site-header" ref={headerRef}>
       <a className="wordmark" href="#top" aria-label="Jerome Ibon, home">
         <span>JI</span>
-        <small>Jeysibn</small>
+        <small>JEYSIBN</small>
       </a>
       <nav
         id="primary-nav"
         className={open ? "site-nav is-open" : "site-nav"}
         aria-label="Primary navigation"
       >
-        {navigation.map((item) => (
+        {primaryNav.map((item) => (
           <a
-            key={item.id}
-            href={`#${item.id}`}
-            aria-current={activeSection === item.id ? "location" : undefined}
+            key={item.label}
+            href={`#${item.ids[0]}`}
+            aria-current={
+              (item.ids as readonly string[]).includes(activeSection) ? "location" : undefined
+            }
             onClick={() => setOpen(false)}
           >
             {item.label}
           </a>
         ))}
+        <a
+          className="nav-resume"
+          href="#resume"
+          aria-current={activeSection === "resume" ? "location" : undefined}
+          onClick={() => setOpen(false)}
+        >
+          Resume
+        </a>
       </nav>
       <div className="header-tools">
+        <a
+          className="header-resume"
+          href="#resume"
+          aria-current={activeSection === "resume" ? "location" : undefined}
+        >
+          Resume
+        </a>
         <button
           className="theme-switch"
           type="button"
@@ -86,11 +114,32 @@ export function SiteHeader({
     </header>
   );
 }
+function SystemStatus() {
+  const [status, setStatus] = useState("checking");
+  useEffect(() => {
+    const c = new AbortController();
+    fetchHealth(c.signal)
+      .then(() => setStatus("online"))
+      .catch((e: unknown) => {
+        if (!(e instanceof DOMException && e.name === "AbortError"))
+          setStatus("unavailable");
+      });
+    return () => c.abort();
+  }, []);
+  return (
+    <div className="system-status" aria-live="polite">
+      <span className={`status-light ${status}`} aria-hidden="true" />
+      API {status}
+    </div>
+  );
+}
+
 export function SiteFooter() {
   return (
     <footer className="site-footer">
-      <p>Jerome Christian Ibon</p>
+      <p className="footer-brand">JEYSIBN · Jerome Christian Ibon</p>
       <p>React + TypeScript · Terraform-managed Azure backend</p>
+      <SystemStatus />
       <VisitorCounter />
     </footer>
   );

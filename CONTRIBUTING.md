@@ -95,13 +95,13 @@ For interactive changes, verify where relevant:
 - `prefers-reduced-motion` remains respected;
 - closed overlays do not block page interaction;
 - project and skill dialogs open and close correctly;
-- project cards use lightweight architecture previews during ordinary browsing;
+- all four project cards are visible without any selector and show a text flow rather than images during ordinary browsing;
 - full-resolution architecture images load only when the explicit architecture zoom is opened;
 - the visitor counter and AI assistant still function;
 - the health panel does not imply dependency health that `/api/health` does not test;
 - Release age is described as build/release metadata, not server uptime;
 - the monitoring card remains readable on phone widths;
-- Principles heading/body spacing and the engineering-principles card remain balanced across breakpoints;
+- section heading, eyebrow and ghost-numeral spacing remain balanced across breakpoints;
 - the compact theme control does not cause scroll jumps or focus-related page movement.
 - Playwright browser coverage remains green at 1920×1080, 1440×900, and the configured mobile device;
 - axe scans cover important open states, not only the initial document;

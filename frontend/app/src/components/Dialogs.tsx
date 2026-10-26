@@ -1,7 +1,8 @@
 import { useEffect, useRef } from "react";
 import type { Project } from "../portfolio";
 import { skillDetails } from "../skill-details";
-import type { SkillSelection } from "./capabilities/CapabilityMap";
+import type { SkillSelection } from "./capabilities/SkillGroups";
+import { ArchitectureFlow } from "./projects/ArchitectureFlow";
 
 function useDialog(open: boolean, onClose: () => void) {
   const ref = useRef<HTMLDialogElement>(null);
@@ -71,6 +72,7 @@ export function ProjectDialog({
               <h3 id="architecture-title">System architecture</h3>
               <p>Repository-derived · container-level views</p>
             </div>
+            <ArchitectureFlow flows={project.details.architectureFlows} />
             {project.architecture.diagrams.map((diagram) => (
               <figure className="architecture-figure" key={diagram.id}>
                 <figcaption>
