@@ -75,38 +75,14 @@ jobs:
           git commit -m "deploy: portfolio ${GITHUB_SHA}"
           git push origin main
 
-      - name: Verify deployed frontend
-        env:
-          PAGE_URL: https://jeysibn.github.io/
-        run: |
-          set -euo pipefail
-
-          for attempt in {1..6}; do
-            if page=$(curl --silent --show-error --fail --max-time 15 "$PAGE_URL"); then
-              if grep -q "Jerome Ibon" <<< "$page"; then
-                echo "GitHub Pages smoke test passed."
-                exit 0
-              fi
-            fi
-
-            echo "Frontend verification attempt $attempt/6 failed; retrying in 10 seconds..."
-            sleep 10
-          done
-
-          echo "GitHub Pages deployment could not be verified."
-          exit 1
-
-      - name: Smoke test published frontend
-        working-directory: frontend/app
-        env:
-          PLAYWRIGHT_BASE_URL: https://jeysibn.github.io
-        run: npm run test:ui -- --project=desktop-1920 tests/ui/portfolio.spec.ts
+      - name: Wait for GitHub Pages to serve the new build
+        run: bash frontend/app/scripts/verify-published.sh https://jeysibn.github.io frontend/app/dist 30 10
 
       - name: Deployment summary
         if: success()
         run: |
           echo "## React Frontend Deployment ✅" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "Vite production build published to Jeysibn/jeysibn.github.io and verified on GitHub Pages." >> "$GITHUB_STEP_SUMMARY"
+          echo "Vite production build published to Jeysibn/jeysibn.github.io; GitHub Pages was confirmed to serve every built file byte for byte." >> "$GITHUB_STEP_SUMMARY"
           echo "**Source commit:** ${{ github.sha }}" >> "$GITHUB_STEP_SUMMARY"
           echo "**URL:** https://jeysibn.github.io/" >> "$GITHUB_STEP_SUMMARY"
