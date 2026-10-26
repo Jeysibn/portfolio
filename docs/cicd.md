@@ -261,6 +261,8 @@ Azure OIDC login
 
 A fresh plan is generated on `main` even when PR validation previously generated one because remote state may change between review and merge.
 
+The PR validation plan runs with `-lock=false` because it only reads state. A newer push cancels the older run, and a plan cancelled mid-run would otherwise leave the remote state locked and fail the next run. The `main` deployment keeps the default locking for apply.
+
 ## Frontend Asset Delivery
 
 The Vite build contains the application JavaScript/CSS and static public assets. The project cards display typed one-line delivery flows, while the inspection dialog exposes the complete repository-derived SVG architecture set.
