@@ -224,9 +224,13 @@ jobs:
           TF_VAR_opencode_api_key: ${{ secrets.OPENCODE_API_KEY }}
           TF_VAR_visitor_hash_secret: ${{ secrets.VISITOR_HASH_SECRET }}
           TF_VAR_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        # A PR plan only reads state, so it does not take the state lock. If a
+        # run is cancelled mid-plan (a newer push cancels the older run), it
+        # can no longer leave the lock behind and block the next run.
         run: |
           terraform plan \
             -input=false \
+            -lock=false \
             -no-color \
             -out=tfplan
 

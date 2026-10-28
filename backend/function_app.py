@@ -70,7 +70,7 @@ OUT_OF_SCOPE_MESSAGE = (
     "or technologies as they relate to his documented work."
 )
 
-AI_MODEL = os.environ.get("AI_MODEL", "mimo-v2.5-free")
+AI_MODEL = os.environ.get("AI_MODEL", "mimo-v2.6-flash-free")
 AI_BASE_URL = os.environ.get("AI_BASE_URL", "https://opencode.ai/zen/v1")
 AI_TEMPERATURE = float(os.environ.get("AI_TEMPERATURE", "0.35"))
 AI_MAX_TOKENS_DEFAULT = 800
